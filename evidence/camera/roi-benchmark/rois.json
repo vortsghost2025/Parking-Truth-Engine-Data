@@ -1,0 +1,1276 @@
+{
+ "images": {
+  "000500": {
+   "camera": "PAPINEAU/ST-GREGOIRE 710-467",
+   "size": [
+    352,
+    240
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "lot + street",
+   "bays": [
+    {
+     "id": "000500-B1",
+     "poly": [
+      70,
+      78,
+      125,
+      148
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "000500-B2",
+     "poly": [
+      125,
+      80,
+      170,
+      145
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "000500-B3",
+     "poly": [
+      170,
+      78,
+      200,
+      112
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "000500-B4",
+     "poly": [
+      280,
+      70,
+      352,
+      100
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "000500-B5",
+     "poly": [
+      0,
+      105,
+      70,
+      150
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "000500-B6",
+     "poly": [
+      205,
+      115,
+      275,
+      150
+     ],
+     "gt": "UNKNOWN",
+     "why": "curb gap, cannot verify empty"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "001250": {
+   "camera": "FLEURY/ST-MICHEL 5914-006",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "right curb row",
+   "bays": [
+    {
+     "id": "001250-B1",
+     "poly": [
+      430,
+      250,
+      520,
+      310
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001250-B2",
+     "poly": [
+      520,
+      305,
+      575,
+      350
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001250-B3",
+     "poly": [
+      540,
+      325,
+      605,
+      370
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001250-B4",
+     "poly": [
+      575,
+      350,
+      655,
+      400
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001250-B5",
+     "poly": [
+      610,
+      375,
+      704,
+      440
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001250-B6",
+     "poly": [
+      400,
+      240,
+      430,
+      280
+     ],
+     "gt": "VACANT",
+     "why": "empty curb before row starts"
+    },
+    {
+     "id": "001250-B7",
+     "poly": [
+      10,
+      280,
+      80,
+      315
+     ],
+     "gt": "UNKNOWN",
+     "why": "travel lane vs parked ambiguous"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "001625": {
+   "camera": "ST-LAURENT/SHERBROOKE 368-072",
+   "size": [
+    352,
+    288
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "commercial rows both sides",
+   "bays": [
+    {
+     "id": "001625-B1",
+     "poly": [
+      120,
+      95,
+      150,
+      130
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001625-B2",
+     "poly": [
+      150,
+      90,
+      180,
+      135
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001625-B3",
+     "poly": [
+      180,
+      100,
+      210,
+      145
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001625-B4",
+     "poly": [
+      205,
+      115,
+      240,
+      150
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "001625-B5",
+     "poly": [
+      330,
+      165,
+      352,
+      225
+     ],
+     "gt": "UNKNOWN",
+     "why": "foreground car at intersection"
+    },
+    {
+     "id": "001625-B6",
+     "poly": [
+      240,
+      100,
+      300,
+      140
+     ],
+     "gt": "UNKNOWN",
+     "why": "cannot verify gap beyond rows"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "003500": {
+   "camera": "BLEURY/PARC/SHERBROOKE 298-129",
+   "size": [
+    352,
+    240
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "night right-curb row",
+   "bays": [
+    {
+     "id": "003500-B1",
+     "poly": [
+      225,
+      145,
+      265,
+      180
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "003500-B2",
+     "poly": [
+      210,
+      170,
+      255,
+      205
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "003500-B3",
+     "poly": [
+      175,
+      190,
+      250,
+      240
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "003500-B4",
+     "poly": [
+      255,
+      120,
+      285,
+      150
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "003500-B5",
+     "poly": [
+      150,
+      200,
+      180,
+      230
+     ],
+     "gt": "UNKNOWN",
+     "why": "night, cannot verify"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "003875": {
+   "camera": "CHERRIER/MONTCALM/SHERBROOK 483-321",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "night left-curb row",
+   "bays": [
+    {
+     "id": "003875-B1",
+     "poly": [
+      70,
+      275,
+      180,
+      335
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "003875-B2",
+     "poly": [
+      230,
+      220,
+      310,
+      275
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "003875-B3",
+     "poly": [
+      295,
+      210,
+      355,
+      260
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "003875-B4",
+     "poly": [
+      180,
+      260,
+      230,
+      300
+     ],
+     "gt": "VACANT",
+     "why": "visible empty curb gap"
+    },
+    {
+     "id": "003875-B5",
+     "poly": [
+      440,
+      165,
+      490,
+      210
+     ],
+     "gt": "UNKNOWN",
+     "why": "distant pair ambiguous"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "004125": {
+   "camera": "AMHERST/MAISONNEUVE 471-282",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "right-curb row",
+   "bays": [
+    {
+     "id": "004125-B1",
+     "poly": [
+      315,
+      120,
+      350,
+      150
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004125-B2",
+     "poly": [
+      340,
+      130,
+      370,
+      155
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004125-B3",
+     "poly": [
+      360,
+      140,
+      395,
+      170
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004125-B4",
+     "poly": [
+      390,
+      155,
+      430,
+      190
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004125-B5",
+     "poly": [
+      415,
+      170,
+      465,
+      210
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004125-B6",
+     "poly": [
+      280,
+      110,
+      315,
+      140
+     ],
+     "gt": "VACANT",
+     "why": "curb empty before row starts"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "004250": {
+   "camera": "NOTRE-DAME/ST-ANTOINE 722-512",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "upper-left lot + street row",
+   "bays": [
+    {
+     "id": "004250-B1",
+     "poly": [
+      20,
+      90,
+      80,
+      125
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004250-B2",
+     "poly": [
+      65,
+      95,
+      130,
+      130
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004250-B3",
+     "poly": [
+      110,
+      120,
+      165,
+      158
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004250-B4",
+     "poly": [
+      165,
+      90,
+      230,
+      120
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004250-B5",
+     "poly": [
+      230,
+      120,
+      280,
+      150
+     ],
+     "gt": "UNKNOWN",
+     "why": "lot gap unverifiable"
+    },
+    {
+     "id": "004250-B6",
+     "poly": [
+      280,
+      95,
+      360,
+      135
+     ],
+     "gt": "UNKNOWN",
+     "why": "street row, moving vs parked ambiguous"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "004500": {
+   "camera": "CRESCENT/MAISONNEUVE 304-185",
+   "size": [
+    352,
+    240
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "left curb, tree occlusion",
+   "bays": [
+    {
+     "id": "004500-B1",
+     "poly": [
+      60,
+      115,
+      130,
+      158
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004500-B2",
+     "poly": [
+      90,
+      125,
+      170,
+      182
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004500-B3",
+     "poly": [
+      0,
+      135,
+      65,
+      195
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "004500-B4",
+     "poly": [
+      250,
+      45,
+      325,
+      105
+     ],
+     "gt": "UNKNOWN",
+     "why": "occluded upper area"
+    },
+    {
+     "id": "004500-B5",
+     "poly": [
+      175,
+      100,
+      250,
+      140
+     ],
+     "gt": "UNKNOWN",
+     "why": "tree-occluded middle stretch"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "005000": {
+   "camera": "COTE-DES-NEIGES/DR-PENFIELD 271-369",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "right-curb row",
+   "bays": [
+    {
+     "id": "005000-B1",
+     "poly": [
+      420,
+      220,
+      490,
+      260
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005000-B2",
+     "poly": [
+      510,
+      235,
+      595,
+      280
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005000-B3",
+     "poly": [
+      590,
+      245,
+      670,
+      280
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005000-B4",
+     "poly": [
+      620,
+      325,
+      704,
+      410
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005000-B5",
+     "poly": [
+      460,
+      295,
+      545,
+      360
+     ],
+     "gt": "UNKNOWN",
+     "why": "parked vs stopped-in-lane ambiguous"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "005375": {
+   "camera": "CHRISTOPHE-COLOMB/JACQUES-CAS 1436-424",
+   "size": [
+    352,
+    240
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "marked lot stalls right",
+   "bays": [
+    {
+     "id": "005375-B1",
+     "poly": [
+      195,
+      140,
+      260,
+      185
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005375-B2",
+     "poly": [
+      230,
+      110,
+      285,
+      150
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005375-B3",
+     "poly": [
+      110,
+      175,
+      205,
+      240
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005375-B4",
+     "poly": [
+      0,
+      180,
+      30,
+      225
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005375-B5",
+     "poly": [
+      275,
+      90,
+      310,
+      130
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005375-B6",
+     "poly": [
+      120,
+      90,
+      155,
+      115
+     ],
+     "gt": "UNKNOWN",
+     "why": "distant single box, context unclear"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "005500": {
+   "camera": "MONT-ROYAL/ST-LAURENT 539-322",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "right-curb delivery row",
+   "bays": [
+    {
+     "id": "005500-B1",
+     "poly": [
+      285,
+      190,
+      330,
+      225
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005500-B2",
+     "poly": [
+      335,
+      165,
+      380,
+      200
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005500-B3",
+     "poly": [
+      375,
+      160,
+      420,
+      200
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005500-B4",
+     "poly": [
+      430,
+      170,
+      465,
+      195
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005500-B5",
+     "poly": [
+      475,
+      190,
+      525,
+      235
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005500-B6",
+     "poly": [
+      575,
+      200,
+      704,
+      340
+     ],
+     "gt": "UNKNOWN",
+     "why": "box truck, loading vs parked ambiguous"
+    },
+    {
+     "id": "005500-B7",
+     "poly": [
+      540,
+      395,
+      675,
+      450
+     ],
+     "gt": "UNKNOWN",
+     "why": "cut-off foreground vehicle"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "005875": {
+   "camera": "COTE-ST-PAUL/NOTRE-DAME 224-349",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "night, both curbs parked rows",
+   "bays": [
+    {
+     "id": "005875-B1",
+     "poly": [
+      0,
+      260,
+      130,
+      360
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005875-B2",
+     "poly": [
+      110,
+      235,
+      200,
+      300
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005875-B3",
+     "poly": [
+      190,
+      215,
+      265,
+      265
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005875-B4",
+     "poly": [
+      285,
+      185,
+      335,
+      225
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005875-B5",
+     "poly": [
+      525,
+      205,
+      590,
+      260
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005875-B6",
+     "poly": [
+      535,
+      160,
+      580,
+      205
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "005875-B7",
+     "poly": [
+      235,
+      190,
+      310,
+      240
+     ],
+     "gt": "UNKNOWN",
+     "why": "mid-road position ambiguous"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "006375": {
+   "camera": "NOTRE-DAME/ROSE-DE-LIMA 755-376",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "right-curb row",
+   "bays": [
+    {
+     "id": "006375-B1",
+     "poly": [
+      340,
+      130,
+      370,
+      160
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "006375-B2",
+     "poly": [
+      360,
+      150,
+      392,
+      175
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "006375-B3",
+     "poly": [
+      385,
+      168,
+      430,
+      205
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "006375-B4",
+     "poly": [
+      300,
+      105,
+      325,
+      120
+     ],
+     "gt": "UNKNOWN",
+     "why": "tiny distant box"
+    },
+    {
+     "id": "006375-B5",
+     "poly": [
+      430,
+      180,
+      470,
+      210
+     ],
+     "gt": "VACANT",
+     "why": "row ends, curb continues empty"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "006875": {
+   "camera": "MONT-ROYAL/RESTHER/ST-HUBER 599-284",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "night, dark right curb",
+   "bays": [
+    {
+     "id": "006875-B1",
+     "poly": [
+      360,
+      250,
+      400,
+      280
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "006875-B2",
+     "poly": [
+      400,
+      245,
+      440,
+      275
+     ],
+     "gt": "UNKNOWN",
+     "why": "second car uncertain in dark"
+    },
+    {
+     "id": "006875-B3",
+     "poly": [
+      320,
+      255,
+      360,
+      285
+     ],
+     "gt": "UNKNOWN",
+     "why": "dark gap/car ambiguous"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "007125": {
+   "camera": "NOTRE-DAME/PL-DARMES/ST-SU 1462-442",
+   "size": [
+    352,
+    288
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "left-curb row",
+   "bays": [
+    {
+     "id": "007125-B1",
+     "poly": [
+      120,
+      245,
+      220,
+      288
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "007125-B2",
+     "poly": [
+      178,
+      160,
+      218,
+      196
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "007125-B3",
+     "poly": [
+      200,
+      135,
+      240,
+      165
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "007125-B4",
+     "poly": [
+      230,
+      105,
+      265,
+      140
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "007125-B5",
+     "poly": [
+      265,
+      95,
+      290,
+      115
+     ],
+     "gt": "UNKNOWN",
+     "why": "tiny edge-of-row box"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "007500": {
+   "camera": "ROSE-DE-LIMA/ST-JACQUES 250-351",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "left-curb row + bus lane",
+   "bays": [
+    {
+     "id": "007500-B1",
+     "poly": [
+      275,
+      195,
+      355,
+      242
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "007500-B2",
+     "poly": [
+      340,
+      180,
+      405,
+      212
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "007500-B3",
+     "poly": [
+      372,
+      168,
+      430,
+      200
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "007500-B4",
+     "poly": [
+      435,
+      145,
+      495,
+      178
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "007500-B5",
+     "poly": [
+      0,
+      300,
+      170,
+      372
+     ],
+     "gt": "UNKNOWN",
+     "why": "foreground car, travel vs double-parked ambiguous"
+    },
+    {
+     "id": "007500-B6",
+     "poly": [
+      495,
+      140,
+      530,
+      170
+     ],
+     "gt": "VACANT",
+     "why": "row ends before intersection"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "008500": {
+   "camera": "EGLISE/LASALLE 14226-311",
+   "size": [
+    704,
+    480
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "right-curb row; same camera different PTZ view from 008750",
+   "bays": [
+    {
+     "id": "008500-B1",
+     "poly": [
+      435,
+      105,
+      480,
+      150
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "008500-B2",
+     "poly": [
+      475,
+      130,
+      532,
+      175
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "008500-B3",
+     "poly": [
+      500,
+      148,
+      570,
+      192
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "008500-B4",
+     "poly": [
+      255,
+      155,
+      322,
+      215
+     ],
+     "gt": "UNKNOWN",
+     "why": "mid-road queued vs parked ambiguous"
+    },
+    {
+     "id": "008500-B5",
+     "poly": [
+      75,
+      225,
+      250,
+      330
+     ],
+     "gt": "UNKNOWN",
+     "why": "SUV crossing intersection, moving"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  },
+  "009250": {
+   "camera": "75E AV/AIRLIE/LA VERENDRYE 9182-238",
+   "size": [
+    352,
+    240
+   ],
+   "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+   "note": "lot row right + left pair",
+   "bays": [
+    {
+     "id": "009250-B1",
+     "poly": [
+      240,
+      135,
+      265,
+      150
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "009250-B2",
+     "poly": [
+      265,
+      160,
+      290,
+      180
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "009250-B3",
+     "poly": [
+      300,
+      150,
+      330,
+      180
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "009250-B4",
+     "poly": [
+      335,
+      170,
+      352,
+      195
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "009250-B5",
+     "poly": [
+      45,
+      145,
+      100,
+      162
+     ],
+     "gt": "OCCUPIED"
+    },
+    {
+     "id": "009250-B6",
+     "poly": [
+      265,
+      135,
+      300,
+      155
+     ],
+     "gt": "UNKNOWN",
+     "why": "tight lot gap unverifiable"
+    }
+   ],
+   "manual_roi": true,
+   "geo_aligned": false
+  }
+ }
+}
