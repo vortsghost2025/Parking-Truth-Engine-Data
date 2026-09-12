@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/vortsghost2025/Parking-Truth-Engine-Data/schemas/parking-telemetry-event-schema.json",
+  "title": "PTE Normalised Parking Telemetry Event",
+  "description": "One parking telemetry event: a bay being used, or a bay being left. Emitted identically by both harvester modes so a downstream consumer cannot tell whether the transition came from live snapshot-diffing or from a historical parking-event archive. AVAILABILITY LANE ONLY - this schema deliberately contains no legality verdict field, and every event carries legalityClaimed=false. Restriction and overstay are carried as observed inventory/metadata, never as a verdict; legality comes from the deterministic rule kernel.",
+  "type": "object",
+  "required": ["eventType", "sourceMode", "bayKey", "sourceId", "timeConfidence", "legalityClaimed"],
+  "additionalProperties": true,
+  "properties": {
+    "eventType": {
+      "type": "string",
+      "enum": ["ARRIVAL", "DEPARTURE", "PARKING_EVENT", "STATUS_UNKNOWN_TRANSITION"],
+      "description": "ARRIVAL = bay became used. DEPARTURE = bay became free. PARKING_EVENT = a historical archive row that already pairs an arrival with a departure. STATUS_UNKNOWN_TRANSITION = status changed to or from a value that is neither free nor occupied (e.g. Restricted, Unofficial, sensor fault); recorded rather than guessed."
+    },
+    "sourceMode": {
+      "type": "string",
+      "enum": ["live-diff", "historical-archive", "crowdsourced", "simulated"],
+      "description": "Provenance of the transition. Determines what timeConfidence is achievable."
+    },
+    "bayKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable per-bay identifier from the source (Melbourne: marker_id / kerbside_id / bay_id). The join key for occupancy-to-geometry work."
+    },
+    "sourceId": {
+      "type": "string",
+      "description": "Dataset or feed identifier, e.g. on-street-parking-bay-sensors or melbourne-2020-jan-may."
+    },
+    "street": { "type": ["string", "null"] },
+    "betweenStreet1": { "type": ["string", "null"], "description": "Cross street bounding the kerb span. Present in Melbourne archives." },
+    "betweenStreet2": { "type": ["string", "null"] },
+    "areaName": { "type": ["string", "null"], "description": "Precinct/zone label from the source." },
+    "restriction": {
+      "type": ["string", "null"],
+      "description": "OBSERVED inventory metadata only (e.g. 1P, 2P, Loading Zone). NOT a legality verdict. Values ending in 'OLD' mean the restriction changed after the event or the sensor was replaced - see dataQuality sign_old_suffix."
+    },
+    "overstay": {
+      "type": ["boolean", "null"],
+      "description": "Publisher-supplied overstay flag where available. An observation about a past event, not a determination about a proposed future interval, so it must not feed the legality kernel."
+    },
+    "lat": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+    "lon": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
+    "fromStatus": {
+      "type": ["string", "null"],
+      "enum": ["FREE", "OCCUPIED", "UNKNOWN", null],
+      "description": "live-diff only: status before the transition."
+    },
+    "toStatus": {
+      "type": ["string", "null"],
+      "enum": ["FREE", "OCCUPIED", "UNKNOWN", null],
+      "description": "live-diff only: status after the transition."
+    },
+    "arrivalTime": { "type": ["string", "null"], "format": "date-time", "description": "ISO-8601 UTC." },
+    "departureTime": { "type": ["string", "null"], "format": "date-time", "description": "ISO-8601 UTC." },
+    "arrivalEpoch": { "type": ["number", "null"] },
+    "departureEpoch": { "type": ["number", "null"] },
+    "observedAt": { "type": ["string", "null"], "format": "date-time", "description": "live-diff only: when the transition was observed." },
+    "observationWindowSeconds": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "live-diff only: the poll interval that bounds the true transition time. The real event happened somewhere inside this window; its exact time is UNKNOWN."
+    },
+    "durationSeconds": {
+      "type": ["number", "null"],
+      "description": "Stay duration. MAY BE NEGATIVE in source data - a documented Melbourne sensor fault where arrival was detected after departure. Flagged as negative_duration and never silently coerced to zero."
+    },
+    "durationMinutes": { "type": ["number", "null"] },
+    "timeConfidence": {
+      "type": "string",
+      "enum": ["OBSERVED", "EPOCH", "DERIVED", "IMPUTED", "UNPARSEABLE", "MISSING", "UNKNOWN"],
+      "description": "The single most important field in this schema. OBSERVED = real sensor timestamp. EPOCH = numeric timestamp. DERIVED = inferred by diffing two state snapshots, bounded by the poll interval. IMPUTED = publisher calculated it from midnight because the sensor time was not recorded; NOT an observation. UNPARSEABLE/MISSING = no usable time. Any hour-of-day or stay-duration analysis must stratify on this field or it will silently mix observed and imputed data."
+    },
+    "timeConfidenceNote": { "type": ["string", "null"] },
+    "sourceHealth": {
+      "type": ["string", "null"],
+      "enum": ["FRESH", "STALE", "DEGRADED", "UNAVAILABLE", "UNKNOWN", null],
+      "description": "Matches the PTE source-health vocabulary. Derived from the lag between poll time and the newest source 'lastupdated' value, because the publisher warns this feed goes through network relays and can be disrupted."
+    },
+    "retrievedAtEpoch": { "type": ["number", "null"] },
+    "dataQuality": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "sign_old_suffix",
+          "negative_duration",
+          "missing_times_imputed",
+          "overstayed",
+          "unknown_status_transition",
+          "cross_year_excluded"
+        ]
+      },
+      "description": "Defect flags. Counted and surfaced, never silently dropped. The first four correspond to defects the City of Melbourne documents for its own archives; cross_year_excluded records the publisher's year-boundary truncation, which right-censors the stay distribution.",
+      "default": []
+    },
+    "provider": { "type": ["string", "null"], "description": "crowdsourced mode only." },
+    "deviceId": { "type": ["string", "null"], "description": "crowdsourced mode only. Must be pseudonymised before persistence." },
+    "synthetic": {
+      "type": "boolean",
+      "default": false,
+      "description": "true when the event came from tools/realtime-sim rather than a real source."
+    },
+    "legalityClaimed": {
+      "type": "boolean",
+      "const": false,
+      "description": "Always false. A structural assertion of the README invariant that occupancy and availability evidence can never determine legality. If this is ever true, the event is invalid."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "sourceMode": { "const": "live-diff" } } },
+      "then": {
+        "required": ["fromStatus", "toStatus", "observedAt", "observationWindowSeconds"],
+        "properties": { "timeConfidence": { "const": "DERIVED" } }
+      }
+    },
+    {
+      "if": { "properties": { "sourceMode": { "const": "historical-archive" } } },
+      "then": {
+        "description": "A historical row must carry at least one of an arrival time or a duration, otherwise the harvester skips it as no_time_information.",
+        "anyOf": [
+          { "required": ["arrivalTime"] },
+          { "required": ["durationSeconds"] }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,291 @@
+{
+  "policy": "Large publicly reproducible sources are referenced by URL+SHA-256+metadata, not stored as bytes here. tools/telemetry/telemetry_harvester.py enforces this in code: archives stream to a temp dir outside the repo, are hashed while reading, and are deleted unless --keep-download.",
+  "recordId": "PTE-TEL-001",
+  "snapshotDate": "2026-09-12",
+  "relatedDoc": "docs/REAL-PARKING-TELEMETRY-SOURCES.md",
+  "relatedSchema": "schemas/parking-telemetry-event-schema.json",
+  "lane": "AVAILABILITY",
+  "legalityClaimed": false,
+  "sandboxLimitation": "bash in the authoring environment has no outbound network. No archive body and no live record payload was fetched. All row counts, byte sizes and publisher defect notes are CITED from portal/dataset metadata, not measured locally. Run `telemetry_harvester.py probe` from a normal network before relying on any endpoint URL here.",
+
+  "headline": {
+    "finding": "Real per-bay parking arrival/departure telemetry already exists at ~246 million quantified rows across 2014-2020 (plus a 2012 archive), openly licensed CC-BY. It does not need to be generated or simulated.",
+    "publisher": "City of Melbourne Open Data",
+    "portal": "https://data.melbourne.vic.gov.au",
+    "portalPlatform": "Opendatasoft (migrated OFF Socrata - see brokenSources)",
+    "quantifiedTotalRows": 246100000,
+    "quantifiedTotalCompressedBytes": "~6.2 GB",
+    "whatARowIs": "Publisher: 'These sensors record when a vehicle arrives and when it departs. Each record also includes the parking restriction for the bay and whether the vehicle has overstayed that restriction. An event will include if a vehicle was present or not which can determine stay time and vacancy time.'"
+  },
+
+  "historicalEventArchives": [
+    {
+      "year": "2014",
+      "dataset": "on-street-car-parking-sensor-data-2014",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-sensor-data-2014/",
+      "exportCsv": "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-car-parking-sensor-data-2014/exports/csv",
+      "rows": 51500000,
+      "compressed": "1.56GB",
+      "license": "CC-BY-4.0",
+      "sha256": null,
+      "preservedAs": "reference only",
+      "publisherDocumentedDefects": {
+        "sign_old_suffix_rows": 1126441,
+        "cross_year_excluded_rows": 3377,
+        "negative_duration": "present, count not published",
+        "missing_times_imputed": "present, count not published"
+      }
+    },
+    {
+      "year": "2015",
+      "dataset": "on-street-car-parking-sensor-data-2015",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-sensor-data-2015/",
+      "exportCsv": "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-car-parking-sensor-data-2015/exports/csv",
+      "directZip": "https://opendatasoft-s3.s3.amazonaws.com/downloads/archive/apua-t2tb.zip",
+      "rows": 37500000,
+      "compressed": "1.17GB",
+      "license": "CC-BY-3.0-AU (per data.gov.au listing)",
+      "dataGovAu": "https://data.gov.au/data/dataset/on-street-car-parking-sensor-data-20151",
+      "sha256": null,
+      "preservedAs": "reference only",
+      "publisherDocumentedDefects": { "sign_old_suffix_rows": 453178, "cross_year_excluded_rows": 4138 }
+    },
+    {
+      "year": "2016",
+      "dataset": "on-street-car-parking-sensor-data-2016",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-sensor-data-2016/",
+      "exportCsv": "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-car-parking-sensor-data-2016/exports/csv",
+      "rows": 34100000,
+      "compressed": "1.07GB",
+      "license": "CC-BY-4.0",
+      "sha256": null,
+      "preservedAs": "reference only",
+      "publisherDocumentedDefects": { "sign_old_suffix_rows": 342475, "cross_year_excluded_rows": 4346 }
+    },
+    {
+      "year": "2017",
+      "dataset": "on-street-car-parking-sensor-data-2017",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-sensor-data-2017/",
+      "exportCsv": "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-car-parking-sensor-data-2017/exports/csv",
+      "rows": 35900000,
+      "compressed": "1.13GB",
+      "license": "CC-BY-4.0",
+      "sha256": null,
+      "preservedAs": "reference only",
+      "publisherDocumentedDefects": { "sign_old_suffix_rows": 860, "cross_year_excluded_rows": 3858 }
+    },
+    {
+      "year": "2018",
+      "dataset": "on-street-car-parking-sensor-data-2018",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-sensor-data-2018/",
+      "exportCsv": "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-car-parking-sensor-data-2018/exports/csv",
+      "rows": 30200000,
+      "compressed": "504MB",
+      "license": "CC-BY-4.0",
+      "sha256": null,
+      "preservedAs": "reference only",
+      "note": "Smallest full-year archive. Good second choice after 2020-jan-may."
+    },
+    {
+      "year": "2019",
+      "dataset": "on-street-car-parking-sensor-data-2019",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-sensor-data-2019/",
+      "exportCsv": "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-car-parking-sensor-data-2019/exports/csv",
+      "rows": 42700000,
+      "compressed": "717.1MB",
+      "license": "CC-BY-4.0",
+      "dataGovAu": "https://www.data.gov.au/data/dataset/on-street-car-parking-sensor-data-2019",
+      "sha256": null,
+      "preservedAs": "reference only",
+      "note": "Best full-year value: 42.7M rows at 717MB, the highest row-per-byte ratio of the full years."
+    },
+    {
+      "year": "2020-jan-may",
+      "dataset": "on-street-car-parking-sensor-data-2020-jan-may",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-sensor-data-2020-jan-may/",
+      "exportCsv": "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-car-parking-sensor-data-2020-jan-may/exports/csv",
+      "directZip": "https://opendatasoft-s3.s3.amazonaws.com/downloads/archive/4n3a-s6rn.zip",
+      "rows": 14200000,
+      "compressed": "258.5MB",
+      "license": "CC-BY-3.0-AU (per data.gov.au listing)",
+      "dataGovAu": "https://www.data.gov.au/data/dataset/on-street-car-parking-sensor-data-2020-jan-may1",
+      "sha256": null,
+      "preservedAs": "reference only",
+      "RECOMMENDED_FIRST_RUN": "Smallest archive at 258.5MB / 14.2M rows. Released by the publisher to support analysis of COVID-19 impact on city movement, so it is also an anomalous period - useful, but do not treat Jan-May 2020 as a normal-demand baseline.",
+      "coverageCaveat": "Jan-May only. No seasonality across a full year, and pandemic-distorted demand."
+    },
+    {
+      "year": "2012",
+      "dataset": "on-street-car-parking-sensor-data-2012",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-sensor-data-2012/",
+      "rows": null,
+      "compressed": null,
+      "license": "CC-BY-4.0",
+      "preservedAs": "reference only",
+      "note": "Existence confirmed via a data.gov.au parking-tag listing. Row count and size NOT CAPTURED in this preflight."
+    }
+  ],
+  "archiveCoverageGap": "No 2021-or-later historical event archive was found. For recent behaviour you must harvest the live feed and diff it. A 2013 archive is likely but was not confirmed.",
+
+  "liveSources": [
+    {
+      "artifact": "melbourne-on-street-parking-bay-sensors",
+      "dataset": "on-street-parking-bay-sensors",
+      "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-parking-bay-sensors/",
+      "publisher": "City of Melbourne",
+      "lane": "AVAILABILITY / near-real-time state",
+      "emitsEvents": false,
+      "emitsState": true,
+      "eventDerivation": "Poll and diff. Free->Occupied = ARRIVAL, Occupied->Free = DEPARTURE. timeConfidence=DERIVED, bounded by the poll interval.",
+      "knownFields": ["bay_id", "kerbside_id", "status", "lat", "lon", "street", "restriction", "sign", "lastupdated"],
+      "knownStatusValues": ["Free", "Occupied", "Restricted", "Unofficial"],
+      "statusSemantics": "Restricted and Unofficial are NEITHER free nor occupied. Must map to UNKNOWN, never coerced.",
+      "sensorCount": "4600+ on-street bays with in-ground sensors (cited)",
+      "license": "CC-BY-4.0",
+      "publisherOutageWarning": "'This dataset is updated through network relays and can be disrupted causing delays in data updates. Users of this data are encouraged to monitor the dataset's last updated timestamp (Lastupdated column) to check for delays in the data being updated.'",
+      "sourceHealthMapping": "harvester computes lag = pollTime - max(lastupdated) and maps it to FRESH / STALE / DEGRADED",
+      "candidateEndpoints": [
+        "https://data.melbourne.vic.gov.au/api/explore/v2.1/catalog/datasets/on-street-parking-bay-sensors/records?limit=5000&offset=0",
+        "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-parking-bay-sensors/records?rows=5000&start=0",
+        "https://data.melbourne.vic.gov.au/api/records/1.0/search/?dataset=on-street-parking-bay-sensors&rows=5000",
+        "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-parking-bay-sensors/exports/json",
+        "https://data.melbourne.vic.gov.au/api/v2/catalog/datasets/on-street-parking-bay-sensors/exports/geojson"
+      ],
+      "endpointVerificationStatus": "NOT VERIFIED from this sandbox. Run `telemetry_harvester.py probe` from a normal network and record which shape responds.",
+      "sha256": null,
+      "preservedAs": "reference only",
+      "censoringBias": "A bay occupied AND vacated between two polls is invisible. Short stays are systematically undercounted; the bias grows with poll interval. Must be stated in any stay-duration analysis built this way."
+    }
+  ],
+
+  "legalityLaneDatasets": {
+    "significance": "Melbourne publishes an explicit, key-based sign-to-curb attachment chain. README.md records this as the central UNRESOLVED Montreal question (PTE-007) and states it can be resolved by 'authoritative keys' or 'documented municipal methodology'. Melbourne supplies both. This makes Melbourne a candidate LEGALITY-lane city, not only an availability laboratory.",
+    "chain": "sign plate -> parking zone -> street segment  ||  sensor -> marker_id -> bay polygon -> bay_id -> restriction",
+    "datasets": [
+      {
+        "dataset": "sign-plates-located-in-each-parking-zone",
+        "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/sign-plates-located-in-each-parking-zone/",
+        "publisherDescription": "A sign plate is where the parking restrictions are displayed. This data set displays parking sign plates that are within a parking zone. There can be multiple restrictions per sign plate.",
+        "role": "sign -> zone"
+      },
+      {
+        "dataset": "parking-zones-linked-to-street-segments",
+        "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/parking-zones-linked-to-street-segments/",
+        "publisherDescription": "This dataset contains each parking zone and the street segment that it is linked to. The parking zone can go across multiple street segments and also one street segment can have multiple zones.",
+        "role": "zone -> curb span",
+        "note": "Many-to-many in BOTH directions per the publisher. Any attachment rule must handle that explicitly rather than assuming 1:1."
+      },
+      {
+        "dataset": "on-street-parking-bays",
+        "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-parking-bays/",
+        "publisherDescription": "This dataset contains spatial polygons which represent parking bays across the city. Each bay can also link to its parking meter, and parking sensor information.",
+        "role": "actual curb-span geometry",
+        "upstreamWarning": "Publisher: 'our parking system is being improved and this dataset may be disrupted.'"
+      },
+      {
+        "dataset": "on-street-car-park-bay-restrictions",
+        "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-park-bay-restrictions/",
+        "publisherDescription": "Each row contains information about the restriction applying to a bay.",
+        "role": "bay -> restriction"
+      },
+      {
+        "dataset": "on-street-car-parking-meters-with-location",
+        "landingPage": "https://data.melbourne.vic.gov.au/explore/dataset/on-street-car-parking-meters-with-location/",
+        "role": "payment instrument location (relevant to ALLOWED_PAID)"
+      },
+      {
+        "dataset": "parking-restrictions-southeast-cbd-only-2014",
+        "note": "A 2014 proof-of-concept survey covering 1/3 of the CBD, showing restrictions along lengths of CBD roads. Historical, partial, but a worked example of surveyed restriction spans."
+      }
+    ],
+    "documentedJoinKeys": {
+      "sensors_to_bays": "marker_id",
+      "sensors_to_bay_restrictions": "bay_id",
+      "bays_to_bay_restrictions": "DOES NOT CURRENTLY JOIN - stated by the publisher. Do not assume a transitive path.",
+      "sourceOfJoinDocumentation": "City of Melbourne portal schema notes, retrieved via search 2026-09-12"
+    },
+    "verificationStatus": "CITED. Dataset existence and descriptions verified from portal metadata; datasets not downloaded (no outbound network). Joins not empirically confirmed.",
+    "nextStep": "Fetch each, record URL + retrievedAt + SHA-256 + row count here, then test the joins. This also becomes the template for what to request from Montreal to resolve PTE-007."
+  },
+
+  "otherRealtimeFeeds": [
+    {
+      "artifact": "tfnsw-car-park-api",
+      "sourceUrl": "https://opendata.transport.nsw.gov.au/data/dataset/car-park-api",
+      "granularity": "AGGREGATE counts per facility, NOT per-bay",
+      "realtime": true,
+      "historical": true,
+      "access": "free registration + API key",
+      "value": "A genuinely documented, supported real-time API. Correct target for proving adapter architecture and HTTP/auth/retry behaviour.",
+      "preservedAs": "reference only",
+      "crossRef": "also recorded in manifests/hobart-availability-sources-manifest.json"
+    },
+    {
+      "artifact": "geelong-real-time-parking-sensors",
+      "sourceUrl": "https://www.geelongdataexchange.com.au/api/v2/catalog/datasets/real-time-parking-sensors-status/exports/json",
+      "granularity": "per-bay LoRa sensor status",
+      "realtime": true,
+      "license": "other-open - confirm before shipping",
+      "value": "Smallest open per-bay real-time feed; simplest smoke test",
+      "preservedAs": "reference only"
+    }
+  ],
+
+  "brokenSources": [
+    {
+      "sourceUrl": "https://data.melbourne.vic.gov.au/resource/vh2v-4nfs.json",
+      "verifiedStatus": "HTTP 404 - 'Page not found'",
+      "verifiedAt": "2026-09-12",
+      "reason": "City of Melbourne migrated its open data portal from Socrata to Opendatasoft. The Socrata SODA v2.0 dataset id vh2v-4nfs is dead. Any code, tutorial or notebook hardcoding it is already broken.",
+      "action": "Use the Opendatasoft shapes listed under liveSources.candidateEndpoints, and run `probe` to confirm which responds today."
+    },
+    {
+      "sourceUrl": "https://hobartcc.maps.arcgis.com/sharing/rest/content/items/ba937e74524740ba81655d907d7a4465?f=json",
+      "verifiedStatus": "ArcGIS error CONT_0001 - 'Item does not exist or is inaccessible.'",
+      "reason": "Retired, moved or made private since a 2024 community report cited it.",
+      "crossRef": "docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md finding H4"
+    }
+  ],
+
+  "rejectedSources": [
+    {
+      "sourceUrl": "https://api.openstreetmap.org/api/0.6/trackpoints?bbox=...&page=N",
+      "reason": "OSM's own API documentation states that for NON-TRACKABLE public traces, waypoints are 'randomized (or rather sorted by lat/lon)' for privacy. Dwell detection depends on intact temporal ordering, so derived parking events from the bulk trackpoints endpoint would be fiction. The endpoint also omits user IDs, so points cannot be reliably grouped into trips. Class: UNKNOWN, leaning do-not-use for arrival/departure telemetry. Acceptable only for coarse movement-density heatmaps.",
+      "documentedAt": "https://wiki.openstreetmap.org/wiki/API_v0.6"
+    },
+    {
+      "sourceUrl": "https://data-1-hobartcc.opendata.arcgis.com/datasets/parking-meters",
+      "reason": "Hobart, INDIANA, USA. Not Hobart, Tasmania."
+    }
+  ],
+
+  "localVerification": {
+    "fixture": "purpose-built 24,000-row CSV reproducing Melbourne's documented column names (Record ID, Marker ID, Status, Arrival Time, Departure Time, seconds, Sign, Overstay, Street, Between Street 1, Between Street 2, Area Name, Lat, Lon, In/Out, Lastupdated) and defect rates",
+    "columnMapping": "16/16 mapped; only genuinely-absent canonical names (numBays, distanceFromCbd) reported unmapped",
+    "defectRecovery": {
+      "negative_duration": { "detected": 649, "expected": 648, "injectionRate": "1/37" },
+      "missing_times_imputed": { "detected": 453, "expected": 453, "injectionRate": "1/53" },
+      "sign_old_suffix": { "detected": 3969, "note": "matches injected 2-of-12 sign values" }
+    },
+    "distributionRecovery": {
+      "generator": "lognormvariate(ln(544s), 1.0)",
+      "medianMinutesDetected": 9.08,
+      "medianMinutesExpected": 9.07,
+      "timeRangeDays": 140.68
+    },
+    "formatsVerified": ["plain CSV", "ZIP (streamed via zipfile, hashed, temp deleted)", "semicolon-delimited (auto-detected fallback)"],
+    "liveDiffVerified": {
+      "method": "mock Opendatasoft portal, 120 bays, 8% flip rate per poll",
+      "polls": 9,
+      "derivedEvents": 66,
+      "eventTypes": ["ARRIVAL", "DEPARTURE"],
+      "neitherStatusBaysCorrectlyUnknown": 2,
+      "observationWindowSeconds": 2.0,
+      "timeConfidence": "DERIVED",
+      "sourceHealth": "FRESH",
+      "errors": {}
+    },
+    "probeVerified": "3 of 5 candidate endpoint shapes identified as live; field lists and resolved column maps printed; recommendation written to out/probe/probe-result.json",
+    "notVerified": "Real Melbourne endpoints and real archive bodies. Sandbox bash has no outbound network; the page fetcher became unreliable for data.melbourne.vic.gov.au mid-session."
+  }
+}

@@ -88,6 +88,8 @@ docs/                  architecture, storage, status, and owner-review documenta
 tools/
   realtime-sim/        synthetic live availability feed + GPS trace replayer
                        (test rig only; NOT real parking data)
+  telemetry/           harvester for REAL parking arrival/departure telemetry
+                       (historical archives + live snapshot-diffing)
 ```
 
 Existing storage/migration documentation is preserved in `docs/PTE-LOCAL-EVIDENCE-INVENTORY.md`.
@@ -180,6 +182,16 @@ A central unresolved question is how a geolocated sign post and its arrow code a
 ### Melbourne
 
 Melbourne is used as an early software/data laboratory because it provides strong public occupancy, geometry, and historical parking datasets. Exact occupancy-to-geometry joins have been proven; some rule joins remain unresolved.
+
+Two findings materially raise Melbourne's role (PTE-TEL-001):
+
+**Real parking-event telemetry at scale.** The City of Melbourne publishes historical archives where each row is one real parking event with arrival time, departure time, duration, restriction and overstay flag — **≈246 million rows across 2014–2020**, CC-BY licensed. That is ground-truth occupancy transition telemetry rather than a proxy, so the availability lane does not need to *generate* data in order to be tested at realistic volume.
+
+**A documented sign-to-curb attachment chain.** Melbourne publishes `sign-plates-located-in-each-parking-zone` and `parking-zones-linked-to-street-segments`, with documented join keys `marker_id` (sensors↔bays) and `bay_id` (sensors↔restrictions). That is precisely the "authoritative keys / documented municipal methodology" this README says would resolve sign-to-curb attachment — the same question currently blocking Montréal PTE-007. Melbourne is therefore a worked template for what to request from Montréal, and a candidate **legality**-lane city rather than only an availability laboratory. The publisher states that bays↔bay-restrictions do **not** currently join, so no transitive path may be assumed.
+
+The publisher also documents four defects in its own archives: negative durations from arrival-detected-after-departure sensor faults, times imputed from midnight when not recorded, restrictions suffixed `OLD` where the rule changed after the event or the sensor was replaced, and year-boundary truncation of events crossing 31 December. These are counted and flagged, never silently coerced, and they are why the telemetry schema carries a `timeConfidence` field separating `OBSERVED` from `IMPUTED` from `DERIVED`.
+
+See [`docs/REAL-PARKING-TELEMETRY-SOURCES.md`](docs/REAL-PARKING-TELEMETRY-SOURCES.md) and [`tools/telemetry/`](tools/telemetry/).
 
 ### Los Angeles
 
@@ -298,7 +310,10 @@ Additional documentation:
 - [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md)
 - [`docs/PTE-LOCAL-EVIDENCE-INVENTORY.md`](docs/PTE-LOCAL-EVIDENCE-INVENTORY.md)
 - [`docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md`](docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md)
+- [`docs/REAL-PARKING-TELEMETRY-SOURCES.md`](docs/REAL-PARKING-TELEMETRY-SOURCES.md)
+- [`schemas/parking-telemetry-event-schema.json`](schemas/parking-telemetry-event-schema.json)
 - [`tools/realtime-sim/README.md`](tools/realtime-sim/README.md)
+- [`tools/telemetry/README.md`](tools/telemetry/README.md)
 
 ## Safety and scope
 
