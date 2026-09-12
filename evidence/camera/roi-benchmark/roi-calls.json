@@ -1,0 +1,911 @@
+[
+ {
+  "image": "000500",
+  "bay": "000500-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "000500",
+  "bay": "000500-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "000500",
+  "bay": "000500-B3",
+  "gt": "OCCUPIED",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.32
+ },
+ {
+  "image": "000500",
+  "bay": "000500-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "000500",
+  "bay": "000500-B5",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.889
+ },
+ {
+  "image": "000500",
+  "bay": "000500-B6",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "001250",
+  "bay": "001250-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "001250",
+  "bay": "001250-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.353
+ },
+ {
+  "image": "001250",
+  "bay": "001250-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.993
+ },
+ {
+  "image": "001250",
+  "bay": "001250-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "001250",
+  "bay": "001250-B5",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.928
+ },
+ {
+  "image": "001250",
+  "bay": "001250-B6",
+  "gt": "VACANT",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "001250",
+  "bay": "001250-B7",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "001625",
+  "bay": "001625-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "001625",
+  "bay": "001625-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "001625",
+  "bay": "001625-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "001625",
+  "bay": "001625-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.618
+ },
+ {
+  "image": "001625",
+  "bay": "001625-B5",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "001625",
+  "bay": "001625-B6",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "003500",
+  "bay": "003500-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "003500",
+  "bay": "003500-B2",
+  "gt": "OCCUPIED",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "UNKNOWN",
+  "overlap_score": 0.217
+ },
+ {
+  "image": "003500",
+  "bay": "003500-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "003500",
+  "bay": "003500-B4",
+  "gt": "OCCUPIED",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "003500",
+  "bay": "003500-B5",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "003875",
+  "bay": "003875-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.977
+ },
+ {
+  "image": "003875",
+  "bay": "003875-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "003875",
+  "bay": "003875-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "003875",
+  "bay": "003875-B4",
+  "gt": "VACANT",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "003875",
+  "bay": "003875-B5",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004125",
+  "bay": "004125-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004125",
+  "bay": "004125-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004125",
+  "bay": "004125-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004125",
+  "bay": "004125-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004125",
+  "bay": "004125-B5",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.945
+ },
+ {
+  "image": "004125",
+  "bay": "004125-B6",
+  "gt": "VACANT",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004250",
+  "bay": "004250-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004250",
+  "bay": "004250-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004250",
+  "bay": "004250-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004250",
+  "bay": "004250-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004250",
+  "bay": "004250-B5",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "004250",
+  "bay": "004250-B6",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004500",
+  "bay": "004500-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004500",
+  "bay": "004500-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004500",
+  "bay": "004500-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "004500",
+  "bay": "004500-B4",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "004500",
+  "bay": "004500-B5",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "005000",
+  "bay": "005000-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005000",
+  "bay": "005000-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.923
+ },
+ {
+  "image": "005000",
+  "bay": "005000-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005000",
+  "bay": "005000-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005000",
+  "bay": "005000-B5",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005375",
+  "bay": "005375-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005375",
+  "bay": "005375-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005375",
+  "bay": "005375-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005375",
+  "bay": "005375-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005375",
+  "bay": "005375-B5",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.837
+ },
+ {
+  "image": "005375",
+  "bay": "005375-B6",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005500",
+  "bay": "005500-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.883
+ },
+ {
+  "image": "005500",
+  "bay": "005500-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005500",
+  "bay": "005500-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.983
+ },
+ {
+  "image": "005500",
+  "bay": "005500-B4",
+  "gt": "OCCUPIED",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.394
+ },
+ {
+  "image": "005500",
+  "bay": "005500-B5",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.907
+ },
+ {
+  "image": "005500",
+  "bay": "005500-B6",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.975
+ },
+ {
+  "image": "005500",
+  "bay": "005500-B7",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "005875",
+  "bay": "005875-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.973
+ },
+ {
+  "image": "005875",
+  "bay": "005875-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005875",
+  "bay": "005875-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.996
+ },
+ {
+  "image": "005875",
+  "bay": "005875-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005875",
+  "bay": "005875-B5",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.994
+ },
+ {
+  "image": "005875",
+  "bay": "005875-B6",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "005875",
+  "bay": "005875-B7",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "006375",
+  "bay": "006375-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.947
+ },
+ {
+  "image": "006375",
+  "bay": "006375-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.709
+ },
+ {
+  "image": "006375",
+  "bay": "006375-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.996
+ },
+ {
+  "image": "006375",
+  "bay": "006375-B4",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.98
+ },
+ {
+  "image": "006375",
+  "bay": "006375-B5",
+  "gt": "VACANT",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "006875",
+  "bay": "006875-B1",
+  "gt": "OCCUPIED",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "006875",
+  "bay": "006875-B2",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "006875",
+  "bay": "006875-B3",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "007125",
+  "bay": "007125-B1",
+  "gt": "OCCUPIED",
+  "centroid": "UNKNOWN",
+  "centroid_score": 0.0,
+  "overlap": "UNKNOWN",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "007125",
+  "bay": "007125-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "007125",
+  "bay": "007125-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.943
+ },
+ {
+  "image": "007125",
+  "bay": "007125-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "007125",
+  "bay": "007125-B5",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.73
+ },
+ {
+  "image": "007500",
+  "bay": "007500-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "007500",
+  "bay": "007500-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.954
+ },
+ {
+  "image": "007500",
+  "bay": "007500-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "007500",
+  "bay": "007500-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "007500",
+  "bay": "007500-B5",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "007500",
+  "bay": "007500-B6",
+  "gt": "VACANT",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "UNKNOWN",
+  "overlap_score": 0.092
+ },
+ {
+  "image": "008500",
+  "bay": "008500-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "008500",
+  "bay": "008500-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.975
+ },
+ {
+  "image": "008500",
+  "bay": "008500-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.972
+ },
+ {
+  "image": "008500",
+  "bay": "008500-B4",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "008500",
+  "bay": "008500-B5",
+  "gt": "UNKNOWN",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "009250",
+  "bay": "009250-B1",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "009250",
+  "bay": "009250-B2",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "009250",
+  "bay": "009250-B3",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 0.64
+ },
+ {
+  "image": "009250",
+  "bay": "009250-B4",
+  "gt": "OCCUPIED",
+  "centroid": "OCCUPIED",
+  "centroid_score": 1.0,
+  "overlap": "OCCUPIED",
+  "overlap_score": 1.0
+ },
+ {
+  "image": "009250",
+  "bay": "009250-B5",
+  "gt": "OCCUPIED",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ },
+ {
+  "image": "009250",
+  "bay": "009250-B6",
+  "gt": "UNKNOWN",
+  "centroid": "VACANT",
+  "centroid_score": 0.0,
+  "overlap": "VACANT",
+  "overlap_score": 0.0
+ }
+]
