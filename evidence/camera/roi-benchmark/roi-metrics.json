@@ -1,0 +1,42 @@
+{
+ "bay_total": 101,
+ "gt": {
+  "OCCUPIED": 73,
+  "VACANT": 5,
+  "UNKNOWN": 23
+ },
+ "by_rule": [
+  {
+   "rule": "centroid",
+   "n_scored": 77,
+   "accuracy": 0.9091,
+   "precision": 0.9851,
+   "recall": 0.9167,
+   "F1": 0.9496,
+   "false_vacancy_rate": 0.0833,
+   "false_occupied": 1,
+   "unknown_predicted": 1,
+   "unknown_gt": 23,
+   "TP": 66,
+   "FP": 1,
+   "FN": 6,
+   "TN": 4
+  },
+  {
+   "rule": "overlap",
+   "n_scored": 75,
+   "accuracy": 0.9467,
+   "precision": 0.9855,
+   "recall": 0.9577,
+   "F1": 0.9714,
+   "false_vacancy_rate": 0.0423,
+   "false_occupied": 1,
+   "unknown_predicted": 3,
+   "unknown_gt": 23,
+   "TP": 68,
+   "FP": 1,
+   "FN": 3,
+   "TN": 3
+  }
+ ]
+}
