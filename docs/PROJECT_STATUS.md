@@ -12,7 +12,7 @@
 - Occupancy independence: implemented and regression tested
 - IANA timezone support: implemented
 - `America/Toronto` DST tests: implemented
-- Latest ordinary test result: **126/126 passing**
+- Latest ordinary core test result: **126/126 passing**
 
 ## Reliability / evidence service
 
@@ -80,27 +80,89 @@ Separate workspace:
 
 `S:\Parking-Truth-Engine-App`
 
-Reported implementation:
+### Application shell
+
+Implemented and verified locally:
 
 - Next.js
 - TypeScript
 - MapLibre
-- map/find-parking/my-car views
-- all normalized curb states
-- evidence/provenance inspector
+- map / Find Parking / My Car views
+- normalized curb-state legend
+- evidence / provenance inspector
 - source-health UI
-- legality/availability separation
+- legality / availability separation
 - responsive desktop/mobile layout
-- mock-data labeling
+- clear mock-data labeling
 
-Reported verification:
+### Contract hardening
 
-- typecheck passed
-- production build passed
-- desktop/mobile rendered
+The frontend integration boundary has now been explicitly typed and separated from mock implementation details.
+
+Added frontend API/domain modules:
+
+- `lib/api/types.ts`
+- `lib/api/client.ts`
+- `lib/api/mockClient.ts`
+- `lib/api/presentation.ts`
+- `lib/api/mockClient.test.ts`
+
+The contract now explicitly represents:
+
+- legality and availability as separate fields
+- availability states `HIGH`, `LIMITED`, `UNKNOWN`
+- legitimate legality `UNKNOWN`
+- conflict source/evidence lineage
+- requested/evaluated intervals
+- explanation and restrictions
+- provenance
+- source timestamps and freshness
+- payment / maximum-stay / move-by information where available
+- reliability classification
+- immutable parked verdict/evidence snapshots
+- source-health records
+
+The frontend uses a `ParkingTruthClient` boundary so the mock implementation can later be replaced by the live core API without reproducing the legality kernel in the UI.
+
+### Frontend verification
+
+Reported verification after contract hardening:
+
+- `npm run typecheck` — passed
+- `npm run test` — passed, **1 file / 6 tests**
+- `npm run build` — passed
+- Playwright smoke verification — passed
+- Find Parking returned 3 legal candidates
+- Park My Car snapshot persisted in the mock flow
+- source-health view opened successfully
+- no mobile horizontal overflow
 - no browser console errors
 
-Live Montréal integration remains intentionally paused until the real legality translation/coverage work is reviewed.
+Contract regression tests include the architectural invariants that:
+
+- `PROHIBITED + HIGH availability` remains prohibited
+- `UNKNOWN + HIGH availability` does not become allowed
+- conflict lineage retains disagreeing source/evidence references
+- source-health failure does not fabricate legality
+- Find Parking remains legality-gated
+- parked snapshots preserve the verdict/evidence state captured at parking time
+
+### Minimum core API capabilities required for live integration
+
+1. Stable curb-segment IDs and renderable geometry.
+2. Interval-evaluated legality verdicts including `UNKNOWN` and `CONFLICT`.
+3. Structured rules, restrictions, payment, maximum-stay, and move-by data where known.
+4. Evidence records with stable IDs, source IDs, observed/retrieved timestamps, freshness, and provenance.
+5. Conflict records retaining disagreeing source/evidence IDs.
+6. Reliability classification.
+7. Separate availability data, or an explicit `UNKNOWN` availability fallback.
+8. Source-health records for the evidence sources.
+
+Open contract questions remain documented, including time-limited Find Parking eligibility, source identity, geometry ownership, availability ownership, conflict-vs-unknown semantics, and parked-snapshot persistence.
+
+See `docs/FRONTEND_INTEGRATION_CONTRACT.md` for the owner-readable integration summary.
+
+**Live Montréal integration remains intentionally paused until PTE-007's Montréal translation and coverage work is reviewed.**
 
 ## Storage
 
