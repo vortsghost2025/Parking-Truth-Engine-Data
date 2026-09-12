@@ -1,0 +1,172 @@
+{
+ "schemaVersion": "pte-cam-003-roi-v1",
+ "protocol": "image-only ROI placement; detector boxes and VOC labels are not inputs",
+ "groundTruth": {
+  "status": "NOT_INDEPENDENTLY_LABELED",
+  "occupied": 0,
+  "vacant": 0,
+  "unknown": 0
+ },
+ "views": [
+  {
+   "cameraId": "5914-006",
+   "viewId": "view-01",
+   "roiVersion": "blind-v1",
+   "source": "BLIND_MANUAL",
+   "size": [
+    704,
+    480
+   ],
+   "imageIds": [
+    "001250",
+    "001375",
+    "001500"
+   ],
+   "notes": "Stable road-facing geometry reviewed across daylight and night; candidate curb regions only.",
+   "rois": [
+    {
+     "id": "5914-006-view-01-B1",
+     "poly": [
+      500,
+      245,
+      548,
+      292
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "blind-v1",
+     "source": "BLIND_MANUAL"
+    },
+    {
+     "id": "5914-006-view-01-B2",
+     "poly": [
+      545,
+      270,
+      592,
+      320
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "blind-v1",
+     "source": "BLIND_MANUAL"
+    },
+    {
+     "id": "5914-006-view-01-B3",
+     "poly": [
+      585,
+      300,
+      635,
+      350
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "blind-v1",
+     "source": "BLIND_MANUAL"
+    },
+    {
+     "id": "5914-006-view-01-B4",
+     "poly": [
+      625,
+      335,
+      678,
+      388
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "blind-v1",
+     "source": "BLIND_MANUAL"
+    },
+    {
+     "id": "5914-006-view-01-B5",
+     "poly": [
+      665,
+      375,
+      704,
+      435
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "blind-v1",
+     "source": "BLIND_MANUAL"
+    }
+   ]
+  }
+ ],
+ "assistedProposals": [
+  {
+   "cameraId": "5914-006",
+   "viewId": "view-01",
+   "roiVersion": "edge-proposal-v1",
+   "source": "ASSISTED_STATIC_EDGE",
+   "method": "fixed curb band plus visible parking-space edges",
+   "scored": false,
+   "rois": [
+    {
+     "id": "5914-006-view-01-P1",
+     "poly": [
+      492,
+      238,
+      555,
+      300
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "edge-proposal-v1",
+     "source": "ASSISTED_STATIC_EDGE"
+    },
+    {
+     "id": "5914-006-view-01-P2",
+     "poly": [
+      537,
+      262,
+      603,
+      326
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "edge-proposal-v1",
+     "source": "ASSISTED_STATIC_EDGE"
+    },
+    {
+     "id": "5914-006-view-01-P3",
+     "poly": [
+      578,
+      291,
+      647,
+      358
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "edge-proposal-v1",
+     "source": "ASSISTED_STATIC_EDGE"
+    },
+    {
+     "id": "5914-006-view-01-P4",
+     "poly": [
+      618,
+      326,
+      689,
+      398
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "edge-proposal-v1",
+     "source": "ASSISTED_STATIC_EDGE"
+    },
+    {
+     "id": "5914-006-view-01-P5",
+     "poly": [
+      655,
+      368,
+      704,
+      447
+     ],
+     "cameraId": "5914-006",
+     "viewId": "view-01",
+     "roiVersion": "edge-proposal-v1",
+     "source": "ASSISTED_STATIC_EDGE"
+    }
+   ]
+  }
+ ]
+}
