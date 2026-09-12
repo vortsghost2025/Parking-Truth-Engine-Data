@@ -1,0 +1,128 @@
+{
+ "schemaVersion": "pte-cam-003-view-evidence-v1",
+ "sample": "data/camera/montreal/source",
+ "method": {
+  "primary": "camera overlay plus fixed-scene landmarks",
+  "supporting": [
+   "pHash",
+   "dHash",
+   "overlay-masked pHash",
+   "overlay-masked ORB"
+  ],
+  "vehicleBoxesUsedForIdentity": false
+ },
+ "pairs": [
+  {
+   "leftImageId": "000125",
+   "rightImageId": "000250",
+   "leftCameraId": "7205-023",
+   "rightCameraId": "7205-023",
+   "staticScene": "SAME",
+   "classification": "SAME_VIEW",
+   "reviewBasis": "OVERLAY_AND_STATIC_LANDMARKS",
+   "notes": "same bridge approach, signal mast, guardrail, and roadway geometry",
+   "phashDistance": 10,
+   "dhashDistance": 9,
+   "maskedPhashDistance": 6,
+   "maskedOrbInliers": 192
+  },
+  {
+   "leftImageId": "001250",
+   "rightImageId": "001375",
+   "leftCameraId": "5914-006",
+   "rightCameraId": "5914-006",
+   "staticScene": "SAME",
+   "classification": "SAME_VIEW",
+   "reviewBasis": "OVERLAY_AND_STATIC_LANDMARKS",
+   "notes": "same Fleury/St-Michel road, Euro sign, speed sign, tree, and curb row",
+   "phashDistance": 10,
+   "dhashDistance": 16,
+   "maskedPhashDistance": 12,
+   "maskedOrbInliers": 174
+  },
+  {
+   "leftImageId": "001250",
+   "rightImageId": "001500",
+   "leftCameraId": "5914-006",
+   "rightCameraId": "5914-006",
+   "staticScene": "SAME",
+   "classification": "SAME_VIEW",
+   "reviewBasis": "OVERLAY_AND_STATIC_LANDMARKS",
+   "notes": "same geometry across daylight and night conditions",
+   "phashDistance": 32,
+   "dhashDistance": 30,
+   "maskedPhashDistance": 34,
+   "maskedOrbInliers": 0
+  },
+  {
+   "leftImageId": "008500",
+   "rightImageId": "008750",
+   "leftCameraId": "14226-311",
+   "rightCameraId": "14226-311",
+   "staticScene": "UNKNOWN",
+   "classification": "AMBIGUOUS",
+   "reviewBasis": "OVERLAY_AND_STATIC_LANDMARKS",
+   "notes": "same camera label and broad scene, but curb-row framing shifts; shared ROIs are not accepted",
+   "phashDistance": 16,
+   "dhashDistance": 16,
+   "maskedPhashDistance": 18,
+   "maskedOrbInliers": 0
+  },
+  {
+   "leftImageId": "009000",
+   "rightImageId": "009125",
+   "leftCameraId": "9182-238",
+   "rightCameraId": "9182-238",
+   "staticScene": "DIFFERENT",
+   "classification": "DIFFERENT_VIEW",
+   "reviewBasis": "OVERLAY_AND_STATIC_LANDMARKS",
+   "notes": "same camera overlay, but PTZ framing changes from a highway curve to a divided-road approach",
+   "phashDistance": 26,
+   "dhashDistance": 31,
+   "maskedPhashDistance": 24,
+   "maskedOrbInliers": 0
+  },
+  {
+   "leftImageId": "000125",
+   "rightImageId": "001250",
+   "leftCameraId": "7205-023",
+   "rightCameraId": "5914-006",
+   "staticScene": "DIFFERENT",
+   "classification": "DIFFERENT_VIEW",
+   "reviewBasis": "OVERLAY_AND_STATIC_LANDMARKS",
+   "notes": "different camera overlays and unrelated fixed landmarks",
+   "phashDistance": 26,
+   "dhashDistance": 27,
+   "maskedPhashDistance": 32,
+   "maskedOrbInliers": 5
+  },
+  {
+   "leftImageId": "005250",
+   "rightImageId": "009125",
+   "leftCameraId": "1012-288",
+   "rightCameraId": "9182-238",
+   "staticScene": "DIFFERENT",
+   "classification": "DIFFERENT_VIEW",
+   "reviewBasis": "OVERLAY_HARD_NEGATIVE",
+   "notes": "close perceptual hash candidate rejected by camera overlay and scene geometry",
+   "phashDistance": 16,
+   "dhashDistance": 22,
+   "maskedPhashDistance": 10,
+   "maskedOrbInliers": 9
+  },
+  {
+   "leftImageId": "001125",
+   "rightImageId": "008125",
+   "leftCameraId": "",
+   "rightCameraId": "",
+   "staticScene": "UNKNOWN",
+   "classification": "AMBIGUOUS",
+   "reviewBasis": "HASH_ONLY",
+   "notes": "near pHash candidate from the pair scan; no accepted overlay or landmark review",
+   "phashDistance": 12,
+   "dhashDistance": 22,
+   "maskedPhashDistance": 18,
+   "maskedOrbInliers": 0
+  }
+ ]
+}
