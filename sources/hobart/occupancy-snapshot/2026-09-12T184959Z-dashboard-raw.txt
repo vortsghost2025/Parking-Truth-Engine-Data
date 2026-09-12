@@ -1,0 +1,21 @@
+Car Park Dashboard
+
+## ARGYLE
+
+Created with Raphaël 2.3.01096Available11330
+
+37 out of 1133 spaces occupied
+
+## CENTREPOINT
+
+Created with Raphaël 2.3.0780Available7800
+
+0 out of 780 spaces occupied
+
+## CENTRAL
+
+Created with Raphaël 2.3.0414Available4600
+
+46 out of 460 spaces occupied
+
+**Last Updated:** 13-09-2026 04:49:59

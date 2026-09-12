@@ -1,0 +1,72 @@
+{
+  "recordType": "LIVE_OBSERVATION",
+  "sourceId": "coh-offstreet-occupancy-dashboard",
+  "sourceName": "City of Hobart — Car Park Dashboard",
+  "sourceUrl": "https://parking-occupancy.hobartcity.com.au/",
+  "publisher": "City of Hobart (Tasmania, Australia)",
+  "retrievedAtUtc": "2026-09-12T18:50:00Z",
+  "retrievalMethod": "HTTP GET via Arena fetch_page (browser-side proxy); sandbox bash has no outbound network",
+  "userAgentClass": "default fetcher UA",
+  "botProtection": "NONE_OBSERVED",
+  "httpStatus": 200,
+  "rawTextFile": "2026-09-12T184959Z-dashboard-raw.txt",
+  "rawTextSha256": "fac09fef5153e94b299079bb9a56f348ecf13f351eba723aa134c50a4ea1c50f",
+  "rawTextBytes": 327,
+  "renderingLibrary": "Raphaël 2.3.0 (SVG gauges drawn client-side)",
+  "dashboardSelfReportedLastUpdated": "13-09-2026 04:49:59",
+  "timezoneInterpretation": "Dashboard timestamp is Hobart local (AEST, UTC+10). 13-09-2026 04:49:59 +10:00 == 2026-09-12T18:49:59Z, i.e. ~1 second before retrieval. Confirms the page is genuinely live, not a cached artifact.",
+  "publishedRefreshInterval": "60 seconds (per hobartcity.com.au Live parking availability map page)",
+  "observations": [
+    {
+      "carparkId": "ARGYLE",
+      "carparkName": "Argyle Street Car Park",
+      "capacityPerDashboard": 1133,
+      "occupied": 37,
+      "availableGaugeText": 1096,
+      "internallyConsistent": true,
+      "occupancyRatio": 0.0327
+    },
+    {
+      "carparkId": "CENTREPOINT",
+      "carparkName": "Centrepoint Car Park",
+      "capacityPerDashboard": 780,
+      "occupied": 0,
+      "availableGaugeText": 780,
+      "internallyConsistent": true,
+      "occupancyRatio": 0.0,
+      "ANOMALY": "Exactly 0 occupied at 04:49 local. Indistinguishable between 'genuinely empty' and 'facility closed / counters reporting zero'. A naive consumer would render '780 spaces available' at 4:50am, which is likely FALSE CERTAINTY. Requires verification of Centrepoint operating hours before any consumer shows an available count here. Status: UNRESOLVED."
+    },
+    {
+      "carparkId": "CENTRAL",
+      "carparkName": "Hobart Central Car Park",
+      "capacityPerDashboard": 460,
+      "occupied": 46,
+      "availableGaugeText": 414,
+      "internallyConsistent": true,
+      "occupancyRatio": 0.1
+    }
+  ],
+  "consistencyChecks": {
+    "availablePlusOccupiedEqualsTotal": "PASS for all 3 car parks",
+    "capacityDisagreement": {
+      "finding": "Dashboard capacities disagree with the City of Hobart media release of 2025-09-01 by -2 spaces for two of three facilities.",
+      "detail": {
+        "ARGYLE": { "dashboard": 1133, "mediaRelease": 1133, "delta": 0 },
+        "CENTREPOINT": { "dashboard": 780, "mediaRelease": 782, "delta": -2 },
+        "CENTRAL": { "dashboard": 460, "mediaRelease": 462, "delta": -2 }
+      },
+      "interpretation": "Two same-authority sources disagree on static capacity. Per PTE conflict semantics this should surface as a capacity CONFLICT or be resolved by an authoritative facility record, not silently averaged. Most likely explanation is out-of-service bays excluded from the live counter feed, but that is NOT VERIFIED.",
+      "status": "UNRESOLVED"
+    }
+  },
+  "structuredApiFound": false,
+  "structuredApiNotes": "No JSON/XHR endpoint was discoverable from this sandbox: bash has no outbound network, and fetch_page returns rendered markdown with scripts stripped. The gauge values are present in the delivered document, so the numbers are scrapeable, but the underlying feed URL, request contract, and polling interval are UNKNOWN from this vantage point. Must be confirmed from a normal network by inspecting devtools Network tab on https://parking-occupancy.hobartcity.com.au/.",
+  "reuseTerms": {
+    "statement": "\"The content displayed on the dashboard is the property of the City of Hobart. You may not reuse or republish the content without written consent from the City.\"",
+    "sourceUrl": "https://www.hobartcity.com.au/Services/Parking-and-transport/Parking/Live-parking-availability-map",
+    "classification": "NO_REUSE_WITHOUT_WRITTEN_CONSENT",
+    "implication": "Reading the page to VERIFY that live data exists is fine for research. Shipping these numbers inside a commercial product is NOT permitted without written consent from the City of Hobart."
+  },
+  "lane": "AVAILABILITY",
+  "legalityClaimMade": false
+}

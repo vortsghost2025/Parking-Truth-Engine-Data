@@ -76,6 +76,7 @@ That keeps the project reproducible without turning Git into bulk object storage
 ```text
 sources/
   montreal/           exact source snapshots where version preservation matters
+  hobart/             City of Hobart live-feed observations (raw + structured)
 
 evidence/
   camera/             derived camera benchmark outputs
@@ -84,6 +85,9 @@ evidence/
 manifests/             hashes, inventories, reproducible-source references
 schemas/               dataset schema/profile records
 docs/                  architecture, storage, status, and owner-review documentation
+tools/
+  realtime-sim/        synthetic live availability feed + GPS trace replayer
+                       (test rig only; NOT real parking data)
 ```
 
 Existing storage/migration documentation is preserved in `docs/PTE-LOCAL-EVIDENCE-INVENTORY.md`.
@@ -181,6 +185,31 @@ Melbourne is used as an early software/data laboratory because it provides stron
 
 Los Angeles provides a second-city control case with exact `spaceid` occupancy/inventory joins and helps prove the shared adapter architecture is not Melbourne-specific.
 
+### Hobart (Tasmania)
+
+Hobart is a source-preflight case, not yet an adapter lane. The working
+assumption that no live parking data exists there was **disproven**: the City of
+Hobart operates in-ground sensors across the CBD, Midtown, North Hobart and
+Salamanca with a 15-second refresh, published at `parkmyride.au` since
+2025-09-01, plus a 60-second off-street occupancy dashboard.
+
+The real blockers are access terms and API shape, not data existence:
+
+- the occupancy dashboard was **verified live and one-second fresh** in this
+  repository (`sources/hobart/occupancy-snapshot/`)
+- `parkmyride.au` sits behind a WAF and refuses programmatic access
+- the City prohibits reuse/republishing **without written consent**
+- sensor coverage is **partial by design**, and non-sensored bays remain
+  enforceable, which keeps legality independent of coverage
+
+Two availability findings are recorded unresolved: a same-authority **capacity
+CONFLICT** between the dashboard and the council's own media release, and an
+**all-zero counter** that cannot be distinguished from a facility closed
+overnight — a concrete false-certainty trap.
+
+See [`docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md`](docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md)
+and `manifests/hobart-availability-sources-manifest.json`.
+
 ### Camera lane
 
 The camera research lane is currently **frozen** at `CAMERA_FIXED_VIEW_PARTIAL`. Archived Montréal imagery showed vehicle detection plus fixed ROI association is technically plausible, but live access, geo-alignment, and broad fixed-view coverage remain unresolved. Camera evidence is therefore an optional **availability** input, not a core dependency.
@@ -268,6 +297,8 @@ Additional documentation:
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md)
 - [`docs/PTE-LOCAL-EVIDENCE-INVENTORY.md`](docs/PTE-LOCAL-EVIDENCE-INVENTORY.md)
+- [`docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md`](docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md)
+- [`tools/realtime-sim/README.md`](tools/realtime-sim/README.md)
 
 ## Safety and scope
 
