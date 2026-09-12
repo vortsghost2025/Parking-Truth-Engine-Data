@@ -1,0 +1,402 @@
+{
+ "000500": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "001250": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "001625": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "003500": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "003875": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "004125": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "004250": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "004500": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "005000": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "005375": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "005500": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "005875": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "006375": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "006875": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "007125": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "007500": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "008500": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "009250": {
+  "class": "CAMERA_KNOWN_BUT_ROI_UNKNOWN",
+  "manual_roi": true,
+  "assessed": "full-frame"
+ },
+ "000750": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "night arterial, no parking visible"
+ },
+ "001000": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "arterial, moving traffic"
+ },
+ "001500": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "arterial, moving traffic only"
+ },
+ "002500": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "empty intersection"
+ },
+ "002750": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "arterial, moving traffic"
+ },
+ "003000": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "construction zone"
+ },
+ "003750": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "wide intersection"
+ },
+ "004000": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "intersection queues, no curb parking"
+ },
+ "004750": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "partial frame: right half obstructed by building"
+ },
+ "005125": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "park road, moving traffic only"
+ },
+ "005250": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "highway interchange"
+ },
+ "005625": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "commercial arterial, moving traffic"
+ },
+ "005750": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "arterial, no curb parking"
+ },
+ "006000": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "highway"
+ },
+ "007750": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "highway (Decarie/Monkland sector 7)"
+ },
+ "008250": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "night arterial"
+ },
+ "008750": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "intersection queue"
+ },
+ "009000": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "highway curve"
+ },
+ "009500": {
+  "class": "NOT_USABLE",
+  "assessed": "full-frame",
+  "reason": "night intersection queues"
+ },
+ "000000": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "000250": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "001750": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "002000": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "002250": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "003250": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "006250": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "006500": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "006750": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "007000": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "007250": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "008000": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "009750": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "000125": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "000375": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "000625": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "000875": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "001125": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "001375": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "001875": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "002125": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "002375": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "002625": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "002875": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "003125": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "003375": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "003625": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "004375": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "004625": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "004875": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "006125": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "006625": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "007375": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "007625": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "007875": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "008125": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "008375": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "008625": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "008875": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "009125": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "009375": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "009625": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ },
+ "009875": {
+  "class": "NOT_USABLE",
+  "assessed": "thumbnail",
+  "reason": "no parkable curb visible at triage scale"
+ }
+}
