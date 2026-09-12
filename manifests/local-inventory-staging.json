@@ -1,0 +1,1372 @@
+[
+ {
+  "path": "docs/montreal/evidence/EmplacementReglementation.csv",
+  "bytes": 1106551,
+  "sha256": "2048eff792b13b1a8b70ec5d4471585c9ae8741fea74fba5565921138d7f5dab"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-catalogue-signalisation-2015.pdf",
+  "bytes": 65333387,
+  "sha256": "2aac9662161dd51ee16dc57de68503a495a7a2273ae703830900a4c82470b3e6"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-codification-rpa-full.json",
+  "bytes": 318548,
+  "sha256": "5f037c45fe8a8a92ee4e15b99d7626f24ce7feed81a6e858f94d56b381897455"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-entraves-travaux-en-cours.csv",
+  "bytes": 876999,
+  "sha256": "61b8f60a8f5bbd3d2457327f3d6c53010bcb109d90c5e627ddaabdd7acdbc970"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-rpa-codification.csv",
+  "bytes": 202149,
+  "sha256": "3af77a62b6a2621296d7822cbd4a92bffaff1ac7c53f22ae178cf95f468f0269"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-rtp-codification.csv",
+  "bytes": 422,
+  "sha256": "ccea54cc06bd3c32f365a23ad6b7a01e84b1582f41574b17b609e324196ace69"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-signage-full.csv",
+  "bytes": 31144523,
+  "sha256": "c78786159d0904e5c11e0c6266b17aef5ea8fb1f8f21d1e294dd633653d7ab6a"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-signage-geojson.head.bin",
+  "bytes": 65536,
+  "sha256": "0fc37320eccc882fa4c05cb6fac288f720e9e371dc88dd145e69b2991dce1227"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-signage-metadata.json",
+  "bytes": 27883,
+  "sha256": "3095aeb8fbd5306d4f5097a3a4ca091c1f91984c0c5aa061b01162766f78e0fe"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-stationnements-hiver-2025-2026.csv",
+  "bytes": 39100,
+  "sha256": "38f81c12a36a7e63c72b3e5159819870f6acf4eb9c40bcdff890755216e07b43"
+ },
+ {
+  "path": "docs/montreal/evidence/mtl-stationnements-hiver-2025-2026.geojson",
+  "bytes": 73120,
+  "sha256": "a1795ebe660e80b4b4088c18204f42a797841cc36f0dd7d48e5a636fb1a2e598"
+ },
+ {
+  "path": "docs/montreal/evidence/Periodes.csv",
+  "bytes": 24414,
+  "sha256": "11202678cca673b860b5c2c8fc49c0ec4ce0c0a773b1bb6690892b89a5631d2d"
+ },
+ {
+  "path": "docs/montreal/evidence/ReglementationPeriode.csv",
+  "bytes": 45641,
+  "sha256": "7263002f02fe7541b1fd45703170d4c80dab529f586199af81933f46c24c65ff"
+ },
+ {
+  "path": "docs/montreal/evidence/Reglementations.csv",
+  "bytes": 14009,
+  "sha256": "6b2623140937cb35ba12a25a17c0c9c3b70b2446fbb3cf18822f37fa47ff10e7"
+ },
+ {
+  "path": "docs/source-preflight/evidence/act-sensor-assets.meta.json",
+  "bytes": 377,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/act-sensor-assets.sample.json",
+  "bytes": 612,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/act-smart-lots.meta.json",
+  "bytes": 371,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/act-smart-lots.sample.json",
+  "bytes": 364,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/act-smart-restrictions.meta.json",
+  "bytes": 387,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/act-smart-restrictions.sample.json",
+  "bytes": 239,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/act-smart-stays.meta.json",
+  "bytes": 373,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/act-smart-stays.sample.json",
+  "bytes": 216,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/hobart-car-parks.meta.json",
+  "bytes": 469,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/hobart-car-parks.sample.json",
+  "bytes": 2745,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/hobart-sensors-catalog.meta.json",
+  "bytes": 409,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/hobart-sensors-catalog.sample.json",
+  "bytes": 8237,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/la-inventory-policies.meta.json",
+  "bytes": 381,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/la-inventory-policies.sample.json",
+  "bytes": 378,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/la-meter-locations.meta.json",
+  "bytes": 375,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/la-meter-locations.sample.json",
+  "bytes": 5,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/la-occupancy-archive.meta.json",
+  "bytes": 379,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/la-occupancy-archive.sample.json",
+  "bytes": 3,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/la-occupancy-live.meta.json",
+  "bytes": 373,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/la-occupancy-live.sample.json",
+  "bytes": 84,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/melb-bay-restrictions.meta.json",
+  "bytes": 449,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/melb-bay-restrictions.sample.json",
+  "bytes": 1503,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/melb-bay-sensors-live.meta.json",
+  "bytes": 464,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/melb-bay-sensors-live.sample.json",
+  "bytes": 274,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/melb-historic-2019.meta.json",
+  "bytes": 444,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/melb-historic-2019.sample.json",
+  "bytes": 33,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/melb-parking-bays-geometry.meta.json",
+  "bytes": 445,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/melb-parking-bays-geometry.sample.json",
+  "bytes": 300,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/mtl-entraves-realtime.meta.json",
+  "bytes": 425,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/mtl-entraves-realtime.sample.json",
+  "bytes": 52,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/mtl-info-travaux.meta.json",
+  "bytes": 387,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/mtl-info-travaux.sample.json",
+  "bytes": 8237,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/mtl-paid-places.meta.json",
+  "bytes": 353,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/mtl-paid-places.sample.csv",
+  "bytes": 8192,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/mtl-signage.meta.json",
+  "bytes": 409,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/mtl-signage.sample.json",
+  "bytes": 8237,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/ott-paid-spaces.meta.json",
+  "bytes": 457,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/ott-paid-spaces.sample.json",
+  "bytes": 4815,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/ott-traffic-cameras.meta.json",
+  "bytes": 364,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/ott-traffic-cameras.sample.json",
+  "bytes": 8237,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/ott-traffic-events.meta.json",
+  "bytes": 381,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/ott-traffic-events.sample.json",
+  "bytes": 8237,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/ott-traffic-images.meta.json",
+  "bytes": 404,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/ott-traffic-images.sample.json",
+  "bytes": 12,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/shortlist-la-inventory.meta.json",
+  "bytes": 16870,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/shortlist-la-inventory.raw.json",
+  "bytes": 1161,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/shortlist-la-occupancy.meta.json",
+  "bytes": 8623,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/shortlist-la-occupancy.raw.json",
+  "bytes": 261,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/shortlist-melb-bays.raw.json",
+  "bytes": 842,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/shortlist-melb-restrictions.raw.json",
+  "bytes": 4217,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/shortlist-melb-sensors.meta.json",
+  "bytes": 4797,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/shortlist-melb-sensors.raw.json",
+  "bytes": 754,
+  "sha256": ""
+ },
+ {
+  "path": "docs/source-preflight/evidence/_verification_run.json",
+  "bytes": 10538,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/alignment.json",
+  "bytes": 9780,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/Places.csv",
+  "bytes": 3179980,
+  "sha256": "092a87e7a487db48cadb21d6fa1329941bf7f349097745599d72f3242aa676fa"
+ },
+ {
+  "path": "data/camera/montreal/rois.json",
+  "bytes": 19572,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/sample-manifest.json",
+  "bytes": 17858,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/view-rois.json",
+  "bytes": 3231,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/000000.xml",
+  "bytes": 2511,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/000125.xml",
+  "bytes": 978,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/000250.xml",
+  "bytes": 2398,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/000375.xml",
+  "bytes": 1773,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/000500.xml",
+  "bytes": 3417,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/000625.xml",
+  "bytes": 3811,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/000750.xml",
+  "bytes": 798,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/000875.xml",
+  "bytes": 2396,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/001000.xml",
+  "bytes": 2820,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/001125.xml",
+  "bytes": 2511,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/001250.xml",
+  "bytes": 2887,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/001375.xml",
+  "bytes": 4325,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/001500.xml",
+  "bytes": 4132,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/001625.xml",
+  "bytes": 4308,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/001750.xml",
+  "bytes": 3747,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/001875.xml",
+  "bytes": 1686,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/002000.xml",
+  "bytes": 1974,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/002125.xml",
+  "bytes": 12498,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/002250.xml",
+  "bytes": 2100,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/002375.xml",
+  "bytes": 3473,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/002500.xml",
+  "bytes": 1525,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/002625.xml",
+  "bytes": 1512,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/002750.xml",
+  "bytes": 1773,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/002875.xml",
+  "bytes": 2799,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/003000.xml",
+  "bytes": 5028,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/003125.xml",
+  "bytes": 2898,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/003250.xml",
+  "bytes": 717,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/003375.xml",
+  "bytes": 989,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/003500.xml",
+  "bytes": 2709,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/003625.xml",
+  "bytes": 3105,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/003750.xml",
+  "bytes": 2279,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/003875.xml",
+  "bytes": 1496,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/004000.xml",
+  "bytes": 11303,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/004125.xml",
+  "bytes": 2839,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/004250.xml",
+  "bytes": 3907,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/004375.xml",
+  "bytes": 5867,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/004500.xml",
+  "bytes": 1948,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/004625.xml",
+  "bytes": 807,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/004750.xml",
+  "bytes": 3570,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/004875.xml",
+  "bytes": 6190,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/005000.xml",
+  "bytes": 3156,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/005125.xml",
+  "bytes": 1439,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/005250.xml",
+  "bytes": 763,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/005375.xml",
+  "bytes": 3251,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/005500.xml",
+  "bytes": 5145,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/005625.xml",
+  "bytes": 2718,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/005750.xml",
+  "bytes": 1278,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/005875.xml",
+  "bytes": 4875,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/006000.xml",
+  "bytes": 6441,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/006125.xml",
+  "bytes": 1954,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/006250.xml",
+  "bytes": 2603,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/006375.xml",
+  "bytes": 3604,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/006500.xml",
+  "bytes": 2227,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/006625.xml",
+  "bytes": 970,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/006750.xml",
+  "bytes": 532,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/006875.xml",
+  "bytes": 794,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/007000.xml",
+  "bytes": 734,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/007125.xml",
+  "bytes": 3212,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/007250.xml",
+  "bytes": 3574,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/007375.xml",
+  "bytes": 5955,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/007500.xml",
+  "bytes": 2748,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/007625.xml",
+  "bytes": 6436,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/007750.xml",
+  "bytes": 2201,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/007875.xml",
+  "bytes": 6286,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/008000.xml",
+  "bytes": 810,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/008125.xml",
+  "bytes": 1885,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/008250.xml",
+  "bytes": 771,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/008375.xml",
+  "bytes": 2674,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/008500.xml",
+  "bytes": 3566,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/008625.xml",
+  "bytes": 3079,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/008750.xml",
+  "bytes": 6864,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/008875.xml",
+  "bytes": 518,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/009000.xml",
+  "bytes": 1401,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/009125.xml",
+  "bytes": 790,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/009250.xml",
+  "bytes": 3918,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/009375.xml",
+  "bytes": 2377,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/009500.xml",
+  "bytes": 7741,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/009625.xml",
+  "bytes": 3116,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/009750.xml",
+  "bytes": 1455,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/annotations/009875.xml",
+  "bytes": 788,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/models/S-512.pt",
+  "bytes": 14775628,
+  "sha256": "e5e488f127572a3873ac6ff32b0486c2dbb3cc434351d6d5b6ee77f8947e9d27"
+ },
+ {
+  "path": "data/camera/montreal/outputs/roi-calls.json",
+  "bytes": 17928,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/roi-metrics.json",
+  "bytes": 718,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/view-fingerprints-masked.json",
+  "bytes": 18800,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/view-fingerprints.json",
+  "bytes": 35040,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/view-pair-evidence.json",
+  "bytes": 3892,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/detector-frcnn/detections.json",
+  "bytes": 69137,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/detector-frcnn/score.json",
+  "bytes": 5920,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/triage/sheet0.jpg",
+  "bytes": 297026,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/triage/sheet1.jpg",
+  "bytes": 284249,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/triage/sheet2.jpg",
+  "bytes": 231800,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/outputs/triage/sheet3.jpg",
+  "bytes": 587049,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/000000.jpeg",
+  "bytes": 32313,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/000125.jpeg",
+  "bytes": 26897,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/000250.jpeg",
+  "bytes": 29870,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/000375.jpeg",
+  "bytes": 26737,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/000500.jpeg",
+  "bytes": 32894,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/000625.jpeg",
+  "bytes": 31525,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/000750.jpeg",
+  "bytes": 27711,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/000875.jpeg",
+  "bytes": 31501,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/001000.jpeg",
+  "bytes": 32770,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/001125.jpeg",
+  "bytes": 31427,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/001250.jpeg",
+  "bytes": 112806,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/001375.jpeg",
+  "bytes": 114091,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/001500.jpeg",
+  "bytes": 73903,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/001625.jpeg",
+  "bytes": 29409,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/001750.jpeg",
+  "bytes": 27741,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/001875.jpeg",
+  "bytes": 28697,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/002000.jpeg",
+  "bytes": 61830,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/002125.jpeg",
+  "bytes": 76883,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/002250.jpeg",
+  "bytes": 59806,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/002375.jpeg",
+  "bytes": 70211,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/002500.jpeg",
+  "bytes": 67934,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/002625.jpeg",
+  "bytes": 94554,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/002750.jpeg",
+  "bytes": 115908,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/002875.jpeg",
+  "bytes": 33494,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/003000.jpeg",
+  "bytes": 42322,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/003125.jpeg",
+  "bytes": 120545,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/003250.jpeg",
+  "bytes": 25566,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/003375.jpeg",
+  "bytes": 73210,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/003500.jpeg",
+  "bytes": 29572,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/003625.jpeg",
+  "bytes": 89062,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/003750.jpeg",
+  "bytes": 106366,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/003875.jpeg",
+  "bytes": 85736,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/004000.jpeg",
+  "bytes": 68255,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/004125.jpeg",
+  "bytes": 77641,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/004250.jpeg",
+  "bytes": 107208,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/004375.jpeg",
+  "bytes": 118498,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/004500.jpeg",
+  "bytes": 47766,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/004625.jpeg",
+  "bytes": 85622,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/004750.jpeg",
+  "bytes": 30355,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/004875.jpeg",
+  "bytes": 70032,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/005000.jpeg",
+  "bytes": 122910,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/005125.jpeg",
+  "bytes": 104508,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/005250.jpeg",
+  "bytes": 73262,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/005375.jpeg",
+  "bytes": 25707,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/005500.jpeg",
+  "bytes": 135033,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/005625.jpeg",
+  "bytes": 106366,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/005750.jpeg",
+  "bytes": 28723,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/005875.jpeg",
+  "bytes": 78106,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/006000.jpeg",
+  "bytes": 82356,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/006125.jpeg",
+  "bytes": 36895,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/006250.jpeg",
+  "bytes": 88155,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/006375.jpeg",
+  "bytes": 121795,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/006500.jpeg",
+  "bytes": 23769,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/006625.jpeg",
+  "bytes": 126479,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/006750.jpeg",
+  "bytes": 26922,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/006875.jpeg",
+  "bytes": 96213,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/007000.jpeg",
+  "bytes": 21396,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/007125.jpeg",
+  "bytes": 36600,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/007250.jpeg",
+  "bytes": 25633,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/007375.jpeg",
+  "bytes": 97187,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/007500.jpeg",
+  "bytes": 102422,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/007625.jpeg",
+  "bytes": 132629,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/007750.jpeg",
+  "bytes": 81203,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/007875.jpeg",
+  "bytes": 138190,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/008000.jpeg",
+  "bytes": 115771,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/008125.jpeg",
+  "bytes": 31234,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/008250.jpeg",
+  "bytes": 22507,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/008375.jpeg",
+  "bytes": 97593,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/008500.jpeg",
+  "bytes": 92963,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/008625.jpeg",
+  "bytes": 66617,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/008750.jpeg",
+  "bytes": 111487,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/008875.jpeg",
+  "bytes": 72970,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/009000.jpeg",
+  "bytes": 24999,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/009125.jpeg",
+  "bytes": 28580,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/009250.jpeg",
+  "bytes": 26953,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/009375.jpeg",
+  "bytes": 26266,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/009500.jpeg",
+  "bytes": 34059,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/009625.jpeg",
+  "bytes": 92661,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/009750.jpeg",
+  "bytes": 94932,
+  "sha256": ""
+ },
+ {
+  "path": "data/camera/montreal/source/009875.jpeg",
+  "bytes": 107665,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/manifest.jsonl",
+  "bytes": 5176,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/inventory/2026-09-11T22-52-52-121Z.json",
+  "bytes": 13540079,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/inventory/2026-09-11T22-52-52-121Z.meta.json",
+  "bytes": 421,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/inventory/2026-09-11T22-53-26-841Z.meta.json",
+  "bytes": 420,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/inventory/2026-09-11T23-02-27-411Z.meta.json",
+  "bytes": 420,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/inventory/2026-09-11T23-02-53-742Z.json",
+  "bytes": 13540079,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/inventory/2026-09-11T23-02-53-742Z.meta.json",
+  "bytes": 421,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/inventory/2026-09-11T23-03-10-544Z.json",
+  "bytes": 13540079,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/inventory/2026-09-11T23-03-10-544Z.meta.json",
+  "bytes": 421,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T22-52-53-382Z.json",
+  "bytes": 349018,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T22-52-53-382Z.meta.json",
+  "bytes": 444,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T22-53-28-479Z.json",
+  "bytes": 349012,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T22-53-28-479Z.meta.json",
+  "bytes": 443,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T23-02-31-151Z.json",
+  "bytes": 349080,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T23-02-31-151Z.meta.json",
+  "bytes": 443,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T23-02-58-395Z.json",
+  "bytes": 349078,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T23-02-58-395Z.meta.json",
+  "bytes": 443,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T23-03-13-003Z.json",
+  "bytes": 349092,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/los-angeles/occupancy/2026-09-11T23-03-13-003Z.meta.json",
+  "bytes": 443,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/geometry/2026-09-11T22-43-52-801Z.json",
+  "bytes": 7700722,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/geometry/2026-09-11T22-43-52-801Z.meta.json",
+  "bytes": 481,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/geometry/2026-09-11T23-02-19-149Z.meta.json",
+  "bytes": 480,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/geometry/2026-09-11T23-02-44-162Z.meta.json",
+  "bytes": 480,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/geometry/2026-09-11T23-02-59-096Z.meta.json",
+  "bytes": 480,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/occupancy/2026-09-11T22-43-56-057Z.json",
+  "bytes": 1510280,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/occupancy/2026-09-11T22-43-56-057Z.meta.json",
+  "bytes": 517,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/occupancy/2026-09-11T23-02-25-299Z.json",
+  "bytes": 1510124,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/occupancy/2026-09-11T23-02-25-299Z.meta.json",
+  "bytes": 517,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/occupancy/2026-09-11T23-02-50-419Z.meta.json",
+  "bytes": 516,
+  "sha256": ""
+ },
+ {
+  "path": "data/raw/melbourne/occupancy/2026-09-11T23-03-07-119Z.meta.json",
+  "bytes": 516,
+  "sha256": ""
+ }
+]
