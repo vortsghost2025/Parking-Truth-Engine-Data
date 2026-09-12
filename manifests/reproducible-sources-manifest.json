@@ -1,0 +1,34 @@
+{
+ "policy": "large publicly reproducible sources are referenced by URL+SHA-256+metadata, not stored as bytes here",
+ "entries": [
+  {
+   "artifact": "mtl-catalogue-signalisation-2015.pdf",
+   "sourceUrl": "https://donnees.montreal.ca/dataset/c5bf5e9c-528b-4c28-b52f-218215992e35/resource/21c0eb84-6c1c-4537-b3e6-aee7b9be65a4/download/0-dec.-2015-catalogue-de-signalisation.pdf",
+   "sha256": "2aac9662161dd51ee16dc57de68503a495a7a2273ae703830900a4c82470b3e6",
+   "retrievedAt": "2026-09-11T22:00:00Z",
+   "bytes": 65333387,
+   "format": "PDF, 260 pages, official visual catalog of Montréal signage (arrow legend pages 78,103,106,110,156,159,161,188,213)",
+   "license": "CC-BY-4.0 via donnees.montreal.ca",
+   "preservedAs": "URL+hash only"
+  },
+  {
+   "artifact": "S-512.pt (City of Montréal urban-detection checkpoint)",
+   "sourceUrl": "https://github.com/VilledeMontreal/urban-detection/releases/download/v0.1-alpha/S-512.pt",
+   "sha256Prefix": "e5e488f1",
+   "retrievedAt": "2026-09-11 (PTE-CAM-002)",
+   "bytes": 14775628,
+   "format": "Ultralytics YOLOv5 checkpoint (2020 era), NOT runnable under modern ultralytics",
+   "license": "TERMS_UNCLEAR (PTE-CAM-002-LICENSE-BOUNDARY.md); do NOT redistribute",
+   "preservedAs": "URL+hash only; never upload"
+  },
+  {
+   "artifact": "melbourne/los-angeles live snapshots (data/raw/)",
+   "sourceUrl": "per-file .meta.json alongside each body (sourceUrl, fetchedAt, contentHash)",
+   "retrievedAt": "2026-09-11",
+   "bytes": "38.4 MB across 258 files",
+   "format": "JSON snapshots of live Socrata/Opendatasoft feeds",
+   "license": "CC BY / public domain per dataset",
+   "preservedAs": "local metas preserved; bodies publicly re-downloadable at will"
+  }
+ ]
+}
