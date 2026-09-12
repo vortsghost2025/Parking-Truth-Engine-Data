@@ -47,6 +47,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import random
 import threading
 import time
@@ -151,8 +152,58 @@ STATUS_FREE, STATUS_OCCUPIED, STATUS_RESTRICTED, STATUS_UNKNOWN = (
     "FREE", "OCCUPIED", "RESTRICTED", "UNKNOWN")
 
 
-def target_occupancy(precinct: str, hour_float: float, weekday: int) -> float:
-    """Equilibrium occupancy fraction for a precinct at a given local time."""
+def interp_curve24(curve, hour_float):
+    """Linear interpolation over a 24-value hourly curve, wrapping midnight."""
+    if not curve or len(curve) != 24:
+        return None
+    h = hour_float % 24.0
+    lo = int(h) % 24
+    hi = (lo + 1) % 24
+    frac = h - int(h)
+    return curve[lo] + (curve[hi] - curve[lo]) * frac
+
+
+def sample_inverse_cdf(inv_cdf, rng):
+    """Inverse-transform sample from an empirical percentile table."""
+    if not inv_cdf:
+        return None
+    u = rng.random()
+    pts = sorted(((float(k["q"]), float(k["seconds"]))
+                  for k in inv_cdf if k.get("seconds") is not None))
+    if not pts:
+        return None
+    if u <= pts[0][0]:
+        return max(60.0, pts[0][1])
+    if u >= pts[-1][0]:
+        return max(60.0, pts[-1][1])
+    for (q0, s0), (q1, s1) in zip(pts, pts[1:]):
+        if q0 <= u <= q1:
+            span = (q1 - q0) or 1e-9
+            return max(60.0, s0 + (s1 - s0) * ((u - q0) / span))
+    return max(60.0, pts[-1][1])
+
+
+def target_occupancy(precinct: str, hour_float: float, weekday: int, cal=None) -> float:
+    """Equilibrium occupancy fraction for a precinct at a given local time.
+
+    When a calibration derived from REAL parking-event data is supplied, the
+    hourly curve comes from Little's Law over that archive (see
+    tools/telemetry/calibrate_sim.py) instead of the hand-written BASE_CURVE
+    below. Weekend/market adjustments are still applied on top, because the
+    archive is city-wide and does not model this simulator's precincts.
+    """
+    if cal:
+        curve = cal.get("occupancyCurveByHour")
+        measured = interp_curve24(curve, hour_float)
+        if measured is not None:
+            base = measured * PRECINCT_PEAK_MULT.get(precinct, 0.9)
+            if precinct == "salamanca" and weekday == 5 and 8.0 <= hour_float <= 15.0:
+                base = min(0.995, base + 0.34)
+            if weekday >= 5 and precinct.startswith("cbd"):
+                base *= 0.72
+            return max(0.0, min(0.995, base))
+        # calibration present but unusable -> fall through to the built-in curve
+
     pts = BASE_CURVE
     lo = pts[-1]
     hi = pts[0]
@@ -181,9 +232,10 @@ def target_occupancy(precinct: str, hour_float: float, weekday: int) -> float:
 class Bay:
     __slots__ = ("bay_id", "street", "precinct", "lat", "lon", "restriction",
                  "sensable", "status", "occupied_since", "stay_target_s",
-                 "sensor_ok", "last_event_seq")
+                 "sensor_ok", "last_event_seq", "cal")
 
-    def __init__(self, bay_id, street, precinct, lat, lon, restriction, sensable, rng):
+    def __init__(self, bay_id, street, precinct, lat, lon, restriction, sensable,
+                 rng, cal=None):
         self.bay_id = bay_id
         self.street = street
         self.precinct = precinct
@@ -196,6 +248,7 @@ class Bay:
         self.stay_target_s = 0
         self.sensor_ok = True
         self.last_event_seq = 0
+        self.cal = cal
         if sensable:
             self.stay_target_s = self._draw_stay(rng)
 
@@ -208,6 +261,21 @@ class Bay:
         the availability lane being allowed to conclude anything about legality.
         """
         mean_min = MEAN_STAY_MIN.get(self.restriction, 120) or 120
+
+        # Prefer the MEASURED distribution from real parking-event data.
+        # Scale it per restriction class so a 1P bay still stays short and a
+        # residential-permit bay still stays long, while the overall shape comes
+        # from observation rather than from an invented lognormal.
+        if self.cal:
+            inv = (self.cal.get("stayDurationSeconds") or {}).get("inverseCdf")
+            secs = sample_inverse_cdf(inv, rng)
+            if secs:
+                cal_median_min = ((self.cal.get("stayDurationSeconds") or {})
+                                  .get("medianMinutes")) or 0
+                if cal_median_min and cal_median_min > 0:
+                    secs *= (mean_min / cal_median_min)
+                return max(90.0, min(secs, 26 * 3600))
+
         secs = rng.lognormvariate(math.log(mean_min * 60 * 0.70), 0.62)
         return max(90.0, min(secs, 26 * 3600))
 
@@ -234,9 +302,17 @@ def haversine_m(a_lat, a_lon, b_lat, b_lon):
 class World:
     """Holds bay/car-park state and advances it one tick at a time."""
 
-    def __init__(self, seed=1337, sim_start=None, bays_per_block=None):
+    def __init__(self, seed=1337, sim_start=None, bays_per_block=None,
+                 calibration=None):
         self.rng = random.Random(seed)
         self.seed = seed
+        self.cal = calibration if (calibration and calibration.get("usable")) else None
+        self._restriction_pool = None
+        self._restriction_weights = None
+        if self.cal and self.cal.get("restrictionMix"):
+            mix = self.cal["restrictionMix"]
+            self._restriction_pool = list(mix.keys())
+            self._restriction_weights = [max(1e-6, float(v)) for v in mix.values()]
         self.lock = threading.Lock()
         self.seq = 0
         self.tick_count = 0
@@ -248,6 +324,25 @@ class World:
         self.carparks = []
         self._build_bays(bays_per_block)
         self._build_carparks()
+        self._seed_equilibrium()
+
+    def _seed_equilibrium(self):
+        """Start sensable bays at the target occupancy for the start hour.
+
+        Without this, every run begins all-FREE and spends the first simulated
+        hour ramping toward the measured curve, so short test runs would report
+        occupancy that reflects the ramp rather than the calibration.
+        """
+        d = self.dt_local()
+        for b in self.bays:
+            if not b.sensable or b.restriction == "NO_PARKING":
+                continue
+            rho = target_occupancy(b.precinct, d.hour_float, d.weekday, self.cal)
+            if self.rng.random() < rho:
+                b.status = STATUS_OCCUPIED
+                # backdate within the stay so departures begin immediately
+                back = self.rng.random() * (b.stay_target_s or 600.0)
+                b.occupied_since = self.sim_epoch - back
 
     # ---------------------------------------------------------------- build --
     def _build_bays(self, bays_per_block):
@@ -269,15 +364,20 @@ class World:
                         off = 0.000036 if side == 0 else -0.000036
                         lat += off
                         lon += off * 0.6
-                        restriction = self.rng.choices(
-                            RESTRICTIONS, weights=RESTRICTION_WEIGHTS)[0]
+                        if self._restriction_pool:
+                            restriction = self.rng.choices(
+                                self._restriction_pool,
+                                weights=self._restriction_weights)[0]
+                        else:
+                            restriction = self.rng.choices(
+                                RESTRICTIONS, weights=RESTRICTION_WEIGHTS)[0]
                         sensable = restriction != "NO_PARKING" and self.rng.random() < 0.88
                         n += 1
                         self.bays.append(Bay(
                             bay_id=f"SIM-HBT-{n:05d}", street=street,
                             precinct=precinct, lat=round(lat, 6),
                             lon=round(lon, 6), restriction=restriction,
-                            sensable=sensable, rng=self.rng))
+                            sensable=sensable, rng=self.rng, cal=self.cal))
         self.bay_index = {b.bay_id: b for b in self.bays}
 
     def _build_carparks(self):
@@ -307,16 +407,35 @@ class World:
         with self.lock:
             # --- on-street bays ------------------------------------------- #
             sensable_by_precinct = {}
-            occ_by_precinct = {}
             for b in self.bays:
                 if not b.sensable:
                     continue
                 sensable_by_precinct[b.precinct] = sensable_by_precinct.get(b.precinct, 0) + 1
-                if b.status == STATUS_OCCUPIED:
-                    occ_by_precinct[b.precinct] = occ_by_precinct.get(b.precinct, 0) + 1
 
-            targets = {p: target_occupancy(p, dt.hour_float, dt.weekday)
+            targets = {p: target_occupancy(p, dt.hour_float, dt.weekday, self.cal)
                        for p in sensable_by_precinct}
+
+            # --- arrival hazard derived from the departure hazard ----------- #
+            # Each occupied bay leaves as a Poisson process with rate
+            #     mu = 1 / stay_target_s
+            # For the precinct to sit at the target occupancy rho in
+            # equilibrium, arrivals onto FREE bays must balance departures:
+            #     lambda * (1 - rho) = mu_bar * rho
+            #     lambda = mu_bar * rho / (1 - rho)
+            # This is the same identity that produced rho (Little's Law), so the
+            # simulator converges to the MEASURED curve at any tick size instead
+            # of overshooting it. Per-tick probabilities are then the exact
+            # exponential-hazard forms, which stay correct for large dt.
+            mu_sum = {}
+            for b in self.bays:
+                if b.sensable and b.sensor_ok and b.restriction != "NO_PARKING":
+                    mu_sum[b.precinct] = mu_sum.get(b.precinct, 0.0) + \
+                        (1.0 / (b.stay_target_s or 600.0))
+            lam_by_precinct = {}
+            for p, cap in sensable_by_precinct.items():
+                rho = min(0.995, max(0.0, targets.get(p, 0.5)))
+                mu_bar = (mu_sum.get(p, 0.0) / cap) if cap else (1.0 / 600.0)
+                lam_by_precinct[p] = mu_bar * rho / max(1e-6, 1.0 - rho)
 
             for b in self.bays:
                 # Signage-known "no parking" bays carry no sensor at all, but
@@ -344,16 +463,11 @@ class World:
                         b.stay_target_s = b._draw_stay(self.rng)
                         produced.append(self._event("departure", b, {"staySeconds": dur}))
                 else:
-                    cap = sensable_by_precinct.get(b.precinct, 1) or 1
-                    cur = occ_by_precinct.get(b.precinct, 0)
-                    want = targets.get(b.precinct, 0.5) * cap
-                    pressure = max(0.0, (want - cur) / max(1.0, cap))
-                    # arrival chance per bay per tick
-                    p_arrive = min(0.9, pressure * dt_sim_seconds / 60.0 * 1.6)
+                    lam = lam_by_precinct.get(b.precinct, 1.0 / 600.0)
+                    p_arrive = 1.0 - math.exp(-lam * dt_sim_seconds)
                     if self.rng.random() < p_arrive:
                         b.status = STATUS_OCCUPIED
                         b.occupied_since = self.sim_epoch
-                        occ_by_precinct[b.precinct] = occ_by_precinct.get(b.precinct, 0) + 1
                         produced.append(self._event("arrival", b, {}))
 
             # --- sensor faults: rare, and they must surface as UNKNOWN ------ #
@@ -382,7 +496,7 @@ class World:
                     continue
 
                 hour_frac = dt.hour_float
-                base = target_occupancy("cbd-core", hour_frac, dt.weekday)
+                base = target_occupancy("cbd-core", hour_frac, dt.weekday, self.cal)
                 want = int(cap * min(0.985, base * self.rng.uniform(0.88, 1.04)))
                 delta = want - c["occupied"]
                 if delta != 0:
@@ -590,10 +704,34 @@ class World:
             }
 
     def meta(self):
+        cal_prov = None
+        if self.cal:
+            p = self.cal.get("provenance", {})
+            cal_prov = {
+                "calibrated": True,
+                "label": self.cal.get("label"),
+                "method": (self.cal.get("method") or {}).get("occupancyCurve"),
+                "sourceSha256": p.get("sourceSha256"),
+                "sourceUrl": p.get("sourceUrl"),
+                "rowsRead": p.get("rowsRead"),
+                "distinctBays": p.get("distinctBays"),
+                "medianStayMinutes": (self.cal.get("stayDurationSeconds") or {}).get("medianMinutes"),
+                "warnings": self.cal.get("warnings"),
+            }
+        else:
+            cal_prov = {
+                "calibrated": False,
+                "note": "Using the built-in hand-written demand curve and an "
+                        "invented lognormal stay distribution. Supply "
+                        "--calibration with a file derived from real "
+                        "parking-event data to make these statistics measured "
+                        "and citable.",
+            }
         return {
             "simulator": SIMULATOR_ID,
-            "version": "1.0.0",
+            "version": "1.1.0",
             "seed": self.seed,
+            "calibration": cal_prov,
             "timezoneAssumed": HOBART_TZ_NAME + " (fixed UTC+10 for determinism)",
             "simulatedNow": iso(self.sim_epoch),
             "wallClockUptimeSeconds": round(time.time() - self.started_wall, 1),
@@ -749,25 +887,48 @@ def main():
                     help="simulated-time multiplier (20 = 20x faster than wall clock)")
     ap.add_argument("--seed", type=int, default=1337, help="RNG seed for reproducibility")
     ap.add_argument("--sim-start", default=None,
-                    help="ISO-ish 'HH:MM' Hobart local time to start the clock at, "
-                         "e.g. 08:30 or 12:45 (default: now)")
+                    help="'HH:MM' local time to start at (today's date), or "
+                         "'YYYY-MM-DDTHH:MM' to pin the date too. Pinning the "
+                         "date matters: weekend multipliers and the Saturday "
+                         "Salamanca market spike both depend on the weekday.")
     ap.add_argument("--bays-per-block", type=int, default=None,
                     help="override bay density per street block")
+    ap.add_argument("--calibration", default=None,
+                    help="calibration.json from tools/telemetry/calibrate_sim.py. "
+                         "Replaces the hand-written demand curve and stay "
+                         "distribution with ones measured from REAL parking-event "
+                         "data, and cites the source SHA-256.")
     args = ap.parse_args()
+
+    calibration = None
+    if args.calibration:
+        if not os.path.exists(args.calibration):
+            raise SystemExit(f"no calibration file at {args.calibration}")
+        with open(args.calibration) as fh:
+            calibration = json.load(fh)
+        if not calibration.get("usable"):
+            print("[sim] WARNING: calibration is marked usable=false; falling "
+                  "back to the built-in hand-written curve.", flush=True)
 
     global WORLD, CONFIG
     CONFIG = {"tick": args.tick, "speed": args.speed}
 
     start_epoch = None
     if args.sim_start:
-        hh, mm = (int(x) for x in args.sim_start.split(":"))
-        today = datetime.now(timezone(timedelta(hours=10))).replace(
-            hour=hh, minute=mm, second=0, microsecond=0)
-        start_epoch = today.timestamp()
+        hobart = timezone(timedelta(hours=10))
+        if "T" in args.sim_start or "-" in args.sim_start:
+            when = datetime.strptime(args.sim_start.replace(" ", "T"),
+                                     "%Y-%m-%dT%H:%M").replace(tzinfo=hobart)
+        else:
+            hh, mm = (int(x) for x in args.sim_start.split(":"))
+            when = datetime.now(hobart).replace(hour=hh, minute=mm, second=0,
+                                                microsecond=0)
+        start_epoch = when.timestamp()
 
     WORLD = World(seed=args.seed, sim_start=start_epoch,
                   bays_per_block=(args.bays_per_block, args.bays_per_block)
-                  if args.bays_per_block else None)
+                  if args.bays_per_block else None,
+                  calibration=calibration)
 
     print("=" * 74)
     print("PTE REAL-TIME AVAILABILITY SIMULATOR  —  SYNTHETIC DATA, NOT REAL")
@@ -776,7 +937,21 @@ def main():
     print(f"  car parks (real capacities): {len(WORLD.carparks)}")
     print(f"  tick                      : {args.tick}s  (speed x{args.speed})")
     print(f"  seed                      : {args.seed}")
-    print(f"  sim clock starts at       : {WORLD.local_dt().strftime('%Y-%m-%d %H:%M:%S')} UTC+10")
+    print(f"  sim clock starts at       : {WORLD.local_dt().strftime('%Y-%m-%d (%a) %H:%M:%S')} UTC+10")
+    if WORLD.cal:
+        prov = WORLD.cal.get("provenance", {})
+        print(f"  CALIBRATED ON REAL DATA   : {WORLD.cal.get('label')}")
+        print(f"    source sha256           : {prov.get('sourceSha256')}")
+        print(f"    rows / bays / dates     : {prov.get('rowsRead'):,} / "
+              f"{prov.get('distinctBays'):,} / {prov.get('distinctArrivalDates')}")
+        sd = WORLD.cal.get("stayDurationSeconds", {})
+        print(f"    median stay (measured)  : {sd.get('medianMinutes')} min")
+        w = WORLD.cal.get("warnings") or []
+        if w:
+            print(f"    calibration warnings    : {len(w)} (see calibration.json)")
+    else:
+        print("  CALIBRATED ON REAL DATA   : NO - using built-in hand-written "
+              "curve (invented distribution)")
     print(f"  listening                 : http://{args.host}:{args.port}")
     print("  endpoints                 : /api/meta.json /api/health /api/bays.geojson")
     print("                              /api/carparks.json /api/snapshot.json /stream")

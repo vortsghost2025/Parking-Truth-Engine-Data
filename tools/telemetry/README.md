@@ -191,6 +191,34 @@ intended extension point.
 
 ---
 
+## `calibrate_sim.py` — closing the loop to the test rig
+
+Harvesting real events is only useful if something consumes them.
+`calibrate_sim.py` turns a harvested `archive-stats.json` into a
+`calibration.json` that drives
+[`../realtime-sim/sim_feed.py`](../realtime-sim/sim_feed.py), so the test rig
+runs on observed behaviour instead of a made-up curve.
+
+```bash
+python3 calibrate_sim.py --stats archive/archive-stats.json --out calibration.json
+```
+
+Emits an occupancy curve by hour, an inverse-CDF stay distribution, the observed
+restriction mix, overstay rate, measured defect rates, and full provenance
+(source, row count, SHA-256, retrieval time).
+
+**The statistic that matters: mean, not median.** Occupancy follows Little's Law
+(ρ = λ · W), which requires the **mean** stay duration. Parking durations are
+strongly right-skewed — a few very long stays carry most of the occupied time —
+so the median underestimates ρ by ~31% on the test fixture. The output records
+`stayStatisticUsed: "mean"` so a downstream consumer can see which was applied.
+
+Verified end to end: 319,009-row fixture → harvester → calibrator (curve peaks
+ρ = 0.556 at 12:00) → `sim_feed.py` converging to 0.97–0.98 of target across
+09:00 / 12:00 / 18:00.
+
+---
+
 ## Verified
 
 Against a purpose-built 24,000-row fixture reproducing Melbourne's documented

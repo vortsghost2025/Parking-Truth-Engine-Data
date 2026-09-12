@@ -94,8 +94,10 @@ Off-street uses **60 s**, matching the published dashboard cadence.
 | `--tick SECONDS` | sensor tick interval |
 | `--speed N` | simulated-time multiplier |
 | `--seed N` | **reproducible** RNG — same seed, same scenario |
-| `--sim-start HH:MM` | start the clock at a given Hobart local time |
+| `--sim-start HH:MM` | start the clock at a given Hobart local time (today's date) |
+| `--sim-start YYYY-MM-DDTHH:MM` | **pin the date too** — weekday/weekend multipliers and the Saturday Salamanca spike depend on it |
 | `--bays-per-block N` | override bay density |
+| `--calibration FILE` | drive occupancy from real telemetry instead of the built-in heuristic (see below) |
 
 Scenarios worth running deliberately:
 
@@ -107,6 +109,65 @@ python3 sim_feed.py --seed 5 --tick 0.2 --speed 60   # fast-forward to force fau
 
 Saturday 08:00–15:00 adds a Salamanca Market spike, which is the realistic
 worst case for Hobart.
+
+---
+
+## Driving the sim from real telemetry
+
+By default the sim runs on a built-in heuristic occupancy curve — plausible, but
+made up. `--calibration` replaces it with a curve derived from **real** parking
+events, so the test rig exercises your app against observed behaviour rather than
+an assumption.
+
+```bash
+# produce calibration.json from a harvested archive (see ../telemetry/README.md)
+python3 ../telemetry/calibrate_sim.py \
+    --stats archive/archive-stats.json --out calibration.json
+
+# run the sim on it, pinned to a known weekday so multipliers are reproducible
+python3 sim_feed.py --calibration calibration.json \
+    --sim-start 2026-09-15T12:00 --speed 1 --tick 1
+```
+
+The arrival model is a **Poisson hazard**, not a pressure heuristic:
+
+```
+λ        = μ̄ · ρ / (1 − ρ)          # μ̄ = mean stay rate, ρ = target occupancy
+p_arrive = 1 − exp(−λ · dt)
+```
+
+This matters. An earlier pressure-based form (`p = min(0.9, pressure·dt/60·1.6)`)
+overshot the target occupancy badly at high `--speed`, because `dt` in simulated
+seconds grows large relative to the equilibrium time constant. The exponential
+hazard form is exact for any `dt`. The world is also seeded at equilibrium at
+startup rather than ramping up from all-free.
+
+**Convergence verified** — calibrated to the 319,009-row Melbourne fixture,
+pinned to Tuesday 2026-09-15, `--speed 1 --tick 1`, 13 s hold, read back from
+`/api/snapshot.json`:
+
+| Sim hour | Bays | Occupied | Free | Unknown | Observed ρ | Citywide target | Ratio |
+|---|---|---|---|---|---|---|---|
+| 09:00 | 846 | 322 | 425 | 99 | 0.431 | 0.449 | 0.96 |
+| 12:00 | 846 | 379 | 368 | 99 | 0.507 | 0.556 | 0.91 |
+| 18:00 | 846 | 158 | 589 | 99 | 0.212 | 0.228 | 0.93 |
+
+The ratios sit *below* 1.0 for a reason that is not error. The target column is
+the **citywide** curve; the sim then applies per-precinct multipliers (cbd-core
+1.00, cbd-east 0.86, cbd-north 0.80, cbd-south 0.90, salamanca 0.94), which
+average ~0.90. So 0.91–0.96 against a citywide target is convergence, not
+undershoot — the sim lands where its own precinct-weighted targets put it.
+`unknown` bays (sensor defects, injected deliberately) are excluded from the ρ
+denominator rather than being counted as free.
+
+03:00 is noisy by nature — only ~14 of 807 bays are expected occupied there, so
+Poisson noise dominates at very low ρ. Do not read a single overnight sample as
+a calibration failure.
+
+> **Testing caveat.** At `--speed 600 --tick 0.05`, 18 real seconds is ~3
+> simulated *days*. Comparing observed occupancy to the target for a start-hour
+> is meaningless unless simulated time is actually verified. Use
+> `--speed 1 --tick 1` for equilibrium-hold tests.
 
 ---
 

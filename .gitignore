@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+
+# Harvested telemetry and derived models are large and reproducible from the
+# documented sources. Keep them out of git; record provenance in manifests/
+# instead. See tools/telemetry/README.md for the storage policy.
+*.jsonl
+*.gpx
+calibration.json
+archive-stats.json
+model*.json
+validation-report.json
+
+# Never commit a harvested payload alongside its metadata by accident.
+sources/**/raw/
+sources/**/downloads/

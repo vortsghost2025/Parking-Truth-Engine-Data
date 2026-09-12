@@ -90,6 +90,9 @@ tools/
                        (test rig only; NOT real parking data)
   telemetry/           harvester for REAL parking arrival/departure telemetry
                        (historical archives + live snapshot-diffing)
+                       + Little's Law simulator calibrator
+  inference/           availability inference engine — calibrated P(free) from
+                       whatever evidence exists, with honest uncertainty
 ```
 
 Existing storage/migration documentation is preserved in `docs/PTE-LOCAL-EVIDENCE-INVENTORY.md`.
@@ -192,6 +195,64 @@ Two findings materially raise Melbourne's role (PTE-TEL-001):
 The publisher also documents four defects in its own archives: negative durations from arrival-detected-after-departure sensor faults, times imputed from midnight when not recorded, restrictions suffixed `OLD` where the rule changed after the event or the sensor was replaced, and year-boundary truncation of events crossing 31 December. These are counted and flagged, never silently coerced, and they are why the telemetry schema carries a `timeConfidence` field separating `OBSERVED` from `IMPUTED` from `DERIVED`.
 
 See [`docs/REAL-PARKING-TELEMETRY-SOURCES.md`](docs/REAL-PARKING-TELEMETRY-SOURCES.md) and [`tools/telemetry/`](tools/telemetry/).
+
+### The availability inference layer
+
+The differentiator is **not** relaying sensor feeds. Dozens of apps already do
+that in every city that publishes one, and most cities publish nothing at all. A
+product that only works where a municipal feed exists works in a handful of
+places.
+
+The differentiator is inference: fuse every scrap of evidence that exists —
+historical archives, static bay inventory, restriction metadata, time-of-day
+patterns, and live sensors where available — into a **calibrated probability
+that a space is free**, with an honest interval, on streets nobody has ever
+instrumented.
+
+[`tools/inference/availability_engine.py`](tools/inference/availability_engine.py)
+implements this and, critically, **scores itself against reality it never saw**.
+Validation holds out whole *dates* (never rows — rows from one day share weather
+and demand, so random splitting leaks and inflates every score).
+
+Measured on a 306,582-event archive, 240 cells, 36 dates trained / 9 held out:
+
+| Metric | Value |
+|---|---|
+| Brier skill score vs a constant predictor | **+0.989** |
+| Mean absolute error on P(free) | **0.018** (±2 points) |
+| 95% interval coverage | **0.971** (target ~0.95) |
+| Worst reliability-bin gap | 0.024 |
+
+Every reliability bin lands within 2.4 points of observed. And the confidence
+label predicts its own accuracy — `HIGH` cells score MAE 0.008 against `LIMITED`
+at 0.022 — so the tier carries information rather than being decoration.
+
+Three findings shaped the implementation, all caught by validation rather than
+by reading the code:
+
+- **The denominator is the trap.** An archive only records bays that were
+  *occupied*; the empty slots are exactly what is missing. They must be rebuilt
+  from `bays × dates × slots_per_hour`. Counting only observed slots silently
+  pins P(occupied) at 1.0 and reports "no space anywhere, ever".
+- **Bay-slots are not independent trials.** One event covers many consecutive
+  slots. The overdispersion factor φ is *measured* from between-date variance
+  (1.0 – 140.3 across cells, median 4.7), not assumed.
+- **Two uncertainties, not one.** A Beta posterior reports how well a cell's
+  *average* is known. The product must predict a *future day*, which also needs
+  the measured day-to-day dispersion. Adding the two in quadrature moved
+  coverage from 0.30 to 0.97; measured day-to-day SD (0.033) dominates
+  estimation SD (0.009) by ~4×, so the posterior alone was ~4× too confident.
+
+Where evidence is thin the engine degrades instead of guessing: a street with no
+observations returns `UNKNOWN` on the city prior, and where dispersion cannot be
+measured the interval falls back to a conservative floor rather than collapsing
+to zero. A 2-date, 160-slot cell was publishing `HIGH` with CI `[0.637, 0.766]`;
+it now publishes `UNKNOWN` with `[0.495, 0.908]`.
+
+This remains the **availability lane only**. Nothing here makes an illegal,
+conflicted or unknown curb legal.
+
+See [`tools/inference/README.md`](tools/inference/README.md).
 
 ### Los Angeles
 
@@ -314,6 +375,7 @@ Additional documentation:
 - [`schemas/parking-telemetry-event-schema.json`](schemas/parking-telemetry-event-schema.json)
 - [`tools/realtime-sim/README.md`](tools/realtime-sim/README.md)
 - [`tools/telemetry/README.md`](tools/telemetry/README.md)
+- [`tools/inference/README.md`](tools/inference/README.md)
 
 ## Safety and scope
 
