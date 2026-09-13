@@ -111,42 +111,87 @@ competitors) confirmed that live on-street occupancy does not exist for most
 cities and is not free where it does. Recorded in
 [`PARKING-DATA-SOURCE-REALITY-CHECK.md`](PARKING-DATA-SOURCE-REALITY-CHECK.md).
 
-Findings that change the plan:
+Findings that change the plan (rev 2, after external review — see §7 of the
+record for what was overclaimed and withdrawn):
 
-- **Cashless parking sessions are the missed source.** A pay-by-phone session is
-  location + start + end + duration — structurally identical to Melbourne's
-  sensor archive, with the payment acting as the sensor. RingGo reported ~250M UK
-  cashless transactions a year; its council-facing Insight product exports
-  session lengths and location data as CSV. **Hull uses MiPermit.** This is a
-  procurement/partnership problem with one repeating integration pattern, not a
-  scraping problem.
+- **Cashless parking sessions are the missed source, and they are a byproduct,
+  not a sensor.** A pay-by-phone session records location, start and **expiry**
+  (determined by the amount paid), fee and vehicle category. It reuses the
+  harvester's ingest path, but it observes **paid sessions, not physical
+  occupancy**: permits, free bays, paper tickets, Blue Badge, overstayers and
+  unpaid cars all create **systematic missingness** that varies by street and
+  restriction type. Modellable, but it **needs calibration** — rev 1's
+  "structurally identical to a ground sensor" is withdrawn.
+- **It is not one integration.** Only RingGo is evidenced. MiPermit and
+  PayByPhone schemas, access models, retention, granularity and licensing are
+  **unverified**. Treat class A as a promising **adapter family**, not a
+  universal adapter. RingGo's own *"clients can access data from their parking
+  locations only"* means coverage is assembled council by council regardless.
+- **It is not real-time.** RingGo's "real-time" refers to Insight dashboards. The
+  documented feed into a council platform is a **daily batch**: Hackney's
+  published playbook describes a previous-day CSV dropped to SFTP each afternoon
+  (`data_warehouse_-YYYY-MM-DD.csv`). Right shape for the climatological layer;
+  not a live occupancy sensor.
+- **The approach is published and measured.** Assemi, Paz & Baker (2021), *IEEE
+  Transactions on Intelligent Transportation Systems*, DOI 10.1109/TITS.2021.3095277:
+  occupancy estimated from **payment data only** at **R² > 94%, RMSE 1.2 bays** —
+  but calibrated against **camera-captured** bay-level occupancy. Precedent for
+  class A, and independent confirmation that cold start is the central risk.
+- **Hull confirms MiPermit on-street**, not only in car parks
+  (`hull.gov.uk/parking/mipermitcashless-parking`). Upgraded from a
+  privacy-notice inference to an official statement.
 - **Enforcement byproducts are real occupancy evidence.** Camden publishes
   transactional PCN data under OGL with street, restriction, contravention code
   and a `Spatial Accuracy` column separating CEO GPS from fixed-CCTV locations.
   Positive-only and biased, so usable for *relative* pressure; needs an absolute
   anchor to invert.
-- **Hull's on-street inventory appears to exist and was missed** — Traffweb
-  (`hull.traffweb.app`) publishes CPZs, resident/business bays and parking
-  restrictions. Whether it exposes machine-readable data is unverified and is the
-  highest-value next check.
-- **Hong Kong's feed is coarser and staleness than assumed**: `vacancy_type` B is
-  binary only, `-1` means the operator provided nothing, `lastupdate` exposes
-  per-record age, and a 2017 LegCo question records lags of "hours to even
-  months". Six apps relaying that all show the same wrong answer simultaneously.
-  Freshness-weighted fusion is a different product from a seventh relay, and
-  layer 2 already implements the mechanism.
-- **Hong Kong and Melbourne are training sets, not markets.** Hull and cities
-  like it are the market, because there is nothing there to relay.
+- **Camden also publishes the bay inventory** (`t4s2-xa5a`): bay length,
+  approximate space count, restriction type, operating times, maximum stay,
+  tariff, road name, CPZ, WKT geometry. So PCN events *and* capacity come from
+  one OGL publisher with **no procurement step** — which is why the Camden
+  experiment is first. Join at street/CPZ level only: bay coordinates derive from
+  an *arbitrary node* on the polyline and individual spaces are not identifiable.
+- **Hull holds an on-street inventory, but Traffweb is not a lawful source for
+  it.** `hull.traffweb.app` publishes CPZs, resident/business bays and
+  restrictions, and is marked *"IN BETA MODE AND ALL DATA IS FOR TESTING PURPOSES
+  ONLY"*, may omit temporary/experimental orders, and defers legal authority to
+  the **Traffic Order documents**. **Probed this turn: no machine-readable
+  endpoint advertised** (negative result). Hull's denominator must come from the
+  Traffic Orders register or FOI. No scraping workaround.
+- **Hong Kong's feed is coarser than assumed, and the staleness claim was
+  misattributed.** Verified against the official specification: `vacancy_type` B
+  is binary only, `-1` means the operator provided nothing, `lastupdate` exposes
+  per-record age. The *"hours to even months"* lag is a **motorist complaint
+  relayed in a 2017 legislator's question**, not a government finding — do not
+  cite it. The verified admission is that TD-managed car parks were **updated
+  manually hourly** in 2017, with replacement from 2018. Current staleness must
+  be **measured** from `lastupdate`, which needs no authentication.
+- **Hong Kong and Melbourne are calibration laboratories, not markets.**
+  Sensor-poor cities are the actual inference problem, because there is nothing
+  there to relay.
 - **Cameras you operate remain a dead end**, consistent with the frozen camera
   lane. The usable inversion is other people's enforcement records, never the
   lens.
 
+**Approved next experiments, deliberately bounded:**
+
+1. ~~Hull Traffweb probe~~ — ✅ **run, negative**. Redirect to Traffic Orders.
+2. **Camden signal test** — PCN events plus Camden bay inventory; test whether
+   street/time patterns correlate with an **independent parking-pressure proxy**.
+   **Do not call it occupancy until calibrated.** Output stays a relative index.
+3. Measure HK staleness from `lastupdate` directly, replacing the 2017 citation.
+4. Test the adapter-family hypothesis: find MiPermit and PayByPhone export
+   schemas and access models.
+
 Open risk: **cold start.** A city with inventory but no event history has nothing
-to train on locally. The intended answer is transferring demand *shape* learned
-from ground-truth cities, applied with wide intervals that narrow as local
-evidence accumulates — the empirical-Bayes prior/shrinkage structure in layer 1
-is already the right mechanism, but **this is not built and is the highest-risk
-assumption in the plan.**
+to train on locally — and the published precedent needed camera-captured ground
+truth to calibrate, so this is a documented dependency, not a hypothetical. The
+intended answer is transferring demand *shape* from ground-truth cities with wide
+intervals that narrow as local evidence accumulates; the empirical-Bayes
+prior/shrinkage structure in layer 1 is already the right mechanism, but **it is
+not built.** The consequence is commercial: **if transfer fails, this is a
+city-by-city data-procurement business rather than a transferable Parking Truth
+Engine.** That fork should be decided before anything is promised.
 
 ## Camera lane
 
