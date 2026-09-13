@@ -532,6 +532,136 @@ pre-registration, not a side effect of this one.
 respected. **The run protocol in §7 is unchanged and still must be executed
 before any Camden row is read.**
 
+## 4C. Protocol step 6 executed — field resolution on the real headers, and two new corrections
+
+Step 6 of the locked protocol says run the field resolver **first** and stop, showing
+resolved, ambiguous and missing fields before anything is calculated. It was run
+against the real column names retrieved from Camden's live SODA API on 2026-09-13.
+**No metric, count, rate or verdict in this section derives from Camden rows.** The
+input was a 2-row sample per dataset, which is sufficient because field resolution is
+a header-level question.
+
+Full record: [`sources/camden/field-resolution-report.json`](../sources/camden/field-resolution-report.json)
+(samples committed under [`sources/camden/samples/`](../sources/camden/samples/) so it is reproducible).
+
+### C2 confirmed on real headers, not merely inferred
+
+`spaceCount` and `bayLengthM` do not resolve. The real columns are `parking_spaces`
+and `parking_bay_length_metres`, and neither `parking spaces` nor `parking bay length
+metres` appears in `BAY_FIELD_CANDIDATES`. Both are **optional** fields, so the
+adapter does not raise — it silently loads every bay with `spaceCount = None`, indexes
+zero streets, and fails F3 for a reason that has nothing to do with Camden. Exactly
+what C2 predicted, now observed.
+
+### The unresolved sets are identical under both header spellings
+
+Two download routes exist and use different spellings: the SODA
+`/resource/{id}.csv` route is snake_case (verified live), while the
+`/api/views/{id}/rows.csv` export is Title Case (**derived mechanically and tested as
+a hypothesis, not observed** — that endpoint returned HTTP 500 through the only
+available network path). Both produce the *same* unresolved set, so these are genuine
+candidate-list gaps, not case mismatches. Normalising case would not have fixed them.
+Field maps for both spellings are prepared:
+[`field-map-soda.json`](../manifests/camden-field-maps/field-map-soda.json),
+[`field-map-viewsexport.json`](../manifests/camden-field-maps/field-map-viewsexport.json).
+
+### C5 (new, moderate) — the publisher's own authoritative description is discarded
+
+`4k7m-4gkk` has a column **`contravention_code_description`** carrying the official text
+verbatim. `PCN_FIELD_CANDIDATES` for `contraventionDescription` are
+`('contravention description', 'contravention', 'description', 'offence description',
+'reason')` — `contravention code description` is not among them, so the field resolves
+to nothing and the column lands in `unconsumedSourceFields`.
+
+C4A means classification no longer depends on this column — class comes from the
+base-code lookup — so **no verdict is affected**. But the record would lose the
+publisher's own wording, which is the best available cross-check on the artifact and
+the field a human reads when auditing a row. Fixed by `--field-map`. Freeze impact:
+none, column wiring only.
+
+### C6 (new, **severe**) — the CPZ join key does not resolve on the PCN side
+
+The bay dataset carries `controlled_parking_zone` and resolves to `cpz` correctly. The
+PCN dataset carries **`controlled_parking_zone_area`** — a *different* column name — and
+`PCN_FIELD_CANDIDATES` for `cpz` are `('cpz', 'controlled parking zone', 'zone', 'cpz
+code')`, so it does **not** resolve.
+
+The values are compatible across both datasets (`CA-E`, `CA-B`, `CA-D`, `CA-F`, `CA-P`,
+`CA-M`, `CA-J`, `CA-Q`, `CA-H`), so the join itself is sound; only the wiring fails. But
+every PCN would normalise with `cpz = None`, and §5 of this record identifies **CPZ as
+the reliable join level** because Camden street strings are uppercase with postcode
+suffixes and junction qualifiers. Protocol step 8 is "run CPZ-level first". With `cpz`
+unresolved that run would either fail coverage or — worse — join nothing to nothing and
+report a result about an empty intersection. `cpz` is not a required field, so nothing
+would raise. **This is the defect that would have invalidated the run silently**, and
+step 6 is the only reason it was found before step 8. Fixed by `--field-map`. Freeze
+impact: none, column wiring only.
+
+### Deliberately left unresolved
+
+- **`wkt`** — mapping `epsg_27700_well_known_text_geometry` would pull polyline geometry
+  into the bay records. The design forbids a bay-level join (Camden bay coordinates are
+  an arbitrary node on a polyline; individual spaces are not identifiable) and
+  `assert_no_bay_level_join()` guards it. Leaving it unresolved removes the temptation.
+- **`pcnReference`** — the only candidate column is `socrata_id`, a Socrata internal row
+  id. Mapping it as a PCN reference would assert provenance the publisher does not claim.
+  This dataset appears to carry no PCN number at all.
+- **`parkingRestriction`** — genuinely absent from the PCN dataset; it is a bay attribute.
+  Correctly unresolved, not a defect.
+
+### Three freeze-time unknowns are now verified
+
+- **`spatial_accuracy` EXISTS** in `4k7m-4gkk` and resolves to `spatialAccuracy` with no
+  override. It was listed at freeze time as documented-but-unverified because the
+  metadata fetch failed on positions 31+. Observed value `Unknown` → `UNKNOWN_OTHER`
+  stratum. The bay dataset also carries `spatial_accuracy`, observed as `Defined By
+  Custodian` — a value the strata model does not define, so it will surface as
+  `UNRECOGNISED` rather than be absorbed, which is the designed behaviour.
+- **The publisher already splits base code from suffix**: `contravention_code: "52M"`
+  alongside `contravention_code_suffix: "M"`. That independently corroborates C4A's
+  parsing design from Camden's own schema.
+- **`contravention_date` carries a full timestamp with milliseconds** (`2026-05-15T15:22:00.000`),
+  so hour is genuinely available and the no-hour-imputation rule is satisfiable rather
+  than merely aspirational.
+
+A separate column `ticket_issued_via_cctv_camera` (`Yes`/`No`) gives a second
+authoritative deployment indicator. Like suffix `j`, it is recorded and **not** used in
+any verdict.
+
+### The artifact is corroborated by a second source
+
+Every observed publisher description matches the frozen artifact — **exactly** for codes
+11, 05 and 01, and as artifact-text plus the suffix expansion in parentheses for `52M`
+(*"…certain types of vehicle (no motor vehicles)"*, where the artifact's suffix legend
+gives `m` = "motor vehicles"). The artifact was transcribed from London Councils; this
+is Camden's own data agreeing with it independently.
+
+One caution found in the same comparison: **`charging_band_description` is not a proxy for
+`Diff. level`.** They agree for parking codes (11 Lower/Lower, 05 Lower/Lower, 01
+Higher/Higher) but diverge for moving traffic — London Councils marks code 52 `n/a` while
+Camden charges `Band A (Higher)`, because Camden must assign a charging band even where
+the differential level is `n/a`. Using `charging_band_description` as a
+parking-vs-moving-traffic discriminator would be wrong.
+
+### Blocker: the full downloads cannot be obtained from this sandbox
+
+`bash` has no outbound network (`curl` → `SSL_ERROR_SYSCALL`). The only network path is
+the page-fetch tool, which returns content into the conversation rather than writing a
+file, so a **495,814-row** PCN export cannot be materialised on disk by any number of
+calls. The SODA `.csv` endpoints additionally returned HTTP 500; only `.json` responded.
+
+Both full exports must be placed in `sources/camden/downloads/` (already gitignored, so
+the large data stays out of Git):
+
+- `https://opendata.camden.gov.uk/api/views/7hiv-3r9k/rows.csv?accessType=DOWNLOAD`
+- `https://opendata.camden.gov.uk/api/views/4k7m-4gkk/rows.csv?accessType=DOWNLOAD`
+
+Either spelling works; the matching field map is already prepared for both. On receipt:
+step 3 hashes both files and records dataset IDs, retrieval time, byte size and row
+count; step 5 applies the frozen C3 filter and reports rows excluded as moving
+traffic/bus lane, the fallback count and every unmapped code; step 6 runs the frozen
+signal test. **No threshold or taxonomy edit after that point.**
+
 ## 5. Unverified at freeze time
 
 Recorded so nobody mistakes an assumption for a finding:

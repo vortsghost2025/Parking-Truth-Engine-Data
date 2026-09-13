@@ -1,0 +1,15 @@
+{
+  "_comment": "PTE-TEL-004 field map. Overrides ONLY column wiring, which the freeze protocol explicitly permits. No threshold, taxonomy, verdict logic or frozen .py file is affected. Fields deliberately LEFT UNRESOLVED: 'wkt' (bay geometry must not enable a bay-level join; assert_no_bay_level_join guards this), 'pcnReference' (the only candidate column is socrata_id, a Socrata internal row id, and mapping it as a PCN reference would assert provenance the publisher does not claim), and 'parkingRestriction' (genuinely absent from the PCN dataset - it is a bay attribute).",
+  "route": "views export /api/views/{id}/rows.csv  (Title Case)",
+  "headerSpellingVerifiedAgainstLiveApi": false,
+  "fieldMap": {
+    "bay-map": {
+      "spaceCount": "Parking Spaces",
+      "bayLengthM": "Parking Bay Length Metres"
+    },
+    "pcn-series": {
+      "contraventionDescription": "Contravention Code Description",
+      "cpz": "Controlled Parking Zone Area"
+    }
+  }
+}
