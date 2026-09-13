@@ -193,6 +193,80 @@ not built.** The consequence is commercial: **if transfer fails, this is a
 city-by-city data-procurement business rather than a transferable Parking Truth
 Engine.** That fork should be decided before anything is promised.
 
+## Camden signal harness (PTE-TEL-003)
+
+Approved and built this turn: a bounded test of whether Camden's PCN exhaust
+carries a reproducible street/time parking-pressure signal.
+[`CAMDEN-SIGNAL-HARNESS.md`](CAMDEN-SIGNAL-HARNESS.md), code in
+[`tools/camden/`](../tools/camden/), schema
+[`camden-pressure-signal-schema.json`](../schemas/camden-pressure-signal-schema.json).
+
+**Status: built and self-tested 14/14. NOT run against real Camden data** — the
+sandbox has no outbound network, so the two OGL downloads have to happen on a
+machine that has one. Column names are therefore candidates, and `--field-map`
+exists so a real download can be pinned without editing code. Unresolved
+*required* fields raise rather than guess; verified by renaming columns until the
+harness refused.
+
+Output is a **relative parking-pressure index** — PCNs per space per date,
+rescaled to an exposure-weighted mean of 1.0. It is not occupancy, not a
+probability of finding a space, and not a confidence figure, and that is
+machine-enforced rather than conventional: `assert_no_forbidden_semantics()`
+walks every emitted report and raises on any key implying one of those claims. It
+caught two of its author's own keys (`isOccupancy`,
+`outputIsRelativeIndexNotOccupancy`), both negations, which is the guard working
+— a namespace that spells denials with the forbidden vocabulary is one careless
+edit away from asserting them.
+
+Scope constraints enforced structurally: street/CPZ join with no bay identifier
+or coordinate permitted in a cell key; `CEO_GPS` / `FIXED_CCTV` / `UNKNOWN_OTHER`
+strata never pooled by default; capacity used only where the publisher supplies
+it (`None`, never `0.0`); approximate-capacity flags propagated end to end;
+hours never imputed, so a date-only PCN is excluded from hourly diagnostics
+rather than placed at midnight; unrecognised publisher values surfaced verbatim
+instead of absorbed into `UNKNOWN_OTHER`; no wall clock anywhere.
+
+Five fail criteria from the approved scope, each demonstrated on a fixture built
+from latent demand and enforcement-deployment processes the harness did not
+create:
+
+| Scenario | Verdict | Diagnostic |
+|---|---|---|
+| demand-dominated | PASS | proxy rho 0.564 (n=47) |
+| deployment-dominated | FAIL F1 | prohibition share 0.964; index-vs-mix rho 0.807 |
+| gps-biased | FAIL F1+F2 | CEO-GPS isolation rho **−0.304** — ranking inverts |
+| sparse-coverage | FAIL F3 | 7 streets (min 10), 12 dates (min 28) |
+| no-validation-route | FAIL F4 | state `NONE_KNOWN` |
+| drifting | FAIL F5 | split-half rho 0.187 |
+| demand-dominated, no proxy | PARTIAL | verdict correctly capped |
+
+One fixture bug worth keeping: `gps-biased` originally failed on F1 rather than
+F2, because with demand and deployment multipliers drawn independently the same
+streets topped both rankings, so Spearman stayed high even though magnitudes
+diverged. **F2 tests order collapse; rescaling is not collapse.** Fixed by
+anti-correlating the multipliers. A test that passes for the wrong reason is
+worse than one that fails.
+
+**Central limitation, which no engineering removes:** `PCN rate ≈ occupancy ×
+violation rate × enforcement intensity`. Dividing by capacity removes the
+street-size term and only that term. **PCN data alone cannot separate parking
+demand from enforcement deployment.** The F1 indicators narrow it; only an
+independent proxy resolves it — which is why F4 is a fail criterion and why a
+proxy-less run is capped at PARTIAL. A signal that correlates only with itself is
+not evidence.
+
+Reading of outcomes: **FAIL** is cheap and useful (drop PTE-TEL-002 class B);
+**PARTIAL** justifies pursuing payment-session access; **PASS** is the strongest
+available evidence for historical inference from administrative exhaust.
+
+Sequencing holds: **Camden before Hull procurement or MiPermit access.** It is
+free, already published, and carries both the enforcement and capacity sides.
+
+Boundaries respected: legality kernel not modified, imported or consulted;
+PTE-007/PTE-008 evidence untouched; camera lane still frozen (this consumes other
+people's published records, operates no lens); no individual-space occupancy
+inferred; nothing deployed; nothing merged to main; no existing data overwritten.
+
 ## Camera lane
 
 **FROZEN — `CAMERA_FIXED_VIEW_PARTIAL`**

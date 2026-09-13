@@ -1,0 +1,231 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/vortsghost2025/Parking-Truth-Engine-Data/schemas/camden-pressure-signal-schema.json",
+  "title": "PTE Camden Relative Parking-Pressure Signal (PTE-TEL-003)",
+  "description": "Output of the Camden signal harness: a RELATIVE parking-pressure index derived from administrative exhaust (PCN events plus publisher-supplied bay capacity). AVAILABILITY-ADJACENT RESEARCH LANE ONLY. This schema deliberately contains no occupancy field, no probability field, no vacancy field, no availability field and no confidence percentage. camden_pressure.assert_no_forbidden_semantics() machine-enforces that at emit time: any key whose name implies one of those claims raises ForbiddenSemanticsError. A PCN proves a vehicle WAS at a location at a time; it never proves a vehicle MAY be there, so legalityClaimed is false throughout and nothing here may be consumed by the legality kernel.",
+  "type": "object",
+  "required": [
+    "recordId",
+    "harnessVersion",
+    "joinLevel",
+    "semanticContract",
+    "coverage",
+    "missingness",
+    "repeatability",
+    "spatialStrataBehaviour",
+    "signal",
+    "confounders",
+    "validation",
+    "verdict",
+    "hardGuarantees"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "recordId": { "const": "PTE-TEL-003" },
+    "harnessVersion": { "type": "string" },
+    "asOf": {
+      "type": ["string", "null"],
+      "description": "Report timestamp. Defaults to the max date present in the PCN series. Never the wall clock: a report must be reproducible from its inputs alone."
+    },
+    "joinLevel": {
+      "type": "string",
+      "enum": ["STREET", "CPZ"],
+      "description": "The aggregation level. There is deliberately NO BAY option. Camden states that individual parking spaces cannot be identified and that bay coordinates derive from an arbitrary node along the polyline geometry, so a bay-level join would fabricate precision the publisher explicitly disclaims. camden_aggregate.assert_no_bay_level_join() raises if any emitted cell carries a bay identifier or a coordinate."
+    },
+    "semanticContract": {
+      "type": "object",
+      "description": "Attached to every report so a number cannot be read out of context. Negations are expressed as a VALUE list rather than as boolean keys, because the forbidden-key guard would otherwise trip on a key whose purpose is to deny the claim.",
+      "required": ["quantity", "units", "doesNotClaim", "legalityClaimed"],
+      "properties": {
+        "quantity": { "const": "RELATIVE_PARKING_PRESSURE_INDEX" },
+        "units": { "type": "string" },
+        "doesNotClaim": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Must include occupancy, probability of finding a space, vacancy, availability, a percentage, a confidence figure, cross-city comparability and legality."
+        },
+        "comparableAcrossCities": { "const": false },
+        "legalityClaimed": { "const": false },
+        "reading": { "type": "string" }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "description": "Deliverable 7 item 1. Geographic and temporal extent, plus the capacity coverage that determines which streets can carry a per-space index at all.",
+      "required": ["criteria", "dateIndex", "bayInventory"]
+    },
+    "missingness": {
+      "type": "object",
+      "description": "Deliverable 7 item 2. Counted, never filled. Includes hourImputationPerformed, which must be false: a PCN carrying a date but no time yields hourKnown=false and is excluded from every hourly diagnostic rather than being placed at midnight.",
+      "required": ["pcnTotal", "bayTotal", "pcnHourUnknown", "hourImputationPerformed", "spatialStrataCounts", "unrecognisedSpatialAccuracyValues"],
+      "properties": {
+        "hourImputationPerformed": { "const": false },
+        "spatialStrataCounts": {
+          "type": "object",
+          "required": ["CEO_GPS", "FIXED_CCTV", "UNKNOWN_OTHER"],
+          "additionalProperties": false,
+          "properties": {
+            "CEO_GPS": { "type": "integer", "minimum": 0 },
+            "FIXED_CCTV": { "type": "integer", "minimum": 0 },
+            "UNKNOWN_OTHER": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "unrecognisedSpatialAccuracyValues": {
+          "type": "object",
+          "description": "Publisher values this adapter has never seen, with counts. Surfaced verbatim so schema drift cannot hide inside UNKNOWN_OTHER.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "repeatability": {
+      "type": "object",
+      "description": "Deliverable 7 item 3. Split-half rank stability across chronological date halves. Repeatability of a RANKING, not of a level: levels are not comparable across periods if the enforcement regime changed.",
+      "required": ["splitHalf"]
+    },
+    "spatialStrataBehaviour": {
+      "type": "object",
+      "description": "Deliverable 7 item 4. Whether GPS-quality events behave differently from CCTV-located ones. Reported PER STRATUM. The three strata are never pooled by default; camden_aggregate.pool_strata() is the only sanctioned route and stamps its output with pooledFrom so a report must show the effect of pooling rather than hide it.",
+      "required": ["CEO_GPS", "FIXED_CCTV", "UNKNOWN_OTHER", "differenceDiagnostic"]
+    },
+    "signal": {
+      "type": "object",
+      "description": "Deliverable 7 item 5. Strongest and weakest streets, the index distribution, and the contravention-class mix used as a confound diagnostic.",
+      "required": ["strongestStreets", "weakestStreets", "globalRatePcnsPerSpacePerDate", "indexDistribution", "contraventionMix"]
+    },
+    "confounders": {
+      "type": "object",
+      "description": "Deliverable 7 item 6. Stated explicitly rather than assumed away. The central one is that PCN counts measure enforcement attention AND driver behaviour, and the two cannot be separated from PCN data alone.",
+      "required": ["deploymentDominance", "stratumIsolation", "stated"]
+    },
+    "validation": {
+      "type": "object",
+      "description": "Fail criterion F4. Three states: SUPPLIED (a proxy was given; correlate and report), AVAILABLE_NOT_SUPPLIED (a route exists but was not supplied this run; the verdict is capped at PARTIAL and the output is descriptive only), NONE_KNOWN (F4 triggers). The harness CANNOT verify that a supplied proxy is independent of the PCN series - that is an operator assertion, and if it is wrong the test is circular.",
+      "required": ["criterion", "state", "triggered"],
+      "properties": {
+        "state": { "enum": ["SUPPLIED", "AVAILABLE_NOT_SUPPLIED", "NONE_KNOWN"] },
+        "capsVerdictAt": { "enum": ["PARTIAL"] },
+        "spearmanIndexVsProxy": { "$ref": "#/definitions/rankCorrelation" },
+        "independenceCaveat": { "type": "string" }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "description": "Deliverable 7 item 7. Explicit PASS / PARTIAL / FAIL with the criteria that produced it.",
+      "required": ["verdict", "hardCriteriaTriggered", "criteriaResults", "explanation"],
+      "properties": {
+        "verdict": { "enum": ["PASS", "PARTIAL", "FAIL"] },
+        "hardCriteriaTriggered": {
+          "type": "array",
+          "items": {
+            "enum": ["coverage", "stratumIsolation", "splitHalfStability",
+                     "deploymentDominance", "validationRoute"]
+          }
+        },
+        "criteriaResults": {
+          "type": "object",
+          "additionalProperties": { "type": "boolean" }
+        },
+        "explanation": { "type": "string" }
+      }
+    },
+    "index": {
+      "type": "object",
+      "description": "The per-street relative pressure index, emitted for the caller-supplied strata scope and separately for each individual stratum.",
+      "properties": {
+        "allSuppliedStrata": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/streetIndexEntry" }
+        },
+        "perStratum": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/definitions/streetIndexEntry" }
+          }
+        }
+      }
+    },
+    "hardGuarantees": {
+      "type": "object",
+      "description": "The scope constraints, asserted by code rather than promised in prose.",
+      "required": [
+        "noBayLevelJoinPerformed",
+        "strataNeverPooledByDefault",
+        "hoursNeverImputed",
+        "capacityUsedOnlyWherePublisherSupplied",
+        "approximateCapacityFlagsPreserved",
+        "outputIsRelativeIndexOnly",
+        "legalityClaimed"
+      ],
+      "properties": {
+        "noBayLevelJoinPerformed": { "const": true },
+        "strataNeverPooledByDefault": { "const": true },
+        "hoursNeverImputed": { "const": true },
+        "capacityUsedOnlyWherePublisherSupplied": { "const": true },
+        "approximateCapacityFlagsPreserved": { "const": true },
+        "outputIsRelativeIndexOnly": { "const": true },
+        "legalityClaimed": { "const": false }
+      }
+    }
+  },
+  "definitions": {
+    "rankCorrelation": {
+      "type": "object",
+      "description": "Spearman rho reported with n and tie counts, because a correlation over six heavily-tied streets is not the same object as one over four hundred.",
+      "required": ["rho", "n"],
+      "properties": {
+        "rho": { "type": ["number", "null"], "minimum": -1, "maximum": 1 },
+        "n": { "type": "integer", "minimum": 0 },
+        "tiesX": { "type": ["integer", "null"] },
+        "tiesY": { "type": ["integer", "null"] },
+        "note": { "type": "string" }
+      }
+    },
+    "streetIndexEntry": {
+      "type": "object",
+      "description": "One street's relative pressure index. spaceCount is null - never 0.0 - where the publisher supplied no capacity, because zero spaces and unknown spaces mean completely different things to a per-space rate.",
+      "required": [
+        "joinKey", "pcnCount", "capacityKnown", "spaceCount",
+        "pcnsPerSpacePerDate", "relativePressureIndex"
+      ],
+      "properties": {
+        "joinKey": {
+          "type": "string",
+          "pattern": "^[^|]*(\\|\\|[^|]*)?$",
+          "description": "\"<cpz>||<street>\" at STREET level, \"<cpz>\" at CPZ level. CPZ is retained because street names repeat across zones and the CPZ is the enforcement-regime boundary. Contains no bay identifier and no coordinate."
+        },
+        "cpz": { "type": ["string", "null"] },
+        "street": { "type": ["string", "null"] },
+        "spaceCount": {
+          "type": ["number", "null"],
+          "description": "Sum of publisher-supplied bay space counts on this street. Null when the publisher supplied none."
+        },
+        "capacityIsApproximate": {
+          "type": ["boolean", "null"],
+          "description": "True if ANY contributing bay is flagged approximate. For Camden that is always, because the publisher describes the figure as approximate. Null when no capacity was supplied."
+        },
+        "capacitySuppliedByPublisher": { "type": ["boolean", "null"] },
+        "capacityCoverageFraction": {
+          "type": ["number", "null"], "minimum": 0, "maximum": 1,
+          "description": "Share of this street's bays for which the publisher supplied a space count."
+        },
+        "exposureBayDates": {
+          "type": ["number", "null"],
+          "description": "spaceCount x the number of distinct dates of that dayType in the series. The rate denominator. Null when capacity is unknown."
+        },
+        "pcnsPerSpacePerDate": {
+          "type": ["number", "null"], "minimum": 0,
+          "description": "A violation RATE, not an occupancy. Inherits the publisher's approximation of capacity."
+        },
+        "relativePressureIndex": {
+          "type": ["number", "null"], "minimum": 0,
+          "description": "pcnsPerSpacePerDate divided by the exposure-weighted global rate, so the mean across indexed streets is 1.0. A value of 2.0 means twice the study-average PCN rate per space. It does NOT mean 200% full, NOT a probability, and NOT twice the occupancy. Null where suppressed."
+        },
+        "indexSuppressedReason": {
+          "type": ["string", "null"],
+          "description": "Why no index was emitted: no publisher-supplied capacity, or exposure below min_exposure. Suppressed streets are RETAINED with a reason rather than dropped, because dropping them would silently bias the indexed set toward large, well-inventoried roads."
+        }
+      }
+    }
+  }
+}

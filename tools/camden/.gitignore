@@ -1,0 +1,9 @@
+# Fixtures, downloads and reports are all reproducible from the documented
+# commands. Keep them out of git; the manifest records their sha256 instead.
+out/
+__pycache__/
+*.pyc
+*.csv
+*.csv.gz
+report*.json
+selftest-result.json

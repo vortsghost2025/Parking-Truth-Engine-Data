@@ -1,0 +1,164 @@
+{
+  "policy": "Machine-readable companion to docs/CAMDEN-SIGNAL-HARNESS.md. Where this file and the narrative disagree, the narrative governs and this file is stale.",
+  "recordId": "PTE-TEL-003",
+  "snapshotDate": "2026-09-13",
+  "relatedDoc": "docs/CAMDEN-SIGNAL-HARNESS.md",
+  "relatedReadme": "tools/camden/README.md",
+  "upstreamRecords": ["PTE-TEL-002", "PTE-TEL-001"],
+  "upstreamAction": "PTE-TEL-002 section 5 action 2 (Camden signal test), approved with bounded scope",
+  "lane": "AVAILABILITY (research)",
+  "legalityClaimed": false,
+  "separationNote": "A PCN proves a vehicle WAS at a location at a time. It never proves a vehicle MAY be there. The legality kernel is not modified, imported or consulted. PTE-007 and PTE-008 evidence is untouched. The camera lane stays frozen: this harness consumes other people's published enforcement records and operates no lens.",
+  "question": "Do Camden PCN event patterns contain a reproducible street/time parking-pressure signal?",
+  "outputQuantity": "RELATIVE_PARKING_PRESSURE_INDEX",
+  "outputUnits": "PCNs per parking space per date, rescaled so the exposure-weighted mean across indexed streets is 1.0",
+  "status": {
+    "built": true,
+    "selfTested": true,
+    "selfTestResult": "14/14 passing",
+    "runAgainstRealCamdenData": false,
+    "deployed": false,
+    "mergedToMain": false,
+    "existingDataOverwritten": false
+  },
+  "modules": [
+    { "path": "tools/camden/camden_sources.py", "deliverable": 1, "role": "source adapters; local files only; provenance stamping; candidate-driven column resolution", "lines": 635 },
+    { "path": "tools/camden/camden_normalize.py", "deliverable": 2, "role": "deterministic normalisation; temporal features; Spatial Accuracy strata; contravention classification", "lines": 401 },
+    { "path": "tools/camden/camden_aggregate.py", "deliverable": [3, 4], "role": "street/CPZ aggregation; stratification; sparse grid with analytic exposure", "lines": 446 },
+    { "path": "tools/camden/camden_pressure.py", "deliverable": 5, "role": "relative pressure index; concentration diagnostics; forbidden-semantics guard", "lines": 304 },
+    { "path": "tools/camden/camden_signal_test.py", "deliverable": 7, "role": "five fail criteria; PASS/PARTIAL/FAIL verdict; report", "lines": 866 },
+    { "path": "tools/camden/make_camden_fixture.py", "deliverable": 6, "role": "synthetic fixture from known latent demand and deployment processes", "lines": 524 },
+    { "path": "tools/camden/run_selftest.py", "deliverable": 6, "role": "grades the harness against truth it did not create", "lines": 460 }
+  ],
+  "schema": "schemas/camden-pressure-signal-schema.json",
+  "inputsRequired": {
+    "bayMap": {
+      "datasetId": "t4s2-xa5a",
+      "title": "Camden Parking Bay Map",
+      "publisher": "London Borough of Camden",
+      "licence": "OGL",
+      "sourceUrl": "https://opendata.camden.gov.uk/d/t4s2-xa5a",
+      "fields": ["approximate length in metres", "approximate number of spaces", "restriction type", "times of operation", "maximum stay", "tariff", "road name", "CPZ", "WKT polyline geometry"],
+      "publisherLimits": "Individual parking spaces cannot be identified. Coordinates are automatically calculated from an ARBITRARY NODE along the polyline geometry."
+    },
+    "pcnSeries": {
+      "datasetId": "camden-transactional-pcn",
+      "publisher": "London Borough of Camden",
+      "licence": "OGL",
+      "sourceUrl": "https://opendata.camden.gov.uk/",
+      "fields": ["contravention code", "ticket type", "street", "parking restriction", "vehicle category", "case status", "Spatial Accuracy"],
+      "spatialAccuracyValues": ["Civil Enforcement Officer GPS Location", "Fixed CCTV Camera", "Unknown"],
+      "publisherLimits": "A Fixed CCTV Camera location could be many metres from the vehicle in contravention."
+    },
+    "independentProxy": {
+      "required": false,
+      "effect": "Without one the verdict is capped at PARTIAL and PASS is unreachable.",
+      "constraint": "Must NOT be derived from the PCN series under test, or the test is circular.",
+      "verifiability": "The harness CANNOT verify independence; it is an operator assertion stamped into the report."
+    }
+  },
+  "constraintsEnforced": [
+    { "constraint": "join at street/CPZ level, never individual bay level", "mechanism": "no bay identifier or coordinate exists in a cell key; assert_no_bay_level_join() raises; joinLevel enum has no BAY member" },
+    { "constraint": "preserve Spatial Accuracy strata separately", "mechanism": "stratum is a dimension of every cell; CEO_GPS, FIXED_CCTV and UNKNOWN_OTHER never share one" },
+    { "constraint": "never pool strata unless a report shows the effect", "mechanism": "pool_strata() is the only route and stamps pooledFrom on its output; nothing pools by default" },
+    { "constraint": "unrecognised publisher values must not hide inside UNKNOWN_OTHER", "mechanism": "map_spatial_accuracy() returns an UNRECOGNISED disposition; raw value reported verbatim with count" },
+    { "constraint": "use bay capacity only where the publisher supplies it", "mechanism": "spaceCount is None, never 0.0; suppressed streets are retained with a reason rather than dropped" },
+    { "constraint": "preserve approximate-capacity flags", "mechanism": "capacityIsApproximate propagates bay -> street -> index entry -> report" },
+    { "constraint": "temporal features: hour, weekday, weekend, month/season", "mechanism": "parse_issue_time() emits all of them plus dayType WEEKDAY/SATURDAY/SUNDAY" },
+    { "constraint": "output a relative pressure index only", "mechanism": "assert_no_forbidden_semantics() walks the emitted report and raises on any key implying occupancy, probability, vacancy, availability or confidence" },
+    { "constraint": "do not create fake confidence percentages", "mechanism": "same guard; negations are expressed as a doesNotClaim value list because a key named isOccupancy:false would trip the check meant to stop occupancy:0.62" },
+    { "constraint": "hours never imputed", "mechanism": "a date-only PCN yields hourKnown false and never lands in bucket 0; hourImputationPerformed asserted false" },
+    { "constraint": "determinism", "mechanism": "sorted iteration, fixed rounding, no wall clock (asOf defaults to max date in data), seeded RNG" }
+  ],
+  "failCriteria": [
+    { "id": "F1", "name": "deploymentDominance", "criterion": "signal dominated by enforcement deployment rather than parking demand", "test": "prohibition-share dominance AND index rising with prohibition mix across streets", "thresholds": { "prohibitionShareDominant": 0.5, "indexVsProhibitionSpearman": 0.4 } },
+    { "id": "F2", "name": "stratumIsolation", "criterion": "results collapse when CEO GPS events are isolated", "test": "Spearman(all-strata ranking, CEO-GPS-only ranking)", "thresholds": { "stratumIsolationSpearman": 0.5 } },
+    { "id": "F3", "name": "coverage", "criterion": "insufficient geographic/time coverage", "test": "distinct streets, distinct dates, capacity coverage fraction, CEO-GPS share", "thresholds": { "minDistinctStreets": 10, "minDistinctDates": 28, "minCapacityCoverageFraction": 0.5, "minCeoGpsShare": 0.05 } },
+    { "id": "F4", "name": "validationRoute", "criterion": "no independent validation route", "test": "SUPPLIED / AVAILABLE_NOT_SUPPLIED / NONE_KNOWN", "thresholds": { "proxySpearman": 0.4 } },
+    { "id": "F5", "name": "splitHalfStability", "criterion": "unstable rankings across comparable periods", "test": "Spearman across chronological date halves", "thresholds": { "splitHalfSpearman": 0.5 } }
+  ],
+  "verdictSemantics": {
+    "FAIL": "any criterion triggered",
+    "PASS": "none triggered AND an independent proxy supplied AND Spearman(index, proxy) >= 0.40",
+    "PARTIAL": "none triggered but the PASS bar not met; in practice no proxy supplied, so the output is descriptive signal characterisation only"
+  },
+  "selfTest": {
+    "command": "python3 tools/camden/run_selftest.py",
+    "totalChecks": 14,
+    "passed": 14,
+    "scenarios": [
+      { "name": "demand-dominated", "expected": "PASS", "observed": "PASS", "triggered": [], "proxyRho": 0.563714, "proxyN": 47 },
+      { "name": "deployment-dominated", "expected": "FAIL", "observed": "FAIL", "triggered": ["deploymentDominance"], "prohibitionShareOverall": 0.964434, "indexVsProhibitionRho": 0.807047 },
+      { "name": "gps-biased", "expected": "FAIL", "observed": "FAIL", "triggered": ["deploymentDominance", "stratumIsolation"], "ceoGpsIsolationRho": -0.304216 },
+      { "name": "sparse-coverage", "expected": "FAIL", "observed": "FAIL", "triggered": ["coverage"], "distinctStreets": 7, "distinctDates": 12 },
+      { "name": "no-validation-route", "expected": "FAIL", "observed": "FAIL", "triggered": ["validationRoute"], "state": "NONE_KNOWN" },
+      { "name": "drifting", "expected": "FAIL", "observed": "FAIL", "triggered": ["splitHalfStability"], "splitHalfRho": 0.186517 },
+      { "name": "demand-dominated-noproxy", "expected": "PARTIAL", "observed": "PARTIAL", "triggered": [], "note": "verdict correctly capped; PASS unreachable without an independent proxy" }
+    ],
+    "structuralChecks": [
+      "fixture bytes deterministic across runs",
+      "report sha256 deterministic across runs",
+      "forbidden-semantics guard fires on an occupancy-shaped key and accepts a clean index",
+      "no-bay-level-join guard fires on a coordinate-bearing cell",
+      "date-only PCNs yield hourKnown false with nothing in hour bucket 0",
+      "unrecognised Spatial Accuracy value surfaces verbatim and lands in UNKNOWN_OTHER",
+      "a real report conforms to the JSON schema (required keys, consts, enums)"
+    ]
+  },
+  "referenceRun": {
+    "scenario": "demand-dominated",
+    "fixture": {
+      "streetCount": 48,
+      "bayRowCount": 118,
+      "pcnRowCount": 21042,
+      "cameraStreetCount": 12,
+      "distinctDates": 84,
+      "dateMin": "2025-01-06",
+      "dateMax": "2025-03-30",
+      "sha256": {
+        "bays.csv": "ea20a4931231146953fa9188277c4380745e056be33c8a1a3729c13c15cea329",
+        "pcn.csv": "071260cb75511c398501660fe26d73676c73837645b2e24e8e4c9e23bc23d399",
+        "proxy.csv": "074de85073429a0af3e643ad85a9f4ea0275be1da415b996acd20c427b8f81d6"
+      }
+    },
+    "reportSha256": "529492a9c677bdd2cbcacd9a6c5778646dbf46e6a7abd15741004959b90ba496",
+    "indexDistribution": { "n": 47, "min": 0.239451, "p25": 0.736052, "median": 0.998758, "p75": 1.259905, "max": 2.851396, "simpleMean": 1.079889 },
+    "streetsWithIndex": 47,
+    "streetsSuppressed": 7,
+    "globalRatePcnsPerSpacePerDate": 0.013988249,
+    "sizeConfoundGiniGap": 0.306075,
+    "note": "median approx 1.0 as constructed; simple mean above 1.0 because the index is exposure-weighted, not street-weighted. The Gini gap exceeds the 0.25 threshold and is correctly reported as a SIZE confound, not as enforcement deployment."
+  },
+  "knownLimitations": [
+    "Never run against real Camden data - the single largest caveat",
+    "Column names are candidates, not verified spellings; --field-map pins a real download without a code edit, and unresolved REQUIRED fields raise rather than guess",
+    "Street matching between the two datasets is token-based; unmatched streets are reported on both sides, and a low match rate surfaces as F3 capacity-coverage failure",
+    "The proxy mechanism is proven only against a synthetic proxy derived from the fixture's latent demand process",
+    "Appealed and cancelled PCNs are included as issued; caseStatus is reported but not used to filter, because filtering on outcome would condition the signal on what happened after the event",
+    "No seasonality modelling; month and season are carried as features and reported but nothing corrects for them",
+    "Contravention classification is a keyword heuristic over free text; AMBIGUOUS is a real outcome and is not forced into a bucket"
+  ],
+  "centralLimitation": "PCN rate = occupancy x violation rate x enforcement intensity. Dividing by capacity removes the street-size term and only that term. PCN data alone CANNOT separate parking demand from enforcement deployment. The F1 indicators narrow that ambiguity; only an independent proxy resolves it. A signal that correlates only with itself is not evidence.",
+  "fixtureBugRecorded": "gps-biased initially failed on F1 rather than F2 because demand and deployment multipliers were drawn independently, so the same streets topped both rankings and Spearman stayed high even though magnitudes diverged. F2 tests ORDER collapse; rescaling is not collapse. Fixed by anti-correlating the two latent multipliers and attributing 97% of camera-street events to CCTV; observed rho then goes to -0.304.",
+  "reproduction": {
+    "selfTest": "python3 tools/camden/run_selftest.py",
+    "generateFixture": "python3 tools/camden/make_camden_fixture.py --out-dir /tmp/cam --scenario demand-dominated --manifest /tmp/cam/manifest.json",
+    "runSignalTest": "python3 tools/camden/camden_signal_test.py --bays /tmp/cam/bays.csv --pcn /tmp/cam/pcn.csv --proxy /tmp/cam/proxy.csv --out /tmp/cam/report.json",
+    "inspectFieldResolution": "python3 tools/camden/camden_sources.py --bays bays.csv --pcn pcn.csv --report resolve.json",
+    "dependencies": "Python 3.11, stdlib only. No network access anywhere in the harness.",
+    "deterministic": true
+  },
+  "expectedReadingOfOutcomes": {
+    "FAIL": "cheap useful result - PCN exhaust is too enforcement-biased to build on and PTE-TEL-002 class B should be dropped",
+    "PARTIAL": "signal is stable and reproducible but unvalidated; enough to justify pursuing payment-session access",
+    "PASS": "administrative exhaust carries a pressure signal that agrees with something independent - the strongest available evidence for the historical-inference route around sensor-poor cities"
+  },
+  "nextResearchQuestion": "Can a pressure model trained or calibrated in a ground-truth city preserve useful ranking in a city where only administrative exhaust exists? That is the transfer problem from PTE-TEL-002 section 3 and the fork between a generally transferable engine and a city-by-city data-acquisition project.",
+  "sequencing": "Run Camden before pursuing Hull procurement or MiPermit access. Camden is free, already published, and carries both the enforcement side and the capacity side; it answers the scientific question before anyone spends money or emails a council.",
+  "environmentGotchas": [
+    "The sandbox has no outbound network except the fetch_page and web_search tools, so Camden CSVs cannot be downloaded here. git push/fetch do work.",
+    "/tmp does not persist across sandbox restarts; every artefact referenced here is regenerable from the documented commands.",
+    "The local git clone can be rolled back to the branch base by a sandbox restart while the working tree survives. Check git ls-remote origin before assuming work is lost; see docs/AVAILABILITY-INFERENCE-HANDOFF.md section 8 for both recovery cases.",
+    "tools/camden/.gitignore excludes fixtures, downloads and reports (*.csv, report*.json, out/). Provenance lives in this manifest instead."
+  ]
+}
