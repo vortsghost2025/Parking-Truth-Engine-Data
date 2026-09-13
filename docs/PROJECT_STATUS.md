@@ -343,12 +343,18 @@ prohibition for F1 is a judgement we declare in advance and freeze:
 whose official text fuses a permit violation with a payment violation),
 18 `NOT_PARKING`, 7 `RESERVED`.
 
-Two things the source gave us that were not being looked for. **`Diff. level` is
-`n/a` for exactly the moving-traffic and bus-lane codes** — an independent
-corroboration of C3 from a source unrelated to Camden's `ticket_type` field. And
-**suffix `j` means camera enforcement**, an authoritative *deployment* marker
-carried in the code itself; it is recorded and counted but deliberately **not**
-used in any verdict, since expanding F1 to read it would be a separate amendment.
+Two things the source gave us that were not being looked for. **All 18
+moving-traffic and bus-lane codes carry `Diff. level = n/a`** — corroborating C3
+from a source unrelated to Camden's `ticket_type` field. But the implication runs
+one way only: 25 codes carry `n/a` and **7 of them are not moving traffic** —
+64, 65, 66 are parking (verge, public-land, footway; Essex/Exeter only) and
+13, 17, 39, 77 are reserved. Precision 18/25 = 0.72, so `n/a` is necessary but
+**not sufficient**, and it corroborates C3 rather than classifying anything. An
+earlier draft called this "exactly the moving-traffic codes"; that overstatement
+is corrected. And **suffix `j` means camera enforcement**, an authoritative
+*deployment* marker carried in the code itself; it is recorded and counted but
+deliberately **not** used in any verdict, since expanding F1 to read it would be a
+separate amendment.
 
 Suffix resolution also had to be code-aware: the general legend reports **`33H` as
 "hospital bay"** and **`52M` as "parking meter"**, where the source's

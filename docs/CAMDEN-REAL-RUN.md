@@ -273,12 +273,21 @@ suffixes, `Diff. level` and section (on-street / off-street).
 
 Two things the source gives us that we were not expecting:
 
-1. **An independent parking-vs-moving-traffic discriminator.** `Diff. level` is
-   `n/a` for exactly the moving-traffic and bus-lane codes. That corroborates C3
-   from a source with no connection to Camden's own `ticket_type` field. It is
-   not sufficient alone — codes 64, 65, 66 also carry `n/a` but *are* parking —
-   so class is declared from description content and cross-checked against
-   `Diff. level`.
+1. **Corroborating evidence for C3 — not a classifier.** All 18 moving-traffic
+   and bus-lane codes carry `Diff. level = n/a`, so the implication
+   *moving-traffic ⟹ `n/a`* holds without exception (recall 1.00). The converse
+   does **not**: 25 codes carry `n/a`, and 7 of them are not moving traffic —
+   codes **64, 65, 66 are parking** contraventions (verge, public-land and
+   footway parking; Essex and Exeter only) and **13, 17, 39, 77 are reserved** for
+   TfL LEZ/ULEZ, road-user charging and DVLA use. Precision is therefore 18/25 =
+   0.72, and `n/a` is necessary but **not sufficient** for non-parking.
+
+   An earlier draft of this record said `n/a` marked "*exactly* the
+   moving-traffic and bus-lane codes". That was too strong and is corrected here:
+   `Diff. level` corroborates C3 from a source with no connection to Camden's own
+   `ticket_type` field, and it is genuinely useful for that, but it must not be
+   used as the discriminator. Class is declared from description content and only
+   cross-checked against `Diff. level`.
 2. **Suffix `j` means camera enforcement.** "Suffix 'j' identifies a
    contravention that can be used on highways other than red routes using CCTV."
    A suffix is therefore an authoritative *deployment* marker carried in the code
