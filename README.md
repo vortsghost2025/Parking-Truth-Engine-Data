@@ -392,6 +392,7 @@ Additional documentation:
 - [`docs/PTE-LOCAL-EVIDENCE-INVENTORY.md`](docs/PTE-LOCAL-EVIDENCE-INVENTORY.md)
 - [`docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md`](docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md)
 - [`docs/REAL-PARKING-TELEMETRY-SOURCES.md`](docs/REAL-PARKING-TELEMETRY-SOURCES.md)
+- [`docs/AVAILABILITY-INFERENCE-HANDOFF.md`](docs/AVAILABILITY-INFERENCE-HANDOFF.md) — handoff record PTE-INF-001: reproduction commands, measured results, invariants, open work
 - [`schemas/parking-telemetry-event-schema.json`](schemas/parking-telemetry-event-schema.json)
 - [`tools/realtime-sim/README.md`](tools/realtime-sim/README.md)
 - [`tools/telemetry/README.md`](tools/telemetry/README.md)

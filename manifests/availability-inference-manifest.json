@@ -1,0 +1,192 @@
+{
+  "policy": "All results in this manifest are reproducible offline from tools/telemetry/make_test_fixture.py. No harvested payload, model, or validation report is stored as bytes here; regenerate them with the commands in docs/AVAILABILITY-INFERENCE-HANDOFF.md section 3. Large real archives are referenced by URL + SHA-256 per manifests/real-parking-telemetry-manifest.json.",
+  "recordId": "PTE-INF-001",
+  "snapshotDate": "2026-09-13",
+  "relatedDoc": "docs/AVAILABILITY-INFERENCE-HANDOFF.md",
+  "relatedNarrative": "tools/inference/README.md",
+  "upstreamRecord": "PTE-TEL-001",
+  "lane": "AVAILABILITY",
+  "legalityClaimed": false,
+  "separationNote": "Availability lane only. Nothing in this stack may upgrade a PROHIBITED, CONFLICT or UNKNOWN legality verdict. Every response payload carries legalityClaimed=false.",
+  "productFraming": "The inference layer, not a parking-finder app and not a sensor relay. Answers 'to the best of our ability, is there a space?' as a calibrated probability with an honest interval, including on streets that have never been instrumented.",
+  "sandboxLimitation": "The authoring environment has no outbound network from bash. No real archive was fetched. Every number here derives from the deterministic synthetic fixture. The pipeline is proven; calibration on real Melbourne data is NOT.",
+  "layers": [
+    {
+      "layer": 1,
+      "name": "climatology",
+      "file": "tools/inference/availability_engine.py",
+      "modes": ["build", "predict", "validate"],
+      "question": "what a street usually does at this hour",
+      "requiresSensors": false,
+      "cellDefinition": "(street, dayType, hour)",
+      "method": "empirical-Bayes Beta posterior over reconstructed bay-slots, measured quasi-binomial overdispersion, city-level prior, continued-fraction incomplete beta (stdlib)"
+    },
+    {
+      "layer": 2,
+      "name": "live fusion",
+      "file": "tools/inference/live_fusion.py",
+      "modes": ["fuse", "validate-fusion", "make-snapshot"],
+      "question": "what the street is doing right now, including at bays that have no sensor",
+      "requiresSensors": false,
+      "method": "Bayesian update: prior moment-matched to the layer-1 predictive spread (nu = rho(1-rho)/sdPredictive^2), Binomial likelihood over sensed bays, freshness weight w = 0.5**(age/medianStay) measured against the predicted instant",
+      "note": "Not a tuned blend. The prior's effective sample size comes from the model's own measured uncertainty, so the sample size decides how much sensors matter."
+    }
+  ],
+  "stateContract": {
+    "states": ["HIGH", "LIMITED", "CONFLICT", "UNKNOWN"],
+    "consumerRequirement": "All four must be handled. Three is a bug.",
+    "HIGH": "95% interval resolves the question. TWO-SIDED: confidently free (lo > 0.35) and confidently full (hi < 0.65) are both HIGH. Requires >= 20 effective bay-slots and >= 12 distinct dates.",
+    "LIMITED": "Real estimate but the interval straddles the ambiguous middle, or evidence is thin. Requires >= 5 distinct dates.",
+    "CONFLICT": "Layer 2 only. Sensors and climatology disagree by >= 3 combined SDs. The blended estimate is still returned, but never as HIGH.",
+    "UNKNOWN": "Insufficient evidence, or no cell and no live bays."
+  },
+  "testFixture": {
+    "generator": "tools/telemetry/make_test_fixture.py",
+    "isRealData": false,
+    "warning": "TEST INPUT. Anything calibrated on it is calibrated on a fiction. The point is to prove the pipeline's arithmetic, not to publish numbers about Melbourne.",
+    "rows": 341058,
+    "sha256": "b10ad4ef7be6eda755de0f3967ae2f4897bc7bda4bef2331277105a108c29758",
+    "bays": 800,
+    "streets": 5,
+    "days": 45,
+    "dateRange": ["2019-03-04", "2019-04-17"],
+    "meanStayMinutes": 39.94,
+    "targetMeanStayMinutes": 40.0,
+    "medianStayMinutes": 28.0,
+    "deterministic": true,
+    "dayEffectSd": 0.2,
+    "eventDays": 5,
+    "eventMultiplier": 1.8,
+    "sameBayOverlappingEvents": 0,
+    "defectsInjected": {
+      "negative_duration": 8146,
+      "imputed_times": 5160,
+      "sign_old_suffix": 11794,
+      "overstayed": 36056,
+      "clipped_boundary": 30
+    }
+  },
+  "reproduction": {
+    "verifiedOn": "2026-09-13",
+    "verifiedFromCleanCheckout": true,
+    "holdoutSeed": 1337,
+    "holdoutRule": "whole DATES, never rows",
+    "trainingDates": 36,
+    "heldOutDates": 9,
+    "commands": [
+      "python3 tools/telemetry/make_test_fixture.py --out $W/events2019.csv",
+      "python3 tools/telemetry/telemetry_harvester.py archive --file $W/events2019.csv --max-emit 400000 --out $W/archive",
+      "python3 tools/inference/availability_engine.py build --events $W/archive/telemetry-events.jsonl --out $W/model.json",
+      "python3 tools/inference/availability_engine.py validate --events $W/archive/telemetry-events.jsonl --holdout 0.2 --model-out $W/model_h.json --report $W/validation.json",
+      "python3 tools/inference/live_fusion.py validate-fusion --events $W/archive/telemetry-events.jsonl --holdout 0.2 --coverages 0.0,0.05,0.10,0.20,0.40,0.70 --report $W/fusion.json",
+      "python3 tools/telemetry/calibrate_sim.py --stats $W/archive/archive-stats.json --out $W/calibration.json"
+    ]
+  },
+  "results": {
+    "layer1": {
+      "scoredObservations": 1080,
+      "scoringUnit": "(street, dayType, hour, DATE) - per date, never aggregated across held-out dates",
+      "brier": 0.00488,
+      "brierConstantBaseline": 0.04165,
+      "brierSkillScore": 0.8828,
+      "logLoss": 0.44504,
+      "meanAbsoluteError": 0.0481,
+      "ci95Coverage": 0.975,
+      "byPublishedState": {
+        "HIGH": { "cells": 688, "mae": 0.028 },
+        "LIMITED": { "cells": 392, "mae": 0.083 }
+      },
+      "stateLabelDiscriminates": true,
+      "coverageHistory": [
+        { "intervalMethod": "Beta posterior on raw slots", "ci95Coverage": 0.304 },
+        { "intervalMethod": "+ city-level overdispersion phi", "ci95Coverage": 0.725 },
+        { "intervalMethod": "+ per-cell phi", "ci95Coverage": 0.667, "note": "worse - the clue that the Beta posterior was answering the wrong question" },
+        { "intervalMethod": "+ between-day dispersion in quadrature", "ci95Coverage": 0.975 }
+      ]
+    },
+    "layer2": {
+      "scoringUnit": "unsensed bays only, per (street, date, hour). Predicting bays you can already see is not a claim worth making.",
+      "sensorInstallation": "fixed across dates (deterministic CRC32 on bay key); real installations do not move day to day",
+      "metric": "MAE minus the irreducible noise floor sqrt(2/pi)*sqrt(p(1-p)/n_unsensed), so coverage levels are comparable",
+      "byCoverage": [
+        { "sensed": 0.00, "climatologyExcess": 0.0364, "liveOnlyExcess": null,   "fusionExcess": 0.0364, "fusionGainPct": null,  "fusedCi95Coverage": 0.956, "conflictsFlagged": 0 },
+        { "sensed": 0.05, "climatologyExcess": 0.0361, "liveOnlyExcess": 0.0869, "fusionExcess": 0.0292, "fusionGainPct": 19.1,  "fusedCi95Coverage": 0.966, "conflictsFlagged": 9 },
+        { "sensed": 0.10, "climatologyExcess": 0.0355, "liveOnlyExcess": 0.0526, "fusionExcess": 0.0217, "fusionGainPct": 38.8,  "fusedCi95Coverage": 0.970, "conflictsFlagged": 34 },
+        { "sensed": 0.20, "climatologyExcess": 0.0348, "liveOnlyExcess": 0.0334, "fusionExcess": 0.0175, "fusionGainPct": 49.8,  "fusedCi95Coverage": 0.970, "conflictsFlagged": 25 },
+        { "sensed": 0.40, "climatologyExcess": 0.0317, "liveOnlyExcess": 0.0166, "fusionExcess": 0.0091, "fusionGainPct": 71.2,  "fusedCi95Coverage": 0.983, "conflictsFlagged": 19 },
+        { "sensed": 0.70, "climatologyExcess": 0.0280, "liveOnlyExcess": 0.0064, "fusionExcess": 0.0043, "fusionGainPct": 84.7,  "fusedCi95Coverage": 0.939, "conflictsFlagged": 23 }
+      ],
+      "atypicalDays": {
+        "definition": "reality departs from the climatological pattern by more than the model's own day-to-day SD. Decided from GROUND TRUTH, not from any predictor's error, so it cannot favour one.",
+        "cells": 95,
+        "ofTotal": 1080,
+        "byCoverage": [
+          { "sensed": 0.05, "climatologyExcess": 0.1633, "fusionExcess": 0.1194, "fusionGainPct": 26.9 },
+          { "sensed": 0.10, "climatologyExcess": 0.1617, "fusionExcess": 0.0870, "fusionGainPct": 46.2 },
+          { "sensed": 0.20, "climatologyExcess": 0.1616, "fusionExcess": 0.0606, "fusionGainPct": 62.5 },
+          { "sensed": 0.40, "climatologyExcess": 0.1578, "fusionExcess": 0.0333, "fusionGainPct": 78.9 },
+          { "sensed": 0.70, "climatologyExcess": 0.1502, "fusionExcess": 0.0128, "fusionGainPct": 91.5 }
+        ]
+      },
+      "headline": "Fusion beats BOTH of its inputs at every coverage level. Climatology handles the ordinary day; live sensing catches the exception - and the exception is exactly when a driver needs help.",
+      "honestLimit": "On a day that behaves normally, sensors add almost nothing."
+    },
+    "simulatorCalibration": {
+      "file": "tools/realtime-sim/sim_feed.py",
+      "calibrationFile": "generated by tools/telemetry/calibrate_sim.py",
+      "pinnedDate": "2026-09-15 (Tuesday)",
+      "speedFactor": 1,
+      "tickSeconds": 1,
+      "holdSeconds": 12,
+      "occupancyCurvePeak": { "hour": 11, "rho": 0.627 },
+      "convergence": [
+        { "simHour": "09:00", "observedRho": 0.452, "citywideTarget": 0.466, "ratio": 0.97 },
+        { "simHour": "12:00", "observedRho": 0.556, "citywideTarget": 0.604, "ratio": 0.92 },
+        { "simHour": "18:00", "observedRho": 0.224, "citywideTarget": 0.244, "ratio": 0.91 }
+      ],
+      "ratioBelowOneIsNotError": "The target is the CITYWIDE curve; the sim then applies per-precinct multipliers averaging ~0.90. Unknown bays are excluded from the denominator rather than counted as free."
+    }
+  },
+  "invariants": [
+    { "id": "I1",  "rule": "The denominator is reconstructed, never counted: totalSlots = distinct_bays x distinct_dates x slots_per_hour", "symptomIfBroken": "pFree = 0.000 everywhere, Brier skill +0.000, coverage 0.000" },
+    { "id": "I2",  "rule": "Slots are weighted by the FRACTION occupied, not by intersection", "symptomIfBroken": "INVISIBLE to layer-1 validation - the bias cancels when prediction and ground truth share the definition. Appears only against a sensor-shaped quantity, as ~25-37% occupancy overstatement", "danger": "highest on this list, because layer 1 cannot detect its violation" },
+    { "id": "I3",  "rule": "A bay is a single server: lambda = rho/((1-rho)*E[S]), not rho/E[S]", "symptomIfBroken": "same-bay overlapping events (the fixture had 31.8%); count-based and set-based occupancy disagree (0.513 vs 0.402)" },
+    { "id": "I4",  "rule": "Validation holds out DATES never rows, and scores PER DATE", "symptomIfBroken": "implausibly good scores; a model that cannot tell an ordinary Tuesday from a stadium event still passes" },
+    { "id": "I5",  "rule": "sdPredictive = sqrt(sdMeanEstimate^2 + sdBetweenDays^2)", "symptomIfBroken": "coverage 0.30-0.70 on a nominal 95% interval" },
+    { "id": "I6",  "rule": "Unmeasurable dispersion floors at DEFAULT_SD_DAY=0.10, never zero", "symptomIfBroken": "a 2-date 160-slot cell publishes HIGH with CI [0.637,0.766] instead of UNKNOWN with [0.495,0.908]" },
+    { "id": "I7",  "rule": "Freshness is measured against the instant being PREDICTED, not the snapshot clock; w = 0.5**(age/medianStay)", "symptomIfBroken": "a 03:30 feed answering a 12:30 query returned pFree 0.897 instead of 0.400 - it would have sent drivers to a full street" },
+    { "id": "I8",  "rule": "Conflicts are detected between SOURCES via z-score, and cap the state at CONFLICT", "symptomIfBroken": "a strong prior damps the posterior shift so real disagreements are averaged away silently and the detector never fires; HIGH published alongside a 92-SD conflict" },
+    { "id": "I9",  "rule": "Report the irreducible noise floor sqrt(2/pi)*sqrt(p(1-p)/n_unsensed)", "symptomIfBroken": "the coverage sweep looks like more sensing makes inference worse" },
+    { "id": "I10", "rule": "HIGH is two-sided: confidently full is knowledge too", "symptomIfBroken": "a confidently full street is labelled merely LIMITED" },
+    { "id": "I11", "rule": "Unsensable, failed and stale bays are excluded, never counted as free", "symptomIfBroken": "availability systematically overstated exactly where sensors are broken" },
+    { "id": "I12", "rule": "Street list is the union of live-feed streets and model streets", "symptomIfBroken": "zero sensed bays prints nothing, which reads as 'this street does not exist'" },
+    { "id": "I13", "rule": "Little's Law consumes the MEAN stay, not the median", "symptomIfBroken": "the whole occupancy curve is scaled down ~31% and the simulator undershoots every target" },
+    { "id": "I14", "rule": "Stay distributions are parameterised on median AND mean: sigma = sqrt(2*ln(mean/median))", "symptomIfBroken": "a fixture whose implied occupancy is ~31% low, silently mis-testing every consumer" },
+    { "id": "I15", "rule": "Bay inventory is shared between training and validation", "symptomIfBroken": "bays empty on every held-out day drop out of the denominator, making the estimator look worse than it is" },
+    { "id": "I16", "rule": "The fixture must contain day-to-day demand variation", "symptomIfBroken": "fusion measures as HARMFUL (-19% to -42%) - correctly, but for a reason with nothing to do with the real world. This nearly produced the wrong conclusion about the product." }
+  ],
+  "knownLimitations": [
+    "Residual bias is systematic, not random: Swanston St weekend 11h-14h predicts pFree 0.37-0.42 against observed 0.65-0.67; Bourke St weekday 15h-17h over-predicted by 0.08-0.11. A time-of-day-only model cannot know about things that changed. The fix is calendar features and a longer archive, not a wider error bar.",
+    "9 held-out dates is a thin sample of weekends and event days; some reliability-bin gaps reach +0.037.",
+    "Never run against real data. The authoring sandbox has no outbound network. Re-run on the real Melbourne archive before quoting any number externally.",
+    "Layer 2 estimates STREET occupancy, not per-bay.",
+    "Overlapping same-bay events in a real archive would double-count fractional occupancy; the cell total is capped at its denominator but per-slot overlap is not. Add an overlap diagnostic before ingesting a new source.",
+    "Hours are UTC as labelled by the harvester. A publisher using local timestamps shifts the hour axis; every response carries timezoneCaveat but nothing corrects it."
+  ],
+  "openWork": [
+    { "priority": 1, "task": "Run the whole chain on the real 2020 Jan-May Melbourne archive (258 MB, 14.2M rows). Expect the numbers to move; the invariants must not." },
+    { "priority": 2, "task": "Add calendar features (public holidays, school terms, event calendars) to attack the residual systematic bias." },
+    { "priority": 3, "task": "Spatial borrowing: neighbouring-street and precinct-level priors for streets with no history and no sensors, which currently fall back to the city prior for that hour." },
+    { "priority": 4, "task": "Per-bay rather than per-street fusion, using adjacency and restriction type." },
+    { "priority": 5, "task": "Same-bay overlap diagnostic on ingest." },
+    { "priority": 6, "task": "Timezone normalisation per source." }
+  ],
+  "environmentGotchas": [
+    "/tmp does not persist between sessions. Anything worth keeping is committed - which is why make_test_fixture.py exists rather than a scratch generator.",
+    "Give every simulator run its own port. A stray sim_feed.py holding the port makes the new one die at bind while the old one keeps answering, so every measurement silently comes from the wrong scenario. This produced observed rho IDENTICAL at 09:00, 12:00 and 18:00 and looked like calibration failure.",
+    "pkill -f 'sim_feed.py' matches your own shell when the pattern appears in its command line. Kill by $! PID.",
+    "Simulator time is not wall-clock time. At --speed 600 --tick 0.05, 18 real seconds is ~3 simulated days. Use --speed 1 --tick 1 for equilibrium-hold tests and --sim-start YYYY-MM-DDTHH:MM to pin the date.",
+    "Overnight hours are noise, not failure: at 03:00 only ~14 of 807 bays are expected occupied.",
+    "The local git clone can be rolled back to the branch base by a sandbox restart while the working tree survives, making committed files appear untracked. Check git ls-remote origin before assuming work is lost; recover with git fetch + git reset --mixed <sha>, which does not touch the working tree."
+  ]
+}
