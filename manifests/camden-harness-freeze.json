@@ -200,6 +200,10 @@
     },
     "newReportField": "classification",
     "newCliFlag": "--code-map",
-    "declarationUnchanged": "The pressure-class declaration itself was NOT revised. The artifact sha256 539c5413ff430eb4ec9756fa27ea020d02ca0bca648ef14f20d03c3c1a892a80 is identical before and after C4A: the code changed to match the declaration, not the declaration to match the code."
-  }
+    "declarationUnchanged": "The pressure-class declaration itself was NOT revised. The artifact sha256 539c5413ff430eb4ec9756fa27ea020d02ca0bca648ef14f20d03c3c1a892a80 is identical before and after C4A: the code changed to match the declaration, not the declaration to match the code.",
+    "amendedAtCommit": "53a9fe2",
+    "selfReferenceNote": "amendedAtCommit cannot be written into the same commit it names, so it is recorded by this follow-up commit. tools/camden/FREEZE.sha256 remains the authoritative verification artifact; this field is a pointer, not the source of truth."
+  },
+  "amendedAtCommit": "53a9fe2",
+  "amendedAtCommitTitle": "PTE-TEL-004 C4A: authoritative code classification, committed before any Camden row"
 }
