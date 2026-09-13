@@ -1,6 +1,7 @@
 # Real Parking Telemetry Sources — arrival/departure events at volume
 
 **Record ID:** PTE-TEL-001
+**Extended by:** [`PARKING-DATA-SOURCE-REALITY-CHECK.md`](PARKING-DATA-SOURCE-REALITY-CHECK.md) (PTE-TEL-002) — what to do about cities that publish *no* occupancy feed at all
 **Snapshot date:** 2026-09-12
 **Lane:** AVAILABILITY
 **Legality claim made:** none. Every artifact described here carries

@@ -393,6 +393,7 @@ Additional documentation:
 - [`docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md`](docs/HOBART-AVAILABILITY-SOURCE-PREFLIGHT.md)
 - [`docs/REAL-PARKING-TELEMETRY-SOURCES.md`](docs/REAL-PARKING-TELEMETRY-SOURCES.md)
 - [`docs/AVAILABILITY-INFERENCE-HANDOFF.md`](docs/AVAILABILITY-INFERENCE-HANDOFF.md) — handoff record PTE-INF-001: reproduction commands, measured results, invariants, open work
+- [`docs/PARKING-DATA-SOURCE-REALITY-CHECK.md`](docs/PARKING-DATA-SOURCE-REALITY-CHECK.md) — record PTE-TEL-002: where live occupancy actually comes from when a city publishes none
 - [`schemas/parking-telemetry-event-schema.json`](schemas/parking-telemetry-event-schema.json)
 - [`tools/realtime-sim/README.md`](tools/realtime-sim/README.md)
 - [`tools/telemetry/README.md`](tools/telemetry/README.md)

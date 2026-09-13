@@ -104,6 +104,50 @@ Not done:
 
 Availability only. Nothing in this lane may upgrade a legality verdict.
 
+## Data source strategy (PTE-TEL-002)
+
+Field research in Hull (no on-street data) and Hong Kong (full data, six
+competitors) confirmed that live on-street occupancy does not exist for most
+cities and is not free where it does. Recorded in
+[`PARKING-DATA-SOURCE-REALITY-CHECK.md`](PARKING-DATA-SOURCE-REALITY-CHECK.md).
+
+Findings that change the plan:
+
+- **Cashless parking sessions are the missed source.** A pay-by-phone session is
+  location + start + end + duration — structurally identical to Melbourne's
+  sensor archive, with the payment acting as the sensor. RingGo reported ~250M UK
+  cashless transactions a year; its council-facing Insight product exports
+  session lengths and location data as CSV. **Hull uses MiPermit.** This is a
+  procurement/partnership problem with one repeating integration pattern, not a
+  scraping problem.
+- **Enforcement byproducts are real occupancy evidence.** Camden publishes
+  transactional PCN data under OGL with street, restriction, contravention code
+  and a `Spatial Accuracy` column separating CEO GPS from fixed-CCTV locations.
+  Positive-only and biased, so usable for *relative* pressure; needs an absolute
+  anchor to invert.
+- **Hull's on-street inventory appears to exist and was missed** — Traffweb
+  (`hull.traffweb.app`) publishes CPZs, resident/business bays and parking
+  restrictions. Whether it exposes machine-readable data is unverified and is the
+  highest-value next check.
+- **Hong Kong's feed is coarser and staleness than assumed**: `vacancy_type` B is
+  binary only, `-1` means the operator provided nothing, `lastupdate` exposes
+  per-record age, and a 2017 LegCo question records lags of "hours to even
+  months". Six apps relaying that all show the same wrong answer simultaneously.
+  Freshness-weighted fusion is a different product from a seventh relay, and
+  layer 2 already implements the mechanism.
+- **Hong Kong and Melbourne are training sets, not markets.** Hull and cities
+  like it are the market, because there is nothing there to relay.
+- **Cameras you operate remain a dead end**, consistent with the frozen camera
+  lane. The usable inversion is other people's enforcement records, never the
+  lens.
+
+Open risk: **cold start.** A city with inventory but no event history has nothing
+to train on locally. The intended answer is transferring demand *shape* learned
+from ground-truth cities, applied with wide intervals that narrow as local
+evidence accumulates — the empirical-Bayes prior/shrinkage structure in layer 1
+is already the right mechanism, but **this is not built and is the highest-risk
+assumption in the plan.**
+
 ## Camera lane
 
 **FROZEN — `CAMERA_FIXED_VIEW_PARTIAL`**
