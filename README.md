@@ -91,6 +91,7 @@ tools/
   telemetry/           harvester for REAL parking arrival/departure telemetry
                        (historical archives + live snapshot-diffing)
                        + Little's Law simulator calibrator
+                       + deterministic test-fixture generator
   inference/           availability inference engine — calibrated P(free) from
                        whatever evidence exists, with honest uncertainty
 ```
@@ -205,54 +206,73 @@ places.
 
 The differentiator is inference: fuse every scrap of evidence that exists —
 historical archives, static bay inventory, restriction metadata, time-of-day
-patterns, and live sensors where available — into a **calibrated probability
-that a space is free**, with an honest interval, on streets nobody has ever
+patterns, and live sensors where available — into a **calibrated probability that
+a space is free**, with an honest interval, on streets nobody has ever
 instrumented.
 
-[`tools/inference/availability_engine.py`](tools/inference/availability_engine.py)
-implements this and, critically, **scores itself against reality it never saw**.
-Validation holds out whole *dates* (never rows — rows from one day share weather
-and demand, so random splitting leaks and inflates every score).
+Two layers, in [`tools/inference/`](tools/inference/):
 
-Measured on a 306,582-event archive, 240 cells, 36 dates trained / 9 held out:
+| | Answers | Works where |
+|---|---|---|
+| **Climatology** — `availability_engine.py` | what a street *usually* does at this hour | everywhere, sensors or not |
+| **Live fusion** — `live_fusion.py` | what it is doing *right now* | infers the bays that have no sensor from the ones that do |
+
+Both **score themselves against reality they never saw**. Validation holds out
+whole *dates* (never rows — rows from one day share weather and demand, so random
+splitting leaks) and scores **per date**, because a driver needs today, not a
+nine-day mean.
+
+**Climatology**, on 1,080 held-out street-hours:
 
 | Metric | Value |
 |---|---|
-| Brier skill score vs a constant predictor | **+0.989** |
-| Mean absolute error on P(free) | **0.018** (±2 points) |
-| 95% interval coverage | **0.971** (target ~0.95) |
-| Worst reliability-bin gap | 0.024 |
+| Brier skill score vs a constant predictor | **+0.883** |
+| Mean absolute error on P(free) | **0.048** |
+| 95% interval coverage | **0.975** (target ~0.95) |
+| `HIGH` vs `LIMITED` accuracy | MAE 0.028 vs 0.083 — the confidence label predicts its own accuracy |
 
-Every reliability bin lands within 2.4 points of observed. And the confidence
-label predicts its own accuracy — `HIGH` cells score MAE 0.008 against `LIMITED`
-at 0.022 — so the tier carries information rather than being decoration.
+**Live fusion** answers the question that actually matters commercially: *given
+partial sensing, what can we say about the bays we cannot see?* It reconstructs
+true instantaneous occupancy on held-out dates, hides a fraction behind a fixed
+sensor installation, and scores against the unsensed remainder. Numbers below are
+MAE minus the irreducible noise floor, so they are comparable across coverage
+levels; lower is better.
 
-Three findings shaped the implementation, all caught by validation rather than
-by reading the code:
+| Bays sensed | Climatology | Live only | **Fusion** | Fusion gain |
+|---|---|---|---|---|
+| 5% | +0.0361 | +0.0869 | **+0.0292** | **+19%** |
+| 20% | +0.0348 | +0.0334 | **+0.0175** | **+50%** |
+| 70% | +0.0280 | +0.0064 | **+0.0043** | **+85%** |
 
-- **The denominator is the trap.** An archive only records bays that were
-  *occupied*; the empty slots are exactly what is missing. They must be rebuilt
-  from `bays × dates × slots_per_hour`. Counting only observed slots silently
-  pins P(occupied) at 1.0 and reports "no space anywhere, ever".
-- **Bay-slots are not independent trials.** One event covers many consecutive
-  slots. The overdispersion factor φ is *measured* from between-date variance
-  (1.0 – 140.3 across cells, median 4.7), not assumed.
-- **Two uncertainties, not one.** A Beta posterior reports how well a cell's
-  *average* is known. The product must predict a *future day*, which also needs
-  the measured day-to-day dispersion. Adding the two in quadrature moved
-  coverage from 0.30 to 0.97; measured day-to-day SD (0.033) dominates
-  estimation SD (0.009) by ~4×, so the posterior alone was ~4× too confident.
+Fusion beats **both** of its inputs at every coverage level — with only ~25 of
+500 bays sensed, error on the bays nobody can see is already down 19%. On
+**atypical days**, where reality departs from the climatological pattern, the
+gain reaches **+91%**. That is the whole argument in one line: *climatology
+handles the ordinary day, live sensing catches the exception* — and the exception
+is exactly when a driver needs help.
 
-Where evidence is thin the engine degrades instead of guessing: a street with no
-observations returns `UNKNOWN` on the city prior, and where dispersion cannot be
-measured the interval falls back to a conservative floor rather than collapsing
-to zero. A 2-date, 160-slot cell was publishing `HIGH` with CI `[0.637, 0.766]`;
-it now publishes `UNKNOWN` with `[0.495, 0.908]`.
+The blend is a Bayesian update, not a tuned weight. The prior's effective sample
+size is derived from the model's own measured uncertainty (`ν = ρ(1−ρ)/σ²`), so
+nobody decides how much to trust sensors — the sample size decides. Sensor
+readings decay on the **measured median stay** (`w = 0.5^(age/median_stay)`), not
+an arbitrary TTL, because a reading goes stale when the car leaves.
+
+Findings that shaped this are recorded in
+[`tools/inference/README.md`](tools/inference/README.md) — including a shared
+definitional error that inflated occupancy ~37% and survived layer-1 validation
+precisely *because* that validation used the same definition on both sides, a
+test fixture that put two cars in one bay 31.8% of the time, and a staleness bug
+that let a 3 a.m. reading override noon climatology and report a full street as
+89% free.
+
+`tools/telemetry/make_test_fixture.py` makes all of this reproducible offline: a
+deterministic 341,058-row synthetic archive (SHA-256 recorded, byte-identical on
+re-run) with Melbourne's real column names, its four documented defects, and
+day-level demand variation. **It is not real data** — it exists to prove the
+arithmetic, not to publish numbers about Melbourne.
 
 This remains the **availability lane only**. Nothing here makes an illegal,
 conflicted or unknown curb legal.
-
-See [`tools/inference/README.md`](tools/inference/README.md).
 
 ### Los Angeles
 

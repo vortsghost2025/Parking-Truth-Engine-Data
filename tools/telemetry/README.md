@@ -191,6 +191,52 @@ intended extension point.
 
 ---
 
+## `make_test_fixture.py` — a deterministic archive, so tests need no download
+
+The real Melbourne archives are ~246M rows and the smallest useful download is
+258 MB. Nobody should need that to run a test. This emits a compact,
+byte-for-byte **reproducible** fixture with the same column names, the same
+documented defects and the same statistical texture.
+
+```bash
+python3 make_test_fixture.py --out /tmp/fx/events2019.csv
+#  341,058 rows   sha256 b10ad4ef7be6eda755de0f3967ae2f4897bc7bda4bef2331277105a108c29758
+#  800 bays   45 days   mean stay 39.94 min (target 40.0)   5 event days
+```
+
+Same flags → same bytes. Two details that are easy to get wrong and were:
+
+**A bay is a single server.** Drawing Poisson arrival counts per bay-hour
+independently — the obvious first attempt — produced a fixture in which **31.8%
+of events overlapped another event on the same bay**. Two cars in one space. That
+silently corrupts every occupancy measure downstream: count-based occupancy read
+0.513 while set-based read 0.402 at the same instant, a 25% disagreement that
+looks like a model bug. The generator now runs a continuous-time renewal process
+per bay where arrivals finding the bay busy are lost, which changes the required
+rate to
+
+```
+λ = ρ / ((1 − ρ) · E[S])        NOT  λ = ρ / E[S]
+```
+
+Overlaps are now 0.
+
+**Stay durations are parameterised on median AND mean.** A lognormal has
+`σ = √(2·ln(mean/median))`. Matching only the median produces a fixture whose
+implied occupancy is ~31% too low, because occupancy follows Little's Law on the
+mean.
+
+Day-level demand effects (`--day-effect-sd`, `--event-day-rate`) are not
+optional extras. Without them every weekday is identical, a climatological model
+is already near-optimal, and live sensor fusion measures as *harmful* — see
+[`../inference/README.md`](../inference/README.md).
+
+> **IT IS NOT REAL DATA.** A test input. Anything calibrated on it is calibrated
+> on a fiction; the point is to prove the pipeline's arithmetic, not to publish
+> numbers about Melbourne.
+
+---
+
 ## `calibrate_sim.py` — closing the loop to the test rig
 
 Harvesting real events is only useful if something consumes them.
@@ -213,9 +259,9 @@ strongly right-skewed — a few very long stays carry most of the occupied time 
 so the median underestimates ρ by ~31% on the test fixture. The output records
 `stayStatisticUsed: "mean"` so a downstream consumer can see which was applied.
 
-Verified end to end: 319,009-row fixture → harvester → calibrator (curve peaks
-ρ = 0.556 at 12:00) → `sim_feed.py` converging to 0.97–0.98 of target across
-09:00 / 12:00 / 18:00.
+Verified end to end: 341,058-row fixture → harvester → calibrator (curve peaks
+ρ = 0.627 at 11:00) → `sim_feed.py` converging to 0.91–0.97 of the citywide
+target across 09:00 / 12:00 / 18:00.
 
 ---
 

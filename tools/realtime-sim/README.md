@@ -142,15 +142,16 @@ seconds grows large relative to the equilibrium time constant. The exponential
 hazard form is exact for any `dt`. The world is also seeded at equilibrium at
 startup rather than ramping up from all-free.
 
-**Convergence verified** — calibrated to the 319,009-row Melbourne fixture,
-pinned to Tuesday 2026-09-15, `--speed 1 --tick 1`, 13 s hold, read back from
-`/api/snapshot.json`:
+**Convergence verified** — calibrated to the 341,058-row fixture from
+[`../telemetry/make_test_fixture.py`](../telemetry/make_test_fixture.py), pinned
+to Tuesday 2026-09-15, `--speed 1 --tick 1`, 12 s hold, each run on its own port
+and read back from `/api/snapshot.json`:
 
 | Sim hour | Bays | Occupied | Free | Unknown | Observed ρ | Citywide target | Ratio |
 |---|---|---|---|---|---|---|---|
-| 09:00 | 846 | 322 | 425 | 99 | 0.431 | 0.449 | 0.96 |
-| 12:00 | 846 | 379 | 368 | 99 | 0.507 | 0.556 | 0.91 |
-| 18:00 | 846 | 158 | 589 | 99 | 0.212 | 0.228 | 0.93 |
+| 09:00 | 846 | 338 | 409 | 99 | 0.452 | 0.466 | 0.97 |
+| 12:00 | 846 | 415 | 331 | 100 | 0.556 | 0.604 | 0.92 |
+| 18:00 | 846 | 167 | 580 | 99 | 0.224 | 0.244 | 0.91 |
 
 The ratios sit *below* 1.0 for a reason that is not error. The target column is
 the **citywide** curve; the sim then applies per-precinct multipliers (cbd-core
@@ -163,6 +164,14 @@ denominator rather than being counted as free.
 03:00 is noisy by nature — only ~14 of 807 bays are expected occupied there, so
 Poisson noise dominates at very low ρ. Do not read a single overnight sample as
 a calibration failure.
+
+> **Give each run its own port.** A previous sim still holding the port makes the
+> new one die at bind time while the old one keeps answering requests, so every
+> measurement silently comes from the wrong scenario. This produced a set of
+> readings that looked like the calibration had stopped working — observed ρ
+> identical at 09:00, 12:00 and 18:00 — before the stray process was found.
+> Check the process is alive and the startup banner shows the expected sim clock
+> before trusting any number.
 
 > **Testing caveat.** At `--speed 600 --tick 0.05`, 18 real seconds is ~3
 > simulated *days*. Comparing observed occupancy to the target for a start-hour

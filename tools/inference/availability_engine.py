@@ -166,10 +166,18 @@ def day_type(dt):
     return "weekend" if dt.weekday() >= 5 else "weekday"
 
 
+STAY_SAMPLE_CAP = 50_000
+
+
 def load_events(path, max_events=None):
     """Yield normalised events, skipping rows that cannot support inference."""
     kept = skipped = 0
     reasons = defaultdict(int)
+    stay_sum = 0.0
+    stay_n = 0
+    # Reservoir sample of stay durations. An exact median would need every
+    # duration in memory, which is fine at 300k rows and impossible at 246M.
+    stay_sample = []
     with open(path) as fh:
         for line in fh:
             line = line.strip()
@@ -214,20 +222,57 @@ def load_events(path, max_events=None):
                 continue
             ev["_a"], ev["_d"] = a, d
             kept += 1
+            stay = d - a
+            stay_sum += stay
+            stay_n += 1
+            if len(stay_sample) < STAY_SAMPLE_CAP:
+                stay_sample.append(stay)
+            else:
+                j = random.randrange(stay_n)
+                if j < STAY_SAMPLE_CAP:
+                    stay_sample[j] = stay
             yield ev
-    load_events.stats = {"kept": kept, "skipped": skipped,
-                         "skipReasons": dict(reasons)}
+    stay_sample.sort()
+    load_events.stats = {
+        "kept": kept, "skipped": skipped, "skipReasons": dict(reasons),
+        "staySeconds": {
+            "mean": (stay_sum / stay_n) if stay_n else None,
+            "median": (stay_sample[len(stay_sample) // 2] if stay_sample else None),
+            "p95": (stay_sample[int(len(stay_sample) * 0.95)]
+                    if len(stay_sample) > 20 else None),
+            "sampleSize": len(stay_sample), "exactCount": stay_n,
+            "medianMethod": "reservoir sample" if stay_n > STAY_SAMPLE_CAP
+                            else "exact",
+        },
+    }
 
 
 def slot_keys(a_epoch, d_epoch):
-    """Yield (date_str, day_type, hour, slot_in_hour) tuples the event covers."""
+    """Yield (date_str, day_type, hour, slot_in_hour, fraction) per slot touched.
+
+    `fraction` is the portion of that 15-minute slot the bay was ACTUALLY
+    occupied - not merely touched.
+
+    WHY FRACTIONAL. Marking a slot occupied on any intersection overstates
+    occupancy badly. A stay of S minutes on a grid of L-minute slots intersects
+    E[S/L + 1] slots at random phase while accounting for only S/L slots worth
+    of real time, so intersection semantics inflates occupancy by (S+L)/S - 1:
+    +37% at a 40-minute mean stay, +75% at 20 minutes. The bias cancels when a
+    slot-based estimate is compared to slot-based ground truth, which is exactly
+    why it survived the first validation intact. It does NOT cancel against a
+    live sensor, which reports instantaneous state. Fractional weighting makes
+    the model's target quantity the expected instantaneous occupancy - the same
+    thing a sensor measures - so the two layers are commensurable.
+    """
     step = SLOT_MINUTES * 60
     start = int(a_epoch // step) * step
     t = start
     while t < d_epoch:
-        dt = datetime.fromtimestamp(t, tz=timezone.utc)
-        yield (dt.strftime("%Y-%m-%d"), day_type(dt), dt.hour,
-               dt.minute // SLOT_MINUTES)
+        overlap = min(d_epoch, t + step) - max(a_epoch, t)
+        if overlap > 0:
+            dt = datetime.fromtimestamp(t, tz=timezone.utc)
+            yield (dt.strftime("%Y-%m-%d"), day_type(dt), dt.hour,
+                   dt.minute // SLOT_MINUTES, overlap / step)
         t += step
 
 
@@ -251,12 +296,14 @@ def build_model(events_path, prior_strength=30.0, max_events=None,
     that were THERE; the empty slots are precisely what is missing from it, and
     they have to be reconstructed from bay inventory x calendar.
     """
-    occupied = defaultdict(int)               # (street,daytype,hour) -> occupied slots
-    city_occ = defaultdict(int)               # (daytype,hour)        -> occupied slots
+    # Fractional bay-slots. These are floats now: a car present for 5 of a
+    # 15-minute slot contributes 0.333, not 1.0.
+    occupied = defaultdict(float)             # (street,daytype,hour) -> occupied slots
+    city_occ = defaultdict(float)             # (daytype,hour)        -> occupied slots
     # (daytype,hour,date) -> occupied city slots. Bounded by 2*24*n_dates, so it
     # stays small even for a multi-year archive. Used to MEASURE day-to-day
     # overdispersion rather than assume slots are independent.
-    daily_city = defaultdict(int)
+    daily_city = defaultdict(float)
     # (street,daytype,hour,date) -> occupied slots, for PER-CELL dispersion.
     # Hard-capped: once the cap is reached no NEW keys are added, though existing
     # keys keep accumulating. On a multi-street multi-year archive this is a
@@ -285,22 +332,22 @@ def build_model(events_path, prior_strength=30.0, max_events=None,
         bays_per_street[street].add(bay)
         city_bays.add(bay)
         seen_cells = set()
-        for date_s, dt_type, hour, slot in slot_keys(a, d):
+        for date_s, dt_type, hour, slot, frac in slot_keys(a, d):
             if date_s in holdout_dates:
                 continue          # never train on held-out evidence
             key = (street, dt_type, hour)
             if (key, date_s, slot) in seen_cells:
                 continue
             seen_cells.add((key, date_s, slot))
-            occupied[key] += 1
-            city_occ[(dt_type, hour)] += 1
-            daily_city[(dt_type, hour, date_s)] += 1
+            occupied[key] += frac
+            city_occ[(dt_type, hour)] += frac
+            daily_city[(dt_type, hour, date_s)] += frac
             ck = (street, dt_type, hour, date_s)
             v = daily_cell.get(ck)
             if v is not None:
-                daily_cell[ck] = v + 1
+                daily_cell[ck] = v + frac
             elif len(daily_cell) < daily_cell_cap:
-                daily_cell[ck] = 1
+                daily_cell[ck] = frac
             else:
                 daily_cell_capped[0] = True
             dates_per_street[(street, dt_type)].add(date_s)
@@ -404,7 +451,7 @@ def build_model(events_path, prior_strength=30.0, max_events=None,
         n = denom_street(street, dt_type)
         if n == 0:
             continue
-        cells[(street, dt_type, hour)] = (min(k, n), n)
+        cells[(street, dt_type, hour)] = (min(k, float(n)), n)
     for (street, dt_type, hour), (k, n) in cells.items():
         pk = priors.get(f"{dt_type}|{hour}")
         a0 = pk["a0"] if pk else prior_strength * 0.5
@@ -477,6 +524,25 @@ def build_model(events_path, prior_strength=30.0, max_events=None,
         "slotMinutes": SLOT_MINUTES,
         "priorStrength": prior_strength,
         "trainingEvents": n_events,
+        # The live-fusion layer needs the measured stay duration: it is the
+        # half-life of a sensor reading, because a reading goes stale when the
+        # car leaves. Recorded here so fusion never has to guess a TTL.
+        "stayStatistics": {
+            "medianMinutes": round(stats.get("staySeconds", {}).get("median", 0)
+                                   / 60.0, 2)
+                             if stats.get("staySeconds", {}).get("median") else None,
+            "meanMinutes": round(stats.get("staySeconds", {}).get("mean", 0)
+                                 / 60.0, 2)
+                           if stats.get("staySeconds", {}).get("mean") else None,
+            "p95Minutes": round(stats.get("staySeconds", {}).get("p95", 0)
+                                / 60.0, 2)
+                          if stats.get("staySeconds", {}).get("p95") else None,
+            "sampleSize": stats.get("staySeconds", {}).get("sampleSize"),
+            "medianMethod": stats.get("staySeconds", {}).get("medianMethod"),
+            "whyItMatters": "Occupancy follows Little's Law on the MEAN, and a "
+                            "live sensor reading decays on the MEDIAN - both are "
+                            "recorded so neither has to be assumed.",
+        },
         "eventFiltering": stats,
         "distinctStreets": len(bays_per_street),
         "distinctDates": len(all_dates),
@@ -484,6 +550,15 @@ def build_model(events_path, prior_strength=30.0, max_events=None,
         "baysPerStreet": {s: len(v) for s, v in bays_per_street.items()},
         "datesPerStreetDayType": {f"{s}|{t}": len(v)
                                   for (s, t), v in dates_per_street.items()},
+        "occupancySemantics": "Fractional. A bay present for part of a "
+                              "15-minute slot contributes that fraction. "
+                              "Intersection semantics (any overlap = occupied) "
+                              "overstates occupancy by +37% at a 40-minute mean "
+                              "stay and +75% at 20 minutes, and the bias hides "
+                              "when compared against slot-based ground truth "
+                              "but not against a live sensor. The target "
+                              "quantity is expected INSTANTANEOUS occupancy, "
+                              "which is what a sensor reports.",
         "denominatorRule": "totalSlots = distinct_bays(street) * "
                            "distinct_dates(street, dayType) * slots_per_hour. "
                            "An event archive only records bays that were "
@@ -513,11 +588,14 @@ def build_model(events_path, prior_strength=30.0, max_events=None,
         "cells": {k: dict(v, publishedState=state_from(v))
                   for k, v in out_cells.items()},
         "stateRule": {
-            "HIGH": f"pFree lower 95% bound > {HIGH_LOWER_BOUND} AND "
-                    f"effectiveSlots >= {MIN_SLOTS_FOR_STATE} AND "
-                    f"distinctDates >= {MIN_DATES_FOR_HIGH}",
-            "LIMITED": f"distinctDates >= {MIN_DATES_FOR_LIMITED} but the lower "
-                       f"bound or the day count does not clear the HIGH bar",
+            "HIGH": f"the 95% interval EXCLUDES the ambiguous middle - either "
+                    f"its lower bound > {HIGH_LOWER_BOUND} (confidently free) or "
+                    f"its upper bound < {round(1.0 - HIGH_LOWER_BOUND, 3)} "
+                    f"(confidently full) - AND effectiveSlots >= "
+                    f"{MIN_SLOTS_FOR_STATE} AND distinctDates >= "
+                    f"{MIN_DATES_FOR_HIGH}",
+            "LIMITED": f"distinctDates >= {MIN_DATES_FOR_LIMITED} but the interval "
+                       f"straddles the middle, or the day count is short",
             "UNKNOWN": f"distinctDates < {MIN_DATES_FOR_LIMITED}, or "
                        f"effectiveSlots < {MIN_SLOTS_FOR_STATE}, or no cell for "
                        f"that street/hour",
@@ -526,9 +604,11 @@ def build_model(events_path, prior_strength=30.0, max_events=None,
             "minDatesLimited": MIN_DATES_FOR_LIMITED,
             "minDatesHigh": MIN_DATES_FOR_HIGH,
             "defaultSdDay": DEFAULT_SD_DAY,
-            "note": "The published state uses the LOWER bound of the predictive "
-                    "interval, not the point estimate, so HIGH is only claimed "
-                    "when the evidence supports it. A confident point estimate "
+            "note": "The published state is decided by the predictive INTERVAL, "
+                    "not the point estimate, and it is two-sided: a street that "
+                    "is confidently full is HIGH just as much as one that is "
+                    "confidently free. HIGH means the evidence resolves the "
+                    "question. A confident point estimate "
                     "from thin data still yields LIMITED or UNKNOWN. Where "
                     "day-to-day dispersion cannot be measured, the interval uses "
                     f"a conservative floor of {DEFAULT_SD_DAY} rather than "
@@ -586,7 +666,15 @@ def state_from(cell):
     """
     if cell is None or not cell.get("sufficientEvidence"):
         return "UNKNOWN"
-    if cell["pFree95"][0] <= HIGH_LOWER_BOUND:
+    lo, hi = cell["pFree95"]
+    # HIGH means "we know the answer", not "the answer is that it is free".
+    # Testing only the lower bound - the original rule - labelled a street that
+    # is confidently FULL as merely LIMITED, because its pFree sits near zero and
+    # so never clears a "confidently free" threshold. Both tails are knowledge.
+    # What is NOT knowledge is an interval straddling the middle: that genuinely
+    # means "could go either way", which is what LIMITED is for.
+    decisive = lo > HIGH_LOWER_BOUND or hi < (1.0 - HIGH_LOWER_BOUND)
+    if not decisive:
         return "LIMITED"
     if cell.get("datesUsed", 0) < MIN_DATES_FOR_HIGH:
         return "LIMITED"          # confident-looking, but not enough days to trust
@@ -660,23 +748,33 @@ def cmd_predict(args):
 # --------------------------------------------------------------------------- #
 
 def observed_occupancy(events_path, dates, max_events=None):
-    """Ground truth: fraction of bay-slots occupied on the held-out dates."""
-    cells = defaultdict(lambda: [0, 0])
+    """Ground truth: fractional bay-slots occupied, PER DATE.
+
+    Returned as "street|dayType|hour|date" -> occupied-slot count (a float).
+
+    WHY PER DATE. Aggregating the held-out dates into one observation per cell
+    makes validation answer the wrong question. Averaging 9 dates cancels the
+    day-to-day variation, so a model that cannot tell an ordinary Tuesday from
+    one with a stadium event still scores well - it was validated against the
+    9-day MEAN, which is not a quantity anyone ever needs. A driver needs today.
+    Per-date scoring is also what makes layer 1 comparable to the fusion layer,
+    which has always been scored per (street, date, hour).
+    """
+    cells = defaultdict(float)
     dates = set(dates)
     for ev in load_events(events_path, max_events=max_events):
         a, d = ev["_a"], ev["_d"]
         street = ev.get("street") or "UNKNOWN_STREET"
         seen = set()
-        for date_s, dt_type, hour, slot in slot_keys(a, d):
+        for date_s, dt_type, hour, slot, frac in slot_keys(a, d):
             if date_s not in dates:
                 continue
-            key = (street, dt_type, hour)
-            if (key, date_s, slot) in seen:
+            key = (street, dt_type, hour, date_s)
+            if (key, slot) in seen:
                 continue
-            seen.add((key, date_s, slot))
-            cells[key][0] += 1
-            cells[key][1] += 1
-    return {f"{s}|{t}|{h}": (k, n) for (s, t, h), (k, n) in cells.items()}
+            seen.add((key, slot))
+            cells[key] += frac
+    return {f"{s}|{t}|{h}|{d}": v for (s, t, h, d), v in cells.items()}
 
 
 def denominator_slots(events_path, dates, max_events=None, bay_inventory=None):
@@ -698,7 +796,7 @@ def denominator_slots(events_path, dates, max_events=None, bay_inventory=None):
         street = ev.get("street") or "UNKNOWN_STREET"
         if bay_inventory is None:
             bays[street].add(ev.get("bayKey") or "UNKNOWN_BAY")
-        for date_s, dt_type, hour, slot in slot_keys(ev["_a"], ev["_d"]):
+        for date_s, dt_type, hour, slot, frac in slot_keys(ev["_a"], ev["_d"]):
             if date_s in dates:
                 day_dates[(street, dt_type)].add(date_s)
     if bay_inventory is not None:
@@ -715,11 +813,30 @@ def denominator_slots(events_path, dates, max_events=None, bay_inventory=None):
     return denom
 
 
+def _row(key, street, dt_type, hour, date_s, observed_p_occ, n_occ_slots,
+         n_total, cell):
+    """One scored observation: a single street, on a single date, in one hour."""
+    return {
+        "key": key, "street": street, "dayType": dt_type, "hour": int(hour),
+        "date": date_s,
+        "observedPOccupied": round(observed_p_occ, 6),
+        "observedPFree": round(1.0 - observed_p_occ, 6),
+        "predictedPOccupied": cell["pOccupied"],
+        "predictedPFree": cell["pFree"],
+        "predictedPFree95": cell["pFree95"],
+        "evidenceSlots": cell.get("totalSlots") or 0,
+        "shrinkageToPrior": cell.get("shrinkageToPrior"),
+        "state": state_from(cell),
+        "heldOutOccupiedSlots": n_occ_slots,
+        "heldOutTotalSlots": n_total,
+    }
+
+
 def cmd_validate(args):
     rng = random.Random(args.seed)
     all_dates = set()
     for ev in load_events(args.events, max_events=args.scan_only):
-        for date_s, _, _, _ in slot_keys(ev["_a"], ev["_d"]):
+        for date_s, _, _, _, _ in slot_keys(ev["_a"], ev["_d"]):
             all_dates.add(date_s)
             break
     all_dates = sorted(all_dates)
@@ -747,32 +864,36 @@ def cmd_validate(args):
 
     print("  reconstructing held-out ground truth ...", flush=True)
     truth = observed_occupancy(args.events, holdout, max_events=args.max_events)
-    denom = denominator_slots(args.events, holdout, max_events=args.max_events,
-                              bay_inventory=model.get("baysPerStreet"))
+    # The denominator no longer needs its own pass over the archive: scoring is
+    # per DATE now, so it is simply bays(street) x slots_per_hour, taken from the
+    # bay inventory the model already carries. Using the model's own inventory
+    # also guarantees train and validation agree on what "all the bays" means.
+    denom = None
 
+    slots_per_hour = 60 // SLOT_MINUTES
+    bays_per_street = model.get("baysPerStreet") or {}
     rows = []
-    for key, (k, n_occ_slots) in truth.items():
-        n_total = denom.get(key)
-        if not n_total:
-            continue
-        observed_p_occ = min(1.0, n_occ_slots / n_total)
-        street, dt_type, hour = key.split("|")
-        cell = model["cells"].get(key) or fallback_for(model, _fake_dt(dt_type, int(hour)))
-        if cell is None:
-            continue
-        rows.append({
-            "key": key, "street": street, "dayType": dt_type, "hour": int(hour),
-            "observedPOccupied": round(observed_p_occ, 6),
-            "observedPFree": round(1.0 - observed_p_occ, 6),
-            "predictedPOccupied": cell["pOccupied"],
-            "predictedPFree": cell["pFree"],
-            "predictedPFree95": cell["pFree95"],
-            "evidenceSlots": cell.get("totalSlots") or 0,
-            "shrinkageToPrior": cell.get("shrinkageToPrior"),
-            "state": state_from(cell),
-            "heldOutOccupiedSlots": n_occ_slots,
-            "heldOutTotalSlots": n_total,
-        })
+    # Enumerate every (street, date, hour) combination, not just the ones that
+    # happen to have events. A street-hour with no events on a held-out date was
+    # genuinely empty, and omitting it would bias observed occupancy upward.
+    for date_s in holdout:
+        d_dt = datetime.strptime(date_s, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        dt_type = day_type(d_dt)
+        for street, n_bays in bays_per_street.items():
+            n_total = n_bays * slots_per_hour          # one date
+            if not n_total:
+                continue
+            for hour in range(24):
+                key = f"{street}|{dt_type}|{hour}"
+                tkey = f"{street}|{dt_type}|{hour}|{date_s}"
+                n_occ_slots = truth.get(tkey, 0.0)
+                observed_p_occ = min(1.0, n_occ_slots / n_total)
+                cell = model["cells"].get(key) or \
+                    fallback_for(model, _fake_dt(dt_type, hour))
+                if cell is None:
+                    continue
+                rows.append(_row(key, street, dt_type, hour, date_s,
+                                 observed_p_occ, n_occ_slots, n_total, cell))
 
     if not rows:
         raise SystemExit("no comparable cells between prediction and ground truth")
