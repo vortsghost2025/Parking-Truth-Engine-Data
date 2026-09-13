@@ -255,6 +255,155 @@ What must not happen is a PASS that quietly skipped F1.
 
 ---
 
+## 4A. C4 executed — and it falsified the C4 plan
+
+C4 was approved first because it is cheap and authoritative. It was executed
+before any Camden row was read, and it produced a result that changes the plan.
+Everything below is pre-registration: no Camden data has been downloaded.
+
+### The authoritative source
+
+`sources/camden/london-councils-contravention-codes-v7.0.json`
+(sha256 `539c5413ff430eb4ec9756fa27ea020d02ca0bca648ef14f20d03c3c1a892a80`)
+
+London Councils, *Penalty Charge Notices: Contravention Code List*, document
+footer **PCN Codes v7.0, effective 31 May 2022**, retrieved 2026-09-13 from the
+2025-03 webpage-version PDF. 91 codes transcribed verbatim with their general
+suffixes, `Diff. level` and section (on-street / off-street).
+
+Two things the source gives us that we were not expecting:
+
+1. **An independent parking-vs-moving-traffic discriminator.** `Diff. level` is
+   `n/a` for exactly the moving-traffic and bus-lane codes. That corroborates C3
+   from a source with no connection to Camden's own `ticket_type` field. It is
+   not sufficient alone — codes 64, 65, 66 also carry `n/a` but *are* parking —
+   so class is declared from description content and cross-checked against
+   `Diff. level`.
+2. **Suffix `j` means camera enforcement.** "Suffix 'j' identifies a
+   contravention that can be used on highways other than red routes using CCTV."
+   A suffix is therefore an authoritative *deployment* marker carried in the code
+   itself. The frozen harness does not read it and under the freeze protocol must
+   not be changed to. It is recorded as the highest-value candidate for a future
+   amendment, because it would let F1 test deployment directly instead of
+   inferring it from code mix.
+
+### The declaration is ours, not the publisher's
+
+London Councils says what a contravention *means*. It publishes no
+"parking-pressure class" taxonomy and none is implied by the list. Which codes
+count as turnover/payment-related versus prohibition/entitlement-related for F1
+is our judgement, declared per code with a rationale and frozen in the artifact:
+
+| declared class | codes | maps to harness label |
+| --- | --- | --- |
+| `TURNOVER_PAYMENT` | 18 | `TURNOVER_TYPE` |
+| `PROHIBITION_ENTITLEMENT` | 46 | `PROHIBITION_TYPE` |
+| `MIXED` | 2 (codes 12, 19) | `AMBIGUOUS` |
+| `NOT_PARKING` | 18 | excluded before classification (C3) |
+| `RESERVED` | 7 | excluded before classification |
+
+Codes 12 and 19 are declared `MIXED` because the official text of each combines
+an entitlement violation with a payment or expiry violation in a single code.
+Forcing them to one side would invent a distinction the source does not make.
+
+### Suffix resolution had to be code-aware
+
+The same letter means different things on different codes. Resolving from the
+general legend alone reports **`33H` as "hospital bay"** when the source's
+code-specific list says **"local buses and cycles only"**, and **`52M` as
+"parking meter"** when it means **"motor vehicles"**. `CODE_SPECIFIC_SUFFIXES`
+overrides the general legend. With that fixed, Camden's two highest-volume codes
+are authoritatively a bus/cycle route restriction and a vehicle-type prohibition
+— both moving traffic, consistent with `ticket_type = MTC` on 170,747 rows.
+33H + 52M account for 150,030 of the 177,779 moving-traffic and bus-lane rows.
+Two independent sources agree.
+
+### The audit result: the C4 input-data route does not work
+
+`sources/camden/code-classification-audit.json` runs the **frozen, unmodified**
+`classify_contravention()` on every authoritative description and compares it
+against the declaration. The frozen harness is bit-identical to `a602244`
+(`sha256sum -c FREEZE.sha256` → 9/9 OK, self-test still 14/14).
+
+**Agreement: 42 of 66 classified codes = 0.636.** 24 codes disagree.
+
+| declared class | recognised | rate |
+| --- | --- | --- |
+| `TURNOVER_TYPE` | 9 of 18 | **0.500** |
+| `PROHIBITION_TYPE` | 31 of 46 | 0.674 |
+| `AMBIGUOUS` | 2 of 2 | 1.000 |
+
+Every failure collapses into `AMBIGUOUS` or `UNCLASSIFIED`. **No code is ever
+inverted** from one substantive class into the other — the classifier destroys
+information rather than swapping it. But it destroys it *asymmetrically*, and
+that is what makes it consequential.
+
+Four mechanisms, all evidenced per code in the audit:
+
+- **Substring matching.** `classify_contravention()` tests `hint in text` with no
+  word boundary. `"permit"` is a substring of `"permitted"`, so code 30 *"Parked
+  for longer than permitted"* — the cleanest maximum-stay code in the list —
+  fires the prohibition hint alongside `"longer than"` and returns `AMBIGUOUS`.
+  Codes 09 and 80 identically.
+- **Overbroad hint `"bay"`.** Nearly every parking contravention concerns a bay
+  or parking place, so it contaminates turnover codes such as 04 into
+  `AMBIGUOUS` for no semantic reason.
+- **Vocabulary gap.** The hints were written from paraphrase, not authoritative
+  wording. The hint is `"expired"`; code 05 says *"expiry"*. Code 05 *"Parked
+  after the expiry of paid for time"* — the purest overstay contravention in the
+  list — returns `UNCLASSIFIED`. So do codes 22, 35, 41, 42, 43, 45, 49, 56, 57,
+  62, 64, 65, 82, 90, 91, 93, 95.
+- **Circular validation — the root cause.** The 14/14 green self-test validated
+  the classifier against fixture text generated by `make_camden_fixture.py`,
+  which used the classifier's own vocabulary. The fixture could not have exposed
+  these failures because it was written in the language the classifier already
+  understood. This is a methodological defect in PTE-TEL-003, found by C4, and
+  it is recorded here rather than buried.
+
+### Direction of the bias, computed not assumed
+
+F1 indicator I2 fires when `prohibitionShareOverall > 0.50`. That share is
+`PROHIBITION_TYPE / total over ALL classes`, so reclassifying rows into
+`AMBIGUOUS`/`UNCLASSIFIED` leaves the denominator unchanged while shrinking both
+numerators — and it shrinks turnover harder (0.500) than prohibition (0.674).
+The net effect is an **upward** bias on `prohibitionShareOverall`:
+
+| true prohibition share | as reported | bias | false F1 trigger? |
+| --- | --- | --- | --- |
+| 0.10 | 0.130 | +0.030 | no |
+| 0.25 | 0.310 | +0.060 | no |
+| 0.35 | 0.421 | +0.071 | no |
+| 0.40 | 0.473 | +0.073 | no |
+| **0.45** | **0.524** | **+0.074** | **YES** |
+| 0.50 | 0.574 | +0.074 | already above |
+| 0.60 | 0.669 | +0.069 | — |
+
+The bias is large enough to cross the frozen threshold unaided. A false F1
+trigger produces a FAIL verdict whose stated meaning is *"the signal is
+dominated by enforcement deployment, not parking demand"* — and the
+pre-registered reading of a Camden FAIL is to drop the PCN-exhaust source class
+as too enforcement-biased. So this defect can manufacture the specific evidence
+that would cause the project to abandon the approach, for a reason that is an
+artefact of a keyword list. That is a strategic-grade false negative.
+
+An earlier draft of this finding claimed the bias ran the other way. It does not;
+the arithmetic in `_contravention_mix()` was checked before the claim was
+written, and the claim was corrected.
+
+### Why this cannot be fixed through input data alone
+
+Protocol rule 3 permits changes only through `--field-map` and input data. The
+only input-data lever is the description column. Making a weak keyword classifier
+reproduce a correct table-driven answer would require writing text engineered to
+trip specific keywords — description text that is *not* the authoritative
+description. That fabricates exactly the provenance the harness exists to
+preserve and makes the result uninterpretable. It is worse than amending the
+classifier.
+
+**C4 is therefore recorded as executed and its planned remedy as falsified.** The
+run is blocked pending a decision on amendment C4A, which must be committed
+before any Camden row is read in order to remain pre-registration.
+
 ## 5. Unverified at freeze time
 
 Recorded so nobody mistakes an assumption for a finding:

@@ -1,0 +1,1712 @@
+{
+  "agree": 42,
+  "agreementRate": 0.636364,
+  "auditVersion": "1.0.0",
+  "camdenObservedCodes": [
+    {
+      "baseCode": "33",
+      "declaredClass": "NOT_PARKING",
+      "observedHarnessLabel": null,
+      "rawCode": "33H",
+      "rows": 76882,
+      "status": "EXCLUDED_BY_C3",
+      "suffix": "H",
+      "suffixIsCameraEnforcement": false,
+      "suffixMeaning": "local buses and cycles only"
+    },
+    {
+      "baseCode": "52",
+      "declaredClass": "NOT_PARKING",
+      "observedHarnessLabel": null,
+      "rawCode": "52M",
+      "rows": 73148,
+      "status": "EXCLUDED_BY_C3",
+      "suffix": "M",
+      "suffixIsCameraEnforcement": false,
+      "suffixMeaning": "motor vehicles"
+    },
+    {
+      "baseCode": "12",
+      "declaredClass": "MIXED",
+      "observedHarnessLabel": "AMBIGUOUS",
+      "rawCode": "12R",
+      "rows": 72219,
+      "status": "AGREES",
+      "suffix": "R",
+      "suffixIsCameraEnforcement": false,
+      "suffixMeaning": "residents' bay"
+    },
+    {
+      "baseCode": "11",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "rawCode": "11",
+      "rows": 68427,
+      "status": "AGREES",
+      "suffix": null,
+      "suffixIsCameraEnforcement": false,
+      "suffixMeaning": null
+    }
+  ],
+  "camdenRowWeightedAgreementAllObservedRows": 0.483858,
+  "camdenRowWeightedAgreementParkingOnly": 1.0,
+  "camdenRowWeightedNote": "Two denominators are reported deliberately. 'ParkingOnly' covers only rows that survive the C3 filter (12R, 11 = 140,646 rows); C3-excluded rows are removed before classification and are not classifier failures. 'AllObservedRows' includes them and is therefore a conservative lower bound. Neither figure is reassuring: Camden's top-2 parking codes classify correctly, but they are only 28.4% of rows, and the remaining 205,138 rows' codes were never retrieved - so the codes that DO fail are precisely the ones we cannot yet see.",
+  "classifiedCodes": 66,
+  "diagnosis": {
+    "asymmetry": "The defects are NOT symmetric between the two classes, and that is what makes them consequential. Recognition rate on the authoritative list is 0.500 for declared TURNOVER codes (9 of 18 recognised) against 0.674 for declared PROHIBITION codes (31 of 46). Every one of the 24 failures collapses into AMBIGUOUS or UNCLASSIFIED; NO code is ever inverted from one substantive class into the other. The classifier is conservative - it destroys information rather than swapping it.",
+    "biasTable": {
+      "frozenThreshold": 0.5,
+      "note": "true prohibition share -> share as reported by the frozen classifier",
+      "recognitionRateProhibition": 0.673913,
+      "recognitionRateTurnover": 0.5,
+      "rows": [
+        {
+          "bias": 0.03,
+          "falseTrigger": false,
+          "observed": 0.13,
+          "true": 0.1
+        },
+        {
+          "bias": 0.06,
+          "falseTrigger": false,
+          "observed": 0.31,
+          "true": 0.25
+        },
+        {
+          "bias": 0.071,
+          "falseTrigger": false,
+          "observed": 0.421,
+          "true": 0.35
+        },
+        {
+          "bias": 0.073,
+          "falseTrigger": false,
+          "observed": 0.473,
+          "true": 0.4
+        },
+        {
+          "bias": 0.074,
+          "falseTrigger": true,
+          "observed": 0.524,
+          "true": 0.45
+        },
+        {
+          "bias": 0.074,
+          "falseTrigger": true,
+          "observed": 0.574,
+          "true": 0.5
+        },
+        {
+          "bias": 0.069,
+          "falseTrigger": false,
+          "observed": 0.669,
+          "true": 0.6
+        }
+      ]
+    },
+    "consequenceForF1": "F1 indicator I2 triggers when prohibitionShareOverall exceeds the frozen threshold prohibitionShareDominant = 0.50. That share is computed as PROHIBITION_TYPE divided by the total over ALL classes, so reclassifying rows into AMBIGUOUS or UNCLASSIFIED leaves the denominator unchanged while shrinking the numerator on both sides - and it shrinks TURNOVER harder than PROHIBITION. The net effect is that prohibitionShareOverall is BIASED UPWARD by +0.030 to +0.074 across plausible true mixes. A street series with a TRUE prohibition share of 0.45 is reported at 0.524 and a true 0.50 at 0.574. The bias is therefore large enough to cross the frozen threshold on its own and produce a FALSE F1 TRIGGER.",
+    "consequenceForStrategy": "A false F1 trigger yields a FAIL verdict whose stated meaning is 'the signal is dominated by enforcement deployment, not parking demand'. The pre-registered reading of a Camden FAIL is to drop the PCN-exhaust source class as too enforcement-biased. So this defect does not merely add noise: it can manufacture the specific evidence that would cause the project to abandon the approach for a reason that is an artefact of a keyword list. That is a strategic-grade false negative and it must be removed before the run, not explained away after it.",
+    "failureModes": {
+      "CIRCULAR_VALIDATION": "Root cause. The 14/14 green self-test validated the classifier against synthetic fixture text generated by make_camden_fixture.py, which used the classifier's own vocabulary. The fixture could not have exposed these failures, because it was written in the language the classifier already understood. This is a methodological defect in PTE-TEL-003, found by PTE-TEL-004 step C4, and it is reported rather than buried.",
+      "OVERBROAD_HINT_BAY": "'bay' is a PROHIBITION hint, but nearly every parking contravention in the authoritative list concerns a bay or parking place. It contaminates turnover codes such as 04 into AMBIGUOUS for no semantic reason.",
+      "SUBSTRING_MATCHING": "classify_contravention() tests `hint in text` with no word boundary. 'permit' is a substring of 'permitted', so code 30 'Parked for longer than permitted' - the cleanest maximum-stay code available - fires the PROHIBITION hint 'permit' alongside the TURNOVER hint 'longer than' and is returned as AMBIGUOUS. Codes 09 and 80 identically.",
+      "VOCABULARY_GAP": "The hints were written from paraphrase, not from the authoritative wording. 'expired' is a hint but code 05 says 'expiry'; code 05 'Parked after the expiry of paid for time' - the purest overstay contravention in the list - returns UNCLASSIFIED. Codes 22, 35, 41, 42, 43, 45, 49, 56, 57, 62, 64, 65, 82, 90, 91, 93, 95 return UNCLASSIFIED for the same reason: no hint matches the real wording."
+    },
+    "summary": "The frozen keyword classifier in camden_normalize.py cannot implement the declared taxonomy on authoritative London Councils text. It disagrees on 24 of 66 classified codes (36.4%), fails to recognise half of all declared turnover codes, and biases prohibitionShareOverall upward by up to +0.074 - enough to cross the frozen F1 threshold of 0.50 unaided and manufacture a false FAIL. The C4 route of fixing this through input data alone is therefore FALSIFIED by evidence gathered before any Camden row was read.",
+    "whyNotFixViaInputData": "The only input-data lever is the description column. Making a weak keyword classifier reproduce a correct table-driven answer would require writing text engineered to trip specific keywords - description text that is NOT the authoritative description. That fabricates the provenance the harness exists to preserve, and it would make the result uninterpretable. It is a worse option than amending the classifier."
+  },
+  "disagree": 24,
+  "disagreements": [
+    {
+      "agrees": false,
+      "baseCode": "04",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "highValueCode": true,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked in a meter bay when penalty time is indicated",
+      "prohibitionHintsMatched": [
+        "bay"
+      ],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": [
+        "meter"
+      ]
+    },
+    {
+      "agrees": false,
+      "baseCode": "05",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked after the expiry of paid for time",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "09",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "highValueCode": false,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked displaying multiple pay & display tickets where prohibited",
+      "prohibitionHintsMatched": [
+        "prohibited"
+      ],
+      "substringArtefacts": [
+        "ticket"
+      ],
+      "turnoverHintsMatched": [
+        "ticket"
+      ]
+    },
+    {
+      "agrees": false,
+      "baseCode": "22",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Re-parked in the same parking place or zone within one hour after leaving",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "23",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a parking place or area not designated for that class of vehicle",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "26",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a special enforcement area more than 50 cm from the edge of the carriageway and not within a designated parking place",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "30",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "highValueCode": true,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked for longer than permitted",
+      "prohibitionHintsMatched": [
+        "permit"
+      ],
+      "substringArtefacts": [
+        "permit"
+      ],
+      "turnoverHintsMatched": [
+        "longer than"
+      ]
+    },
+    {
+      "agrees": false,
+      "baseCode": "35",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a disc parking place without clearly displaying a valid disc",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "41",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Stopped in a parking place designated for diplomatic vehicles",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "42",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a parking place designated for police vehicles",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "43",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Stopped on a cycle docking station parking place",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "45",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Stopped on a taxi rank",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "49",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked wholly or partly on a cycle track or lane",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "56",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in contravention of a commercial vehicle waiting restriction",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "57",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in contravention of a bus ban",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "62",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked with one or more wheels on or over a footpath or any part of a road other than a carriageway",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "64",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in contravention of a notice prohibiting leaving vehicles on a grass verge, garden, lawn or green maintained by a local authority",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "65",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in contravention of a notice prohibiting leaving vehicles on land laid out as a public garden or used for the purpose of public recreation",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "80",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "highValueCode": true,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked for longer than permitted",
+      "prohibitionHintsMatched": [
+        "permit"
+      ],
+      "substringArtefacts": [
+        "permit"
+      ],
+      "turnoverHintsMatched": [
+        "longer than"
+      ]
+    },
+    {
+      "agrees": false,
+      "baseCode": "82",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked after the expiry of paid for time",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "90",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Re-parked in the same car park within one hour after leaving",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "91",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a car park or area not designated for that class of vehicle",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "93",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in car park when closed",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "95",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a parking place for a purpose other than that designated",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    }
+  ],
+  "excludedBeforeClassification": 25,
+  "failureModes": {
+    "SPURIOUS_PROHIBITION_HINT": 4,
+    "VOCABULARY_GAP": 20
+  },
+  "frozenClassifierUnmodified": true,
+  "highValueFailures": [
+    {
+      "baseCode": "04",
+      "expected": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "observed": "AMBIGUOUS",
+      "officialDescription": "Parked in a meter bay when penalty time is indicated",
+      "substringArtefacts": []
+    },
+    {
+      "baseCode": "05",
+      "expected": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "observed": "UNCLASSIFIED",
+      "officialDescription": "Parked after the expiry of paid for time",
+      "substringArtefacts": []
+    },
+    {
+      "baseCode": "22",
+      "expected": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "observed": "UNCLASSIFIED",
+      "officialDescription": "Re-parked in the same parking place or zone within one hour after leaving",
+      "substringArtefacts": []
+    },
+    {
+      "baseCode": "30",
+      "expected": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "observed": "AMBIGUOUS",
+      "officialDescription": "Parked for longer than permitted",
+      "substringArtefacts": [
+        "permit"
+      ]
+    },
+    {
+      "baseCode": "35",
+      "expected": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "observed": "UNCLASSIFIED",
+      "officialDescription": "Parked in a disc parking place without clearly displaying a valid disc",
+      "substringArtefacts": []
+    },
+    {
+      "baseCode": "80",
+      "expected": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "observed": "AMBIGUOUS",
+      "officialDescription": "Parked for longer than permitted",
+      "substringArtefacts": [
+        "permit"
+      ]
+    },
+    {
+      "baseCode": "82",
+      "expected": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "observed": "UNCLASSIFIED",
+      "officialDescription": "Parked after the expiry of paid for time",
+      "substringArtefacts": []
+    },
+    {
+      "baseCode": "90",
+      "expected": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "observed": "UNCLASSIFIED",
+      "officialDescription": "Re-parked in the same car park within one hour after leaving",
+      "substringArtefacts": []
+    }
+  ],
+  "perCode": [
+    {
+      "agrees": true,
+      "baseCode": "01",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a restricted street during prescribed hours",
+      "prohibitionHintsMatched": [
+        "restricted"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "02",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked or loading / unloading in a restricted street where waiting and loading / unloading restrictions are in force",
+      "prohibitionHintsMatched": [
+        "restricted",
+        "loading"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "04",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "highValueCode": true,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked in a meter bay when penalty time is indicated",
+      "prohibitionHintsMatched": [
+        "bay"
+      ],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": [
+        "meter"
+      ]
+    },
+    {
+      "agrees": false,
+      "baseCode": "05",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked after the expiry of paid for time",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "06",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked without clearly displaying a valid pay & display ticket or voucher",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "ticket"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "07",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked with payment made to extend the stay beyond initial time",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "payment"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "08",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked at an out-of-order meter during controlled hours",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "meter"
+      ]
+    },
+    {
+      "agrees": false,
+      "baseCode": "09",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "highValueCode": false,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked displaying multiple pay & display tickets where prohibited",
+      "prohibitionHintsMatched": [
+        "prohibited"
+      ],
+      "substringArtefacts": [
+        "ticket"
+      ],
+      "turnoverHintsMatched": [
+        "ticket"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "10",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked without clearly displaying two valid pay and display tickets when required",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "pay and display",
+        "ticket"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "11",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": true,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked without payment of the parking charge",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "without payment",
+        "payment"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "12",
+      "declaredClass": "MIXED",
+      "expectedHarnessLabel": "AMBIGUOUS",
+      "failureMode": null,
+      "highValueCode": true,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked in a residents' or shared use parking place or zone without a valid virtual permit or clearly displaying a valid physical permit or voucher or pay and display ticket issued for that place where required, or without payment of the parking charge",
+      "prohibitionHintsMatched": [
+        "permit",
+        "resident"
+      ],
+      "turnoverHintsMatched": [
+        "without payment",
+        "pay and display",
+        "payment",
+        "ticket"
+      ]
+    },
+    {
+      "agrees": null,
+      "baseCode": "13",
+      "declaredClass": "RESERVED",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "14",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in an electric vehicles' charging place during restricted hours without charging",
+      "prohibitionHintsMatched": [
+        "restricted"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "16",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a permit space or zone without a valid virtual permit or clearly displaying a valid physical permit where required",
+      "prohibitionHintsMatched": [
+        "permit"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "17",
+      "declaredClass": "RESERVED",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "18",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Using a vehicle in a parking place in connection with the sale or offering or exposing for sale of goods when prohibited",
+      "prohibitionHintsMatched": [
+        "prohibited"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "19",
+      "declaredClass": "MIXED",
+      "expectedHarnessLabel": "AMBIGUOUS",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked in a residents' or shared use parking place or zone with an invalid virtual permit or displaying an invalid physical permit or voucher or pay and display ticket, or after the expiry of paid for time",
+      "prohibitionHintsMatched": [
+        "permit",
+        "resident"
+      ],
+      "turnoverHintsMatched": [
+        "pay and display",
+        "ticket"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "20",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a part of a parking place marked by a yellow line where waiting is prohibited",
+      "prohibitionHintsMatched": [
+        "prohibited",
+        "yellow line"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "21",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked wholly or partly in a suspended bay or space",
+      "prohibitionHintsMatched": [
+        "bay",
+        "suspended"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "22",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Re-parked in the same parking place or zone within one hour after leaving",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "23",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a parking place or area not designated for that class of vehicle",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "24",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Not parked correctly within the markings of the bay or space",
+      "prohibitionHintsMatched": [
+        "bay"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "25",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a loading place or bay during restricted hours without loading",
+      "prohibitionHintsMatched": [
+        "restricted",
+        "loading",
+        "bay"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "26",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a special enforcement area more than 50 cm from the edge of the carriageway and not within a designated parking place",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "27",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a special enforcement area adjacent to a footway, cycle track or verge lowered to meet the level of the carriageway",
+      "prohibitionHintsMatched": [
+        "footway"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "28",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a special enforcement area on part of the carriageway raised to meet the level of a footway, cycle track or verge",
+      "prohibitionHintsMatched": [
+        "footway"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "29",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": false,
+      "baseCode": "30",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "highValueCode": true,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked for longer than permitted",
+      "prohibitionHintsMatched": [
+        "permit"
+      ],
+      "substringArtefacts": [
+        "permit"
+      ],
+      "turnoverHintsMatched": [
+        "longer than"
+      ]
+    },
+    {
+      "agrees": null,
+      "baseCode": "31",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "32",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "33",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "34",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": false,
+      "baseCode": "35",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a disc parking place without clearly displaying a valid disc",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "36",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "37",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "38",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "39",
+      "declaredClass": "RESERVED",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "40",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a designated disabled person's parking place without displaying a valid disabled person's badge in the prescribed manner",
+      "prohibitionHintsMatched": [
+        "disabled"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "41",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Stopped in a parking place designated for diplomatic vehicles",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "42",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a parking place designated for police vehicles",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "43",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Stopped on a cycle docking station parking place",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "45",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Stopped on a taxi rank",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "46",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped where prohibited (on a red route or clearway)",
+      "prohibitionHintsMatched": [
+        "prohibited",
+        "clearway"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "47",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped on a restricted bus stop or stand",
+      "prohibitionHintsMatched": [
+        "restricted"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "48",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped in a restricted area outside a school, a hospital or a fire, police or ambulance station when prohibited",
+      "prohibitionHintsMatched": [
+        "restricted",
+        "prohibited",
+        "school"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "49",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked wholly or partly on a cycle track or lane",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "50",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "51",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "52",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "53",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "54",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "55",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "A commercial vehicle parked in a restricted street in contravention of the Overnight Waiting Ban",
+      "prohibitionHintsMatched": [
+        "restricted"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "56",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in contravention of a commercial vehicle waiting restriction",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "57",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in contravention of a bus ban",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "58",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "59",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "61",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "A heavy commercial vehicle wholly or partly parked on a footway, verge or land between two carriageways",
+      "prohibitionHintsMatched": [
+        "footway"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "62",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked with one or more wheels on or over a footpath or any part of a road other than a carriageway",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "63",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked with engine running where prohibited",
+      "prohibitionHintsMatched": [
+        "prohibited"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "64",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in contravention of a notice prohibiting leaving vehicles on a grass verge, garden, lawn or green maintained by a local authority",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "65",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in contravention of a notice prohibiting leaving vehicles on land laid out as a public garden or used for the purpose of public recreation",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "66",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked on a verge, central reservation or footway comprised in an urban road",
+      "prohibitionHintsMatched": [
+        "footway"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "67",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "68",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "70",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a loading place or bay during restricted hours without loading",
+      "prohibitionHintsMatched": [
+        "restricted",
+        "loading",
+        "bay"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "71",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in an electric vehicles' charging place during restricted hours without charging",
+      "prohibitionHintsMatched": [
+        "restricted"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "72",
+      "declaredClass": "RESERVED",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "73",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked without payment of the parking charge",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "without payment",
+        "payment"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "74",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Using a vehicle in a parking place in connection with the sale or offering or exposing for sale of goods when prohibited",
+      "prohibitionHintsMatched": [
+        "prohibited"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "75",
+      "declaredClass": "RESERVED",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "76",
+      "declaredClass": "RESERVED",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": null,
+      "baseCode": "77",
+      "declaredClass": "RESERVED",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "78",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked wholly or partly in a suspended bay or space",
+      "prohibitionHintsMatched": [
+        "bay",
+        "suspended"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "80",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "SPURIOUS_PROHIBITION_HINT",
+      "highValueCode": true,
+      "observedHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked for longer than permitted",
+      "prohibitionHintsMatched": [
+        "permit"
+      ],
+      "substringArtefacts": [
+        "permit"
+      ],
+      "turnoverHintsMatched": [
+        "longer than"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "81",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a restricted area in an off-street car park or housing estate",
+      "prohibitionHintsMatched": [
+        "restricted"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "82",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked after the expiry of paid for time",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "83",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked in a car park without clearly displaying a valid pay & display ticket or voucher or parking clock",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "ticket"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "84",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked with payment made to extend the stay beyond initial time",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "payment"
+      ]
+    },
+    {
+      "agrees": true,
+      "baseCode": "85",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked without a valid virtual permit or clearly displaying a valid physical permit where required",
+      "prohibitionHintsMatched": [
+        "permit"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "86",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Not parked correctly within the markings of a bay or space",
+      "prohibitionHintsMatched": [
+        "bay"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "87",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a designated disabled person's parking place without displaying a valid disabled person's badge in the prescribed manner",
+      "prohibitionHintsMatched": [
+        "disabled"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "89",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Vehicle parked exceeds maximum weight or height or length permitted",
+      "prohibitionHintsMatched": [
+        "permit"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "90",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": true,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Re-parked in the same car park within one hour after leaving",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "91",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a car park or area not designated for that class of vehicle",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "92",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked causing an obstruction",
+      "prohibitionHintsMatched": [
+        "obstruct"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": false,
+      "baseCode": "93",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in car park when closed",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "94",
+      "declaredClass": "TURNOVER_PAYMENT",
+      "expectedHarnessLabel": "TURNOVER_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked in a pay & display car park without clearly displaying two valid pay and display tickets when required",
+      "prohibitionHintsMatched": [],
+      "turnoverHintsMatched": [
+        "pay and display",
+        "ticket"
+      ]
+    },
+    {
+      "agrees": false,
+      "baseCode": "95",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": "VOCABULARY_GAP",
+      "highValueCode": false,
+      "observedHarnessLabel": "UNCLASSIFIED",
+      "officialDescription": "Parked in a parking place for a purpose other than that designated",
+      "prohibitionHintsMatched": [],
+      "substringArtefacts": [],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": true,
+      "baseCode": "96",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked with engine running where prohibited",
+      "prohibitionHintsMatched": [
+        "prohibited"
+      ],
+      "turnoverHintsMatched": []
+    },
+    {
+      "agrees": null,
+      "baseCode": "97",
+      "declaredClass": "NOT_PARKING",
+      "expectedHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "failureMode": null,
+      "note": "excluded before classification (C3)",
+      "observedHarnessLabel": null
+    },
+    {
+      "agrees": true,
+      "baseCode": "99",
+      "declaredClass": "PROHIBITION_ENTITLEMENT",
+      "expectedHarnessLabel": "PROHIBITION_TYPE",
+      "failureMode": null,
+      "highValueCode": false,
+      "observedHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped on a pedestrian crossing or crossing area marked by zigzags",
+      "prohibitionHintsMatched": [
+        "crossing",
+        "pedestrian"
+      ],
+      "turnoverHintsMatched": []
+    }
+  ],
+  "substringArtefactCodes": [
+    "09",
+    "30",
+    "80"
+  ],
+  "totalCodes": 91
+}

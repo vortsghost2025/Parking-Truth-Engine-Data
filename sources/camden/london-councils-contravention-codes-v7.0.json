@@ -1,0 +1,1103 @@
+{
+  "artifactVersion": "1.0.0",
+  "camdenObservedTopCodes": {
+    "11": 68427,
+    "12R": 72219,
+    "33H": 76882,
+    "52M": 73148
+  },
+  "camdenObservedTopCodesNote": "From Camden publisher metadata for 4k7m-4gkk, retrieved before any row was read. These four codes are 290,676 of 495,814 rows (58.6%). 33H and 52M are NOT_PARKING (150,030 rows), which accounts for most of the 177,779 moving-traffic and bus-lane rows implied by ticket_type - two independent sources agreeing.",
+  "cameraEnforcementNote": "Source: \"Suffix 'j' identifies a contravention that can be used on highways other than red routes using CCTV. The suffix itself is not required on a PCN.\" This is an authoritative deployment marker carried in the code itself. The frozen harness does not read it and, under the freeze protocol, must not be changed to. Recorded as the highest-value candidate for a future pre-registered amendment, because it would let F1 test deployment directly instead of inferring it from code mix.",
+  "cameraEnforcementSuffix": "j",
+  "classCounts": {
+    "MIXED": 2,
+    "NOT_PARKING": 18,
+    "PROHIBITION_ENTITLEMENT": 46,
+    "RESERVED": 7,
+    "TURNOVER_PAYMENT": 18
+  },
+  "codeSpecificSuffixes": {
+    "01": {
+      "a": "temporary traffic order"
+    },
+    "02": {
+      "a": "temporary traffic order"
+    },
+    "12": {
+      "w": "wrong parking zone",
+      "x": "incorrect VRM",
+      "y": "obscured/illegible permit",
+      "z": "out of date permit"
+    },
+    "16": {
+      "w": "wrong parking zone",
+      "x": "incorrect VRM",
+      "y": "obscured/illegible permit",
+      "z": "out of date permit"
+    },
+    "19": {
+      "w": "wrong parking zone",
+      "x": "incorrect VRM",
+      "y": "obscured/illegible permit",
+      "z": "out of date permit"
+    },
+    "32": {
+      "d": "proceeding in the wrong direction",
+      "t": "turning in the wrong direction"
+    },
+    "33": {
+      "b": "buses only",
+      "c": "buses and cycles only",
+      "e": "buses, cycles and taxis only",
+      "f": "buses and taxis only",
+      "g": "local buses only",
+      "h": "local buses and cycles only",
+      "i": "local buses, cycles and taxis only",
+      "k": "local buses and taxis only",
+      "q": "tramcars and local buses only",
+      "r": "tramcars only",
+      "s": "tramcars and buses only",
+      "y": "pedal cycles only",
+      "z": "pedal cycles and pedestrians only"
+    },
+    "38": {
+      "l": "must pass to the left",
+      "r": "must pass to the right"
+    },
+    "45": {
+      "w": "amends the contravention code description to change the wording from 'stopped' to 'waiting'"
+    },
+    "50": {
+      "l": "no left turn",
+      "r": "no right turn",
+      "u": "no U-turn"
+    },
+    "52": {
+      "b": "buses",
+      "g": "goods vehicles exceeding max gross weight indicated",
+      "m": "motor vehicles",
+      "s": "solo motorcycles",
+      "v": "all vehicles except non-mechanically propelled ones being pushed",
+      "x": "motor vehicles except solo m/cycles"
+    },
+    "53": {
+      "c": "amends the description to add 'and cycle' after the word pedestrian"
+    },
+    "54": {
+      "c": "amends the description to add 'and cycle' after the word pedestrian"
+    },
+    "61": {
+      "1": "one wheel on footway",
+      "2": "partly on footway",
+      "4": "all wheels on footway",
+      "c": "on vehicle crossover",
+      "g": "on grass verge"
+    },
+    "62": {
+      "1": "one wheel on footway",
+      "2": "partly on footway",
+      "4": "all wheels on footway",
+      "c": "on vehicle crossover",
+      "g": "on grass verge"
+    },
+    "64": {
+      "1": "one wheel on footway",
+      "2": "partly on footway",
+      "4": "all wheels on footway",
+      "c": "on vehicle crossover",
+      "g": "on grass verge"
+    },
+    "65": {
+      "1": "one wheel on footway",
+      "2": "partly on footway",
+      "4": "all wheels on footway",
+      "c": "on vehicle crossover",
+      "g": "on grass verge"
+    },
+    "66": {
+      "1": "one wheel on footway",
+      "2": "partly on footway",
+      "4": "all wheels on footway",
+      "c": "on vehicle crossover",
+      "g": "on grass verge"
+    },
+    "85": {
+      "w": "wrong parking zone",
+      "x": "incorrect VRM",
+      "y": "obscured/illegible permit",
+      "z": "out of date permit"
+    }
+  },
+  "codes": {
+    "01": {
+      "baseCode": "01",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location entitlement: no right to wait there at all during prescribed hours.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "ajoyz",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a restricted street during prescribed hours",
+      "section": "ON_STREET"
+    },
+    "02": {
+      "baseCode": "02",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location entitlement during a waiting or loading restriction.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "ajo",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked or loading / unloading in a restricted street where waiting and loading / unloading restrictions are in force",
+      "section": "ON_STREET"
+    },
+    "04": {
+      "baseCode": "04",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Duration at a permitted meter bay; penalty time is an overstay condition.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "cs",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked in a meter bay when penalty time is indicated",
+      "section": "ON_STREET"
+    },
+    "05": {
+      "baseCode": "05",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Pure overstay of paid time at a permitted place - the most direct demand-duration signal.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "cgpsuv1",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked after the expiry of paid for time",
+      "section": "ON_STREET"
+    },
+    "06": {
+      "baseCode": "06",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Payment compliance at a permitted pay-and-display place.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "cipv1",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked without clearly displaying a valid pay & display ticket or voucher",
+      "section": "ON_STREET"
+    },
+    "07": {
+      "baseCode": "07",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Meter feeding: extending a stay. Directly about duration demand.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "cgmprsuv",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked with payment made to extend the stay beyond initial time",
+      "section": "ON_STREET"
+    },
+    "08": {
+      "baseCode": "08",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Payment mechanism failure at a permitted place; turnover-side.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "c",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked at an out-of-order meter during controlled hours",
+      "section": "ON_STREET"
+    },
+    "09": {
+      "baseCode": "09",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Duration control at a permitted place.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "ps",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked displaying multiple pay & display tickets where prohibited",
+      "section": "ON_STREET"
+    },
+    "10": {
+      "baseCode": "10",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Payment compliance for a longer stay at a permitted place.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "p",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked without clearly displaying two valid pay and display tickets when required",
+      "section": "ON_STREET"
+    },
+    "11": {
+      "baseCode": "11",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Non-payment at a place where parking is permitted for a charge. Demand-side: the space was wanted and used.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "gu",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked without payment of the parking charge",
+      "section": "ON_STREET"
+    },
+    "12": {
+      "baseCode": "12",
+      "declaredPressureClass": "MIXED",
+      "declaredRationale": "Official text mixes an entitlement violation (no valid permit) with a payment violation (no payment of the charge) in a single code. Declared MIXED rather than forced to one side. Note Camden's observed 12R carries suffix r = residents' bay, which tilts toward entitlement, but the base code is what the frozen classifier sees.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "arstuwy4",
+      "mapsToHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked in a residents' or shared use parking place or zone without a valid virtual permit or clearly displaying a valid physical permit or voucher or pay and display ticket issued for that place where required, or without payment of the parking charge",
+      "section": "ON_STREET"
+    },
+    "13": {
+      "baseCode": "13",
+      "declaredPressureClass": "RESERVED",
+      "declaredRationale": "Reserved by the source.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "---- RESERVED FOR TfL USE (LOW EMISSION ZONE) - - - -",
+      "section": "ON_STREET"
+    },
+    "14": {
+      "baseCode": "14",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Entitlement to a specially designated place.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "ay89",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in an electric vehicles' charging place during restricted hours without charging",
+      "section": "ON_STREET"
+    },
+    "16": {
+      "baseCode": "16",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Permit entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "abdehqstwxyz4569",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a permit space or zone without a valid virtual permit or clearly displaying a valid physical permit where required",
+      "section": "ON_STREET"
+    },
+    "17": {
+      "baseCode": "17",
+      "declaredPressureClass": "RESERVED",
+      "declaredRationale": "Reserved by the source.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "---- RESERVED FOR ROAD USER CHARGING USE - - - -",
+      "section": "ON_STREET"
+    },
+    "18": {
+      "baseCode": "18",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Prohibited use of a parking place.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "abcdefghmprsvxy12356789",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Using a vehicle in a parking place in connection with the sale or offering or exposing for sale of goods when prohibited",
+      "section": "ON_STREET"
+    },
+    "19": {
+      "baseCode": "19",
+      "declaredPressureClass": "MIXED",
+      "declaredRationale": "Official text mixes invalid-permit entitlement with expiry of paid time. Declared MIXED.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "airsuwxyz4",
+      "mapsToHarnessLabel": "AMBIGUOUS",
+      "officialDescription": "Parked in a residents' or shared use parking place or zone with an invalid virtual permit or displaying an invalid physical permit or voucher or pay and display ticket, or after the expiry of paid for time",
+      "section": "ON_STREET"
+    },
+    "20": {
+      "baseCode": "20",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location: yellow-line prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a part of a parking place marked by a yellow line where waiting is prohibited",
+      "section": "ON_STREET"
+    },
+    "21": {
+      "baseCode": "21",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Bay suspension - an enforcement and works-driven condition, not a demand condition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "abcdefghijklmnpqrsuvxy1256789",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked wholly or partly in a suspended bay or space",
+      "section": "ON_STREET"
+    },
+    "22": {
+      "baseCode": "22",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Circulation behaviour driven by scarcity: re-parking to reset a limit is a demand-pressure signature.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "cfglmnopsv1289",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Re-parked in the same parking place or zone within one hour after leaving",
+      "section": "ON_STREET"
+    },
+    "23": {
+      "baseCode": "23",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Vehicle-class entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "abcdefghklprsvwxy123789",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a parking place or area not designated for that class of vehicle",
+      "section": "ON_STREET"
+    },
+    "24": {
+      "baseCode": "24",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Manner of parking rather than duration or payment; enforcement-observation dependent.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "abcdefghijklmpqrsvxy1256789",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Not parked correctly within the markings of the bay or space",
+      "section": "ON_STREET"
+    },
+    "25": {
+      "baseCode": "25",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Entitlement to a loading place.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "n2",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a loading place or bay during restricted hours without loading",
+      "section": "ON_STREET"
+    },
+    "26": {
+      "baseCode": "26",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location prohibition in a special enforcement area.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "n",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a special enforcement area more than 50 cm from the edge of the carriageway and not within a designated parking place",
+      "section": "ON_STREET"
+    },
+    "27": {
+      "baseCode": "27",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "no",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a special enforcement area adjacent to a footway, cycle track or verge lowered to meet the level of the carriageway",
+      "section": "ON_STREET"
+    },
+    "28": {
+      "baseCode": "28",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "no",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a special enforcement area on part of the carriageway raised to meet the level of a footway, cycle track or verge",
+      "section": "ON_STREET"
+    },
+    "29": {
+      "baseCode": "29",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a in the source.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "j",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Failing to comply with a one-way restriction",
+      "section": "ON_STREET"
+    },
+    "30": {
+      "baseCode": "30",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Maximum-stay overstay at a permitted place - the cleanest duration-demand code.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "acfglmnopsuy12789",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked for longer than permitted",
+      "section": "ON_STREET"
+    },
+    "31": {
+      "baseCode": "31",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "j",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Entering and stopping in a box junction when prohibited",
+      "section": "ON_STREET"
+    },
+    "32": {
+      "baseCode": "32",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "jdt",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Failing to proceed in the direction shown by the arrow on a blue sign",
+      "section": "ON_STREET"
+    },
+    "33": {
+      "baseCode": "33",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a. Camden's highest-volume code 33H (76,882 rows) is this, with suffix h = local buses and cycles only.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "jbcefghikqrsyz",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Using a route restricted to certain vehicles",
+      "section": "ON_STREET"
+    },
+    "34": {
+      "baseCode": "34",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Bus lane. Diff. level n/a. Corresponds to Camden's BUS ticket_type (7,032 rows).",
+      "diffLevel": "n/a",
+      "generalSuffixes": "j0",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Being in a bus lane",
+      "section": "ON_STREET"
+    },
+    "35": {
+      "baseCode": "35",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Duration control by disc at a permitted place.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked in a disc parking place without clearly displaying a valid disc",
+      "section": "ON_STREET"
+    },
+    "36": {
+      "baseCode": "36",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "j",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Being in a mandatory cycle lane",
+      "section": "ON_STREET"
+    },
+    "37": {
+      "baseCode": "37",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "j",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Failing to give way to oncoming vehicles",
+      "section": "ON_STREET"
+    },
+    "38": {
+      "baseCode": "38",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "jlr",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Failing to comply with a sign indicating that vehicular traffic must pass to the specified side of the sign",
+      "section": "ON_STREET"
+    },
+    "39": {
+      "baseCode": "39",
+      "declaredPressureClass": "RESERVED",
+      "declaredRationale": "Reserved by the source.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "---- RESERVED FOR TfL USE (ULTRA LOW EMISSION ZONE) - - - -",
+      "section": "ON_STREET"
+    },
+    "40": {
+      "baseCode": "40",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Badge entitlement to a designated place.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "n",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a designated disabled person's parking place without displaying a valid disabled person's badge in the prescribed manner",
+      "section": "ON_STREET"
+    },
+    "41": {
+      "baseCode": "41",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Designated-place entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped in a parking place designated for diplomatic vehicles",
+      "section": "ON_STREET"
+    },
+    "42": {
+      "baseCode": "42",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Designated-place entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a parking place designated for police vehicles",
+      "section": "ON_STREET"
+    },
+    "43": {
+      "baseCode": "43",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Designated-place entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped on a cycle docking station parking place",
+      "section": "ON_STREET"
+    },
+    "45": {
+      "baseCode": "45",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Designated-place entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "nw",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped on a taxi rank",
+      "section": "ON_STREET"
+    },
+    "46": {
+      "baseCode": "46",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "n",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped where prohibited (on a red route or clearway)",
+      "section": "ON_STREET"
+    },
+    "47": {
+      "baseCode": "47",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "jn",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped on a restricted bus stop or stand",
+      "section": "ON_STREET"
+    },
+    "48": {
+      "baseCode": "48",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location prohibition in a protected area.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "jlr",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped in a restricted area outside a school, a hospital or a fire, police or ambulance station when prohibited",
+      "section": "ON_STREET"
+    },
+    "49": {
+      "baseCode": "49",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Location prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "j",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked wholly or partly on a cycle track or lane",
+      "section": "ON_STREET"
+    },
+    "50": {
+      "baseCode": "50",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "jlru",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Performing a prohibited turn",
+      "section": "ON_STREET"
+    },
+    "51": {
+      "baseCode": "51",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "j",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Failing to comply with a no entry restriction",
+      "section": "ON_STREET"
+    },
+    "52": {
+      "baseCode": "52",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a. Camden's second-highest code 52M (73,148 rows) is this, suffix m = motor vehicles.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "jgmsvx",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Failing to comply with a prohibition on certain types of vehicle",
+      "section": "ON_STREET"
+    },
+    "53": {
+      "baseCode": "53",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "cj",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Failing to comply with a restriction on vehicles entering a pedestrian zone",
+      "section": "ON_STREET"
+    },
+    "54": {
+      "baseCode": "54",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Moving traffic. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "cj",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Failing to comply with a restriction on vehicles entering and waiting in a pedestrian zone",
+      "section": "ON_STREET"
+    },
+    "55": {
+      "baseCode": "55",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Overnight waiting ban - location and time prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "A commercial vehicle parked in a restricted street in contravention of the Overnight Waiting Ban",
+      "section": "ON_STREET"
+    },
+    "56": {
+      "baseCode": "56",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Commercial waiting restriction.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in contravention of a commercial vehicle waiting restriction",
+      "section": "ON_STREET"
+    },
+    "57": {
+      "baseCode": "57",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Bus ban waiting restriction.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in contravention of a bus ban",
+      "section": "ON_STREET"
+    },
+    "58": {
+      "baseCode": "58",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "London Lorry Control Scheme route permit. Moving-traffic style, Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Using a vehicle on a restricted street during prescribed hours without a valid permit",
+      "section": "ON_STREET"
+    },
+    "59": {
+      "baseCode": "59",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "London Lorry Control Scheme route permit. Diff. level n/a.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Using a vehicle on a restricted street during prescribed hours in breach of permit conditions",
+      "section": "ON_STREET"
+    },
+    "61": {
+      "baseCode": "61",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Footway parking prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "124cgn",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "A heavy commercial vehicle wholly or partly parked on a footway, verge or land between two carriageways",
+      "section": "ON_STREET"
+    },
+    "62": {
+      "baseCode": "62",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Footway parking prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "124cgn",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked with one or more wheels on or over a footpath or any part of a road other than a carriageway",
+      "section": "ON_STREET"
+    },
+    "63": {
+      "baseCode": "63",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Manner-of-parking prohibition.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked with engine running where prohibited",
+      "section": "ON_STREET"
+    },
+    "64": {
+      "baseCode": "64",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Verge prohibition. Diff. level n/a but this IS a parking contravention (Essex only), so it is declared by content, not by Diff. level.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "124",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in contravention of a notice prohibiting leaving vehicles on a grass verge, garden, lawn or green maintained by a local authority",
+      "section": "ON_STREET"
+    },
+    "65": {
+      "baseCode": "65",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Verge or public-land prohibition (Essex only). Declared by content; Diff. level n/a is not sufficient on its own to mean moving traffic.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "124",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in contravention of a notice prohibiting leaving vehicles on land laid out as a public garden or used for the purpose of public recreation",
+      "section": "ON_STREET"
+    },
+    "66": {
+      "baseCode": "66",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Verge or footway prohibition (Exeter only). Declared by content, not by Diff. level.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "124cg",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked on a verge, central reservation or footway comprised in an urban road",
+      "section": "ON_STREET"
+    },
+    "67": {
+      "baseCode": "67",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "HGV Safety Permit Scheme (Direct Vision Standard). Route permit, not parking.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Using a vehicle on a restricted street without a valid HGV Safety Permit",
+      "section": "ON_STREET"
+    },
+    "68": {
+      "baseCode": "68",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "HGV Safety Permit Scheme. Route permit, not parking.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Using a vehicle on a restricted street in breach of HGV Safety Permit conditions",
+      "section": "ON_STREET"
+    },
+    "70": {
+      "baseCode": "70",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street loading entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a loading place or bay during restricted hours without loading",
+      "section": "OFF_STREET"
+    },
+    "71": {
+      "baseCode": "71",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street EV place entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in an electric vehicles' charging place during restricted hours without charging",
+      "section": "OFF_STREET"
+    },
+    "72": {
+      "baseCode": "72",
+      "declaredPressureClass": "RESERVED",
+      "declaredRationale": "Reserved by the source (London only).",
+      "diffLevel": null,
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "--- RESERVED FOR BUILDERS' SKIPS CONTRAVENTIONS - - -",
+      "section": "ON_STREET"
+    },
+    "73": {
+      "baseCode": "73",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Off-street non-payment at a permitted place. Demand-side.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "gu",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked without payment of the parking charge",
+      "section": "OFF_STREET"
+    },
+    "74": {
+      "baseCode": "74",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Prohibited use of an off-street place.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "prs",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Using a vehicle in a parking place in connection with the sale or offering or exposing for sale of goods when prohibited",
+      "section": "OFF_STREET"
+    },
+    "75": {
+      "baseCode": "75",
+      "declaredPressureClass": "RESERVED",
+      "declaredRationale": "Reserved by the source.",
+      "diffLevel": null,
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "--- RESERVED FOR LITTERING FROM MOTOR VEHICLES - - -",
+      "section": "ON_STREET"
+    },
+    "76": {
+      "baseCode": "76",
+      "declaredPressureClass": "RESERVED",
+      "declaredRationale": "Reserved by the source (London only).",
+      "diffLevel": null,
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "- - RESERVED FOR WASTE RECEPTACLE CONTRAVENTIONS - -",
+      "section": "ON_STREET"
+    },
+    "77": {
+      "baseCode": "77",
+      "declaredPressureClass": "RESERVED",
+      "declaredRationale": "Reserved by the source.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "--- RESERVED FOR DVLA USE - - -",
+      "section": "OFF_STREET"
+    },
+    "78": {
+      "baseCode": "78",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street suspension.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "abdefghklpquv156789",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked wholly or partly in a suspended bay or space",
+      "section": "OFF_STREET"
+    },
+    "80": {
+      "baseCode": "80",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Off-street maximum-stay overstay. Duration demand.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "gu",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked for longer than permitted",
+      "section": "OFF_STREET"
+    },
+    "81": {
+      "baseCode": "81",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street location prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "o",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a restricted area in an off-street car park or housing estate",
+      "section": "OFF_STREET"
+    },
+    "82": {
+      "baseCode": "82",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Off-street overstay of paid time. Duration demand.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "puv4",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked after the expiry of paid for time",
+      "section": "OFF_STREET"
+    },
+    "83": {
+      "baseCode": "83",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Off-street payment compliance.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "4",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked in a car park without clearly displaying a valid pay & display ticket or voucher or parking clock",
+      "section": "OFF_STREET"
+    },
+    "84": {
+      "baseCode": "84",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Off-street meter feeding. Duration demand.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "gu",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked with payment made to extend the stay beyond initial time",
+      "section": "OFF_STREET"
+    },
+    "85": {
+      "baseCode": "85",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street permit entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "abtrwyz45",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked without a valid virtual permit or clearly displaying a valid physical permit where required",
+      "section": "OFF_STREET"
+    },
+    "86": {
+      "baseCode": "86",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street manner of parking.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "prs",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Not parked correctly within the markings of a bay or space",
+      "section": "OFF_STREET"
+    },
+    "87": {
+      "baseCode": "87",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street badge entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a designated disabled person's parking place without displaying a valid disabled person's badge in the prescribed manner",
+      "section": "OFF_STREET"
+    },
+    "89": {
+      "baseCode": "89",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street vehicle-dimension entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Vehicle parked exceeds maximum weight or height or length permitted",
+      "section": "OFF_STREET"
+    },
+    "90": {
+      "baseCode": "90",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Off-street circulation to reset a limit. Scarcity-driven.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "psuv",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Re-parked in the same car park within one hour after leaving",
+      "section": "OFF_STREET"
+    },
+    "91": {
+      "baseCode": "91",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street vehicle-class entitlement.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "cg",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a car park or area not designated for that class of vehicle",
+      "section": "OFF_STREET"
+    },
+    "92": {
+      "baseCode": "92",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street obstruction.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "o",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked causing an obstruction",
+      "section": "OFF_STREET"
+    },
+    "93": {
+      "baseCode": "93",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street closure prohibition.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in car park when closed",
+      "section": "OFF_STREET"
+    },
+    "94": {
+      "baseCode": "94",
+      "declaredPressureClass": "TURNOVER_PAYMENT",
+      "declaredRationale": "Off-street payment compliance for a longer stay.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "p",
+      "mapsToHarnessLabel": "TURNOVER_TYPE",
+      "officialDescription": "Parked in a pay & display car park without clearly displaying two valid pay and display tickets when required",
+      "section": "OFF_STREET"
+    },
+    "95": {
+      "baseCode": "95",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street designated-purpose entitlement.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked in a parking place for a purpose other than that designated",
+      "section": "OFF_STREET"
+    },
+    "96": {
+      "baseCode": "96",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Off-street manner of parking.",
+      "diffLevel": "Lower",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Parked with engine running where prohibited",
+      "section": "OFF_STREET"
+    },
+    "97": {
+      "baseCode": "97",
+      "declaredPressureClass": "NOT_PARKING",
+      "declaredRationale": "Speeding. London only. Not parking.",
+      "diffLevel": "n/a",
+      "generalSuffixes": "",
+      "mapsToHarnessLabel": "EXCLUDED_BEFORE_CLASSIFICATION",
+      "officialDescription": "Driving a motor vehicle in an unrestricted street in excess of the posted speed limit",
+      "section": "ON_STREET"
+    },
+    "99": {
+      "baseCode": "99",
+      "declaredPressureClass": "PROHIBITION_ENTITLEMENT",
+      "declaredRationale": "Pedestrian crossing prohibition.",
+      "diffLevel": "Higher",
+      "generalSuffixes": "no",
+      "mapsToHarnessLabel": "PROHIBITION_TYPE",
+      "officialDescription": "Stopped on a pedestrian crossing or crossing area marked by zigzags",
+      "section": "ON_STREET"
+    }
+  },
+  "declarationStatus": "FROZEN BEFORE ANY CAMDEN DATA ROW WAS READ. The turnover-versus-prohibition grouping used by fail criterion F1 is declared here and may not be revised after a result is seen.",
+  "declaredClasses": {
+    "MIXED": "Official text combines an entitlement violation with a payment or expiry violation in one code. Cannot be assigned to either side without inventing a distinction the source does not make.",
+    "NOT_PARKING": "Moving traffic, bus lane, speeding or route-permit contravention. Not a parking event at all; excluded by pre-registered correction C3 before any analysis. Corroborated by Diff. level = n/a in the source.",
+    "PROHIBITION_ENTITLEMENT": "Location or entitlement: the driver had no right to be there at all. Frequency depends on where enforcement looks as much as on demand, so it is DEPLOYMENT-SENSITIVE.",
+    "RESERVED": "Code reserved by the source for another scheme; never issued as a parking contravention.",
+    "TURNOVER_PAYMENT": "Duration or payment at a place where parking is otherwise permitted. Frequency scales with how many drivers want the space and for how long, so it tracks DEMAND."
+  },
+  "independentParkingDiscriminator": "The source's 'Diff. level' column is 'n/a' for the moving-traffic and bus-lane codes (29, 31-34, 36-38, 50-54, 58, 59, 67, 68, 97). That is an INDEPENDENT corroboration of pre-registered correction C3 - that 35.9% of Camden's PCN rows are not parking - from a source with no connection to Camden's own ticket_type field. Note it is not sufficient on its own: codes 64, 65 and 66 also carry 'n/a' but ARE parking contraventions, so class is declared from the description content and cross-checked against Diff. level.",
+  "legalityClaimed": false,
+  "recordId": "PTE-TEL-004-C4",
+  "source": {
+    "codeListEffectiveDate": "2022-05-31",
+    "codeListVersion": "PCN Codes v7.0",
+    "licence": "London Councils published code list; transcribed verbatim",
+    "publisher": "London Councils (Transport and Environment Committee)",
+    "retrievedDate": "2026-09-13",
+    "sourceUrl": "https://www.londoncouncils.gov.uk/sites/default/files/2025-03/Penalty%20Charge%20Notices%20Contravention%20Code%20List%202025%20%28Webpage%20Version%29%20%281%29.pdf",
+    "title": "Penalty Charge Notices: Contravention Code List",
+    "transcriptionNote": "Descriptions, general suffixes and Diff. level are transcribed verbatim from the source. declaredPressureClass and declaredRationale are OURS, not the publisher's."
+  },
+  "suffixLegend": {
+    "0": "local buses / trams only",
+    "1": "electric vehicles bay",
+    "2": "goods vehicle loading bays",
+    "3": "bicycle bay",
+    "4": "virtual permit",
+    "5": "dedicated disabled bay",
+    "6": "hotel bay",
+    "7": "taxis only",
+    "8": "zero emission capable taxis only",
+    "9": "electric vehicle car club bay",
+    "a": "permit holder only electric vehicle charging bay",
+    "b": "business bay",
+    "c": "buses only",
+    "d": "doctor's bay",
+    "e": "car club bay",
+    "f": "free parking bay",
+    "g": "motorcycle bay",
+    "h": "hospital bay",
+    "i": "wrong type of voucher",
+    "j": "camera enforcement",
+    "k": "ambulance bay",
+    "l": "loading place",
+    "m": "parking meter",
+    "n": "red route",
+    "o": "blue badge holder",
+    "p": "pay & display",
+    "q": "market traders' bay",
+    "r": "residents' bay",
+    "s": "shared use bay",
+    "t": "voucher/P&D ticket used in permit bay",
+    "u": "electronic payment",
+    "v": "voucher",
+    "w": "e-scooter bay",
+    "x": "disabled bay",
+    "y": "electric solo motorcycle bay"
+  },
+  "suffixResolutionRule": "A suffix is resolved against CODE_SPECIFIC_SUFFIXES for its base code first, and only falls back to the general legend if that code has no specific entry. The general legend alone is wrong for the highest-volume moving-traffic codes: it reports 33H as 'hospital bay' when the source says 'local buses and cycles only', and 52M as 'parking meter' when the source says 'motor vehicles'.",
+  "totalCodes": 91
+}
