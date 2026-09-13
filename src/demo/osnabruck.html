@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Parkway · Osnabrück</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #122039;
+      --ink-soft: #53627a;
+      --blue: #246bf3;
+      --blue-dark: #1454d5;
+      --orange: #f56a2d;
+      --green: #158d58;
+      --red: #d94854;
+      --amber: #c27a00;
+      --paper: #ffffff;
+      --line: #e2e8f0;
+      --shadow: 0 14px 42px rgba(24, 42, 71, .16);
+    }
+    * { box-sizing: border-box; }
+    html, body { min-width: 320px; min-height: 100%; margin: 0; }
+    body { overflow-x: hidden; color: var(--ink); background: #eef3f8; font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .topbar { position: relative; z-index: 1000; height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 clamp(18px, 3vw, 42px); background: rgba(255,255,255,.98); border-bottom: 1px solid #dce4ee; }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: #fff; background: var(--ink); font-size: 24px; line-height: 1; }
+    .brand-name { font-family: Manrope, ui-sans-serif, sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -.045em; }
+    .brand-city { display: block; margin-top: 1px; color: #7a879a; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .feed-status { display: flex; align-items: center; gap: 9px; color: var(--ink-soft); font-size: 13px; font-weight: 700; }
+    .feed-status small { display: block; color: #8592a5; font-size: 11px; font-weight: 500; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #b9c3d0; box-shadow: 0 0 0 4px #b9c3d01f; }
+    .status-dot.ok { background: #25b873; box-shadow: 0 0 0 4px #25b87322; }
+    .status-dot.warn { background: #e4a229; box-shadow: 0 0 0 4px #e4a22922; }
+    .status-dot.bad { background: var(--red); box-shadow: 0 0 0 4px #d9485422; }
+    .map-shell { position: relative; height: calc(100vh - 76px); min-height: 720px; overflow: hidden; background: #cbd9e6; }
+    #map { position: absolute; z-index: 0; inset: 0; background: #cbd9e6; }
+    .leaflet-control-zoom { margin-right: 22px !important; margin-bottom: 260px !important; border: 0 !important; box-shadow: var(--shadow) !important; }
+    .leaflet-control-zoom a { width: 42px !important; height: 42px !important; display: grid !important; place-items: center; color: var(--ink) !important; border: 0 !important; background: #fff !important; font-size: 20px !important; }
+    .leaflet-control-zoom a:first-child { border-bottom: 1px solid var(--line) !important; border-radius: 12px 12px 0 0; }
+    .leaflet-control-zoom a:last-child { border-radius: 0 0 12px 12px; }
+    .leaflet-control-attribution { margin: 0 14px 188px 0 !important; border-radius: 6px; color: #53627a; background: rgba(255,255,255,.82) !important; }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip { color: var(--ink); background: #fff; }
+    .leaflet-popup-content { margin: 14px 16px; line-height: 1.5; }
+    .popup-title { max-width: 245px; font-weight: 800; }
+    .popup-meta { color: var(--ink-soft); font-size: 12px; }
+    .search-card { position: absolute; z-index: 600; top: 24px; left: 24px; width: min(430px, calc(100% - 48px)); padding: 18px; border: 1px solid rgba(220,228,238,.95); border-radius: 18px; background: rgba(255,255,255,.97); box-shadow: var(--shadow); }
+    .search-card h1 { margin: 0 0 4px; font-family: Manrope, ui-sans-serif, sans-serif; font-size: 24px; letter-spacing: -.04em; }
+    .search-card p { margin: 0 0 14px; color: var(--ink-soft); font-size: 13px; line-height: 1.45; }
+    .search-row { display: flex; gap: 8px; }
+    .search-input-wrap { position: relative; flex: 1; }
+    .search-input-wrap span { position: absolute; top: 50%; left: 14px; color: var(--blue); transform: translateY(-52%); font-size: 22px; line-height: 1; }
+    input { width: 100%; height: 50px; padding: 0 12px 0 43px; color: var(--ink); border: 1px solid #ccd7e5; border-radius: 11px; outline: 0; background: #fff; }
+    input::placeholder { color: #8794a8; }
+    input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #246bf31c; }
+    .primary { height: 50px; padding: 0 17px; color: #fff; border: 0; border-radius: 11px; background: var(--blue); font-weight: 800; white-space: nowrap; transition: background .16s, transform .16s; }
+    .primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .primary:disabled { cursor: wait; opacity: .62; transform: none; }
+    .source-note { display: flex; align-items: center; gap: 7px; margin-top: 12px; color: #61728b; font-size: 11px; }
+    .source-note strong { color: var(--green); font-weight: 800; }
+    .form-error { margin-top: 8px; color: var(--red); font-size: 12px; font-weight: 700; }
+    .hidden { display: none !important; }
+    .spaces-card { position: absolute; z-index: 600; top: 24px; right: 24px; width: 260px; padding: 16px; border: 1px solid rgba(220,228,238,.95); border-radius: 17px; background: rgba(255,255,255,.94); box-shadow: var(--shadow); }
+    .spaces-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 11px; }
+    .spaces-head h2 { margin: 0; font-family: Manrope, ui-sans-serif, sans-serif; font-size: 15px; letter-spacing: -.02em; }
+    .spaces-head span { color: #8390a3; font-size: 11px; }
+    .space-row { display: grid; grid-template-columns: 9px 1fr auto; gap: 9px; align-items: center; padding: 10px 0; border-top: 1px solid #edf1f5; }
+    .space-dot { width: 9px; height: 9px; border-radius: 50%; background: #b3bfce; }
+    .space-dot.vacant { background: #22a96a; }
+    .space-dot.occupied { background: #e2525e; }
+    .space-dot.unknown { background: #e4a229; }
+    .space-name { overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .space-id { color: #7d8ba0; font-size: 10px; font-weight: 600; }
+    .space-state { color: #63728a; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    .space-state.vacant { color: var(--green); }
+    .space-state.occupied { color: var(--red); }
+    .space-state.unknown { color: var(--amber); }
+    .route-sheet { position: absolute; z-index: 650; right: 24px; bottom: 22px; left: 24px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 22px; align-items: center; max-width: 1120px; min-height: 172px; margin: 0 auto; padding: 21px 24px; border: 1px solid rgba(220,228,238,.9); border-radius: 22px; background: rgba(255,255,255,.97); box-shadow: 0 20px 55px rgba(24,42,71,.2); }
+    .route-main { min-width: 0; }
+    .route-head { display: flex; align-items: center; gap: 12px; margin-bottom: 5px; }
+    .route-head h2 { overflow: hidden; margin: 0; font-family: Manrope, ui-sans-serif, sans-serif; font-size: clamp(20px, 2.5vw, 29px); letter-spacing: -.045em; text-overflow: ellipsis; white-space: nowrap; }
+    .route-badge { padding: 5px 8px; color: var(--blue); border: 1px solid #b9cefb; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .07em; white-space: nowrap; }
+    .route-subtitle { overflow: hidden; margin: 0; color: var(--ink-soft); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+    .route-metrics { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 20px; }
+    .metric { display: flex; align-items: center; gap: 8px; min-width: 106px; }
+    .metric-icon { width: 28px; height: 28px; display: grid; place-items: center; color: var(--blue); border-radius: 8px; background: #edf4ff; font-size: 15px; font-weight: 800; }
+    .metric span { display: block; color: #8794a8; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .metric strong { display: block; margin-top: 2px; color: var(--ink); font-size: 13px; }
+    .route-action { display: flex; flex-direction: column; align-items: stretch; gap: 10px; min-width: 230px; }
+    .gps-button { height: 53px; padding: 0 20px; color: #fff; border: 0; border-radius: 12px; background: var(--blue); font-weight: 800; box-shadow: 0 8px 18px #246bf32e; transition: background .16s, transform .16s; }
+    .gps-button:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .gps-button:disabled { cursor: not-allowed; opacity: .45; transform: none; }
+    .gps-help { color: #8491a4; font-size: 10px; text-align: center; }
+    .source-trace { position: absolute; z-index: 600; right: 24px; bottom: 208px; display: flex; align-items: center; gap: 8px; padding: 9px 12px; color: #5c6b81; border: 1px solid rgba(220,228,238,.85); border-radius: 10px; background: rgba(255,255,255,.9); font-size: 11px; box-shadow: 0 7px 24px rgba(24,42,71,.1); }
+    .source-trace strong { color: var(--green); font-weight: 800; }
+    .source-trace a { color: var(--blue); text-decoration: none; }
+    .source-trace a:hover { text-decoration: underline; }
+    .notice { position: absolute; z-index: 600; bottom: 205px; left: 24px; max-width: 390px; padding: 10px 13px; color: #58677d; border-left: 3px solid var(--orange); border-radius: 0 9px 9px 0; background: rgba(255,255,255,.86); font-size: 11px; line-height: 1.4; }
+    .flash { position: fixed; z-index: 1200; bottom: 25px; left: 50%; max-width: calc(100% - 30px); padding: 12px 16px; color: #fff; border-radius: 12px; background: var(--ink); box-shadow: var(--shadow); font-size: 13px; font-weight: 700; transform: translateX(-50%); }
+    @media (max-width: 900px) {
+      .map-shell { min-height: calc(100vh - 76px); }
+      .spaces-card { top: 24px; right: 24px; width: 220px; }
+      .route-sheet { grid-template-columns: 1fr auto; }
+      .notice { bottom: 205px; max-width: 300px; }
+      .source-trace { bottom: 205px; }
+    }
+    @media (max-width: 640px) {
+      .topbar { height: 64px; padding: 0 14px; }
+      .brand-mark { width: 34px; height: 34px; border-radius: 10px; font-size: 20px; }
+      .brand-name { font-size: 19px; }
+      .brand-city { font-size: 9px; }
+      .feed-status { font-size: 11px; }
+      .feed-status small { display: none; }
+      .map-shell { height: calc(100vh - 64px); min-height: calc(100vh - 64px); }
+      .search-card { top: 12px; right: 12px; left: 12px; width: auto; padding: 14px; border-radius: 15px; }
+      .search-card h1 { font-size: 21px; }
+      .search-card p { margin-bottom: 10px; font-size: 12px; }
+      .search-row { gap: 7px; }
+      .primary { padding: 0 13px; font-size: 13px; }
+      .spaces-card { top: 180px; right: 12px; left: 12px; width: auto; padding: 10px 13px; border-radius: 13px; }
+      .spaces-head { margin-bottom: 3px; }
+      .spaces-head h2 { font-size: 13px; }
+      .space-row { display: inline-grid; grid-template-columns: 8px auto auto; gap: 6px; width: 32%; padding: 7px 3px 3px 0; border-top: 0; vertical-align: top; }
+      .space-name { max-width: 58px; font-size: 10px; }
+      .space-id { font-size: 9px; }
+      .space-state { grid-column: 2 / span 2; font-size: 9px; }
+      .route-sheet { right: 10px; bottom: 10px; left: 10px; display: block; min-height: 225px; padding: 17px 16px 15px; border-radius: 18px; }
+      .route-head h2 { font-size: 21px; }
+      .route-subtitle { font-size: 12px; white-space: normal; }
+      .route-metrics { gap: 12px; margin-top: 14px; }
+      .metric { min-width: 0; flex: 1 1 28%; gap: 6px; }
+      .metric-icon { width: 24px; height: 24px; font-size: 13px; }
+      .metric span { font-size: 9px; }
+      .metric strong { font-size: 12px; }
+      .route-action { min-width: 0; margin-top: 14px; }
+      .gps-button { width: 100%; height: 48px; }
+      .gps-help { display: none; }
+      .source-trace { right: 12px; bottom: 248px; left: 12px; justify-content: center; padding: 7px; font-size: 10px; }
+      .notice { right: 12px; bottom: 302px; left: 12px; max-width: none; padding: 7px 10px; font-size: 10px; }
+      .leaflet-control-zoom { margin-right: 13px !important; margin-bottom: 265px !important; }
+      .leaflet-control-attribution { margin-right: 9px !important; margin-bottom: 248px !important; font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark" aria-hidden="true">⌖</div><div><div class="brand-name">Parkway</div><span class="brand-city">Osnabrück sensor pilot</span></div></div>
+    <div class="feed-status"><i class="status-dot" id="statusDot"></i><div><span id="sourcePill">Checking official feed</span><small id="sourcePillDetail">Individual-space occupancy</small></div></div>
+  </header>
+
+  <main class="map-shell">
+    <div id="map" aria-label="Live map of official parking-space sensors"></div>
+
+    <section class="search-card" aria-label="Destination search">
+      <h1>Where are you going?</h1>
+      <p>Find the closest available sensor space near your destination.</p>
+      <form id="destinationForm">
+        <div class="search-row"><div class="search-input-wrap"><span aria-hidden="true">⌕</span><label class="hidden" for="destinationInput">Destination</label><input id="destinationInput" autocomplete="street-address" placeholder="Rathaus Osnabrück" required></div><button class="primary" id="findButton" type="submit">Find space</button></div>
+        <div class="form-error hidden" id="formError" role="alert"></div>
+      </form>
+      <div class="source-note"><strong>● Official city feed</strong><span id="mapLabel">3 monitored sensor spaces</span></div>
+    </section>
+
+    <aside class="spaces-card" aria-labelledby="spacesTitle"><div class="spaces-head"><h2 id="spacesTitle">Nearby spaces</h2><span id="spaceCount">3 monitored</span></div><div id="spotList"></div></aside>
+
+    <div class="notice">Statuses come directly from the official sensor feed. Old readings are shown as unknown and never routed.</div>
+    <div class="source-trace"><strong id="feedConnection">Feed connected</strong><span>Latest: <span id="feedLatest">—</span></span><a id="datasetLink" href="https://datenplattform.osnabrueck.de/parkplatzdaten/" target="_blank" rel="noreferrer">Source</a></div>
+
+    <section class="route-sheet" aria-labelledby="routeTitle">
+      <div class="route-main"><div class="route-head"><h2 id="routeTitle">Search for a destination</h2><span class="route-badge" id="routeBadge">READY</span></div><p class="route-subtitle" id="routeSubtitle">Your route will appear here after the address is found.</p><div class="route-metrics"><div class="metric"><div class="metric-icon" aria-hidden="true">⌖</div><div><span>Best match</span><strong id="metricTarget">—</strong></div></div><div class="metric"><div class="metric-icon" aria-hidden="true">◷</div><div><span>Official reading</span><strong id="metricReading">—</strong></div></div><div class="metric"><div class="metric-icon" aria-hidden="true">➤</div><div><span>GPS</span><strong id="metricGps">Not started</strong></div></div></div></div>
+      <div class="route-action"><button class="gps-button" id="startGpsButton" type="button" disabled>Start live GPS</button><div class="gps-help">Uses your phone’s real location</div></div>
+    </section>
+  </main>
+  <div class="flash hidden" id="flash" role="status"></div>
+
+  <script>window.__INITIAL_STATE__ = null;</script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    const map = L.map('map', { zoomControl: false, preferCanvas: true, zoomAnimation: false }).setView([52.274, 8.05], 15);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', { maxZoom: 19, detectRetina:false, subdomains:'abcd', attribution: '&copy; OpenStreetMap contributors &copy; CARTO' }).addTo(map);
+    const markers = new Map(); let destinationMarker = null; let positionMarker = null; let routeLine = null; let current = null; let previousTargetId = null; let livePosition = null;
+    const $ = (id) => document.getElementById(id);
+    const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+    const ageLabel = (seconds) => { if (seconds === null || seconds === undefined) return 'unknown age'; const minutes = Math.round(seconds / 60); if (minutes < 60) return `${minutes} min ago`; const hours = Math.floor(minutes / 60); return `${hours}h ${minutes % 60}m ago`; };
+    const timeLabel = (value) => value ? new Intl.DateTimeFormat('en-CA', { year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit', timeZoneName:'short' }).format(new Date(value)) : 'not available';
+    const stateClass = (spot) => spot.availability === 'VACANT' ? 'vacant' : spot.availability === 'OCCUPIED' ? 'occupied' : 'unknown';
+    const stateLabel = (spot) => spot.availability === 'VACANT' ? 'Vacant' : spot.availability === 'OCCUPIED' ? 'Occupied' : 'Stale / unknown';
+    const flash = (message) => { $('flash').textContent = message; $('flash').classList.remove('hidden'); clearTimeout(flash.timer); flash.timer = setTimeout(() => $('flash').classList.add('hidden'), 6500); };
+
+    function popup(spot) { return `<div class="popup-title">${esc(spot.label)}</div><div class="popup-meta"><b>${esc(stateLabel(spot))}</b><br>Official Thing ${esc(spot.sourceThingId)} · Datastream ${esc(spot.sourceDatastreamId)}<br>Source state: ${esc(spot.rawState)}<br>Reading: ${esc(timeLabel(spot.observedAt))}<br>${spot.fresh ? 'Allowed in routing' : 'Excluded until refreshed'}</div>`; }
+    function renderMarkers(spots) { const seen = new Set(); spots.forEach((spot) => { seen.add(spot.spotId); const color = spot.availability === 'VACANT' ? '#1b9b60' : spot.availability === 'OCCUPIED' ? '#df4c58' : '#d9941e'; const marker = markers.get(spot.spotId); if (marker) { marker.setLatLng([spot.latitude, spot.longitude]).setStyle({ color, fillColor: color }); marker.bindPopup(popup(spot)); } else { markers.set(spot.spotId, L.circleMarker([spot.latitude, spot.longitude], { radius: 10, color, fillColor: color, fillOpacity: .95, weight: 3 }).addTo(map).bindPopup(popup(spot))); } }); [...markers.keys()].filter((id) => !seen.has(id)).forEach((id) => { map.removeLayer(markers.get(id)); markers.delete(id); }); }
+    function renderSpaces(spots, target) { $('spotList').innerHTML = spots.map((spot) => `<div class="space-row"><i class="space-dot ${stateClass(spot)}"></i><span class="space-name" title="${esc(spot.label)}">${esc(spot.label.replace(/^Parkplatz für Menschen mit Behinderung /i, ''))}</span><span class="space-id">${esc(spot.spotId)}</span><span class="space-state ${stateClass(spot)}">${stateLabel(spot)}</span></div>`).join(''); $('spaceCount').textContent = `${spots.length} monitored`; }
+    function renderRoute(data) { const target = data.target; const destination = data.destination; if (!destination) { $('routeTitle').textContent = 'Search for a destination'; $('routeSubtitle').textContent = 'Your route will appear here after the address is found.'; $('routeBadge').textContent = 'READY'; $('metricTarget').textContent = '—'; $('metricReading').textContent = '—'; $('startGpsButton').disabled = true; return; } if (data.outcome === 'COVERAGE_UNAVAILABLE') { $('routeTitle').textContent = 'Outside pilot coverage'; $('routeSubtitle').textContent = 'This pilot currently covers central Osnabrück.'; $('routeBadge').textContent = 'NO COVERAGE'; $('metricTarget').textContent = '—'; $('metricReading').textContent = '—'; $('startGpsButton').disabled = true; return; } if (data.outcome === 'LIVE_FEED_UNAVAILABLE') { $('routeTitle').textContent = 'Feed unavailable'; $('routeSubtitle').textContent = 'No destination will be routed until the official feed reconnects.'; $('routeBadge').textContent = 'SOURCE OFFLINE'; $('metricTarget').textContent = '—'; $('metricReading').textContent = '—'; $('startGpsButton').disabled = true; return; } if (!target) { $('routeTitle').textContent = 'No live space available'; $('routeSubtitle').textContent = 'All monitored spaces are occupied, unknown or too old to route.'; $('routeBadge').textContent = 'WAITING FOR SOURCE'; $('metricTarget').textContent = '—'; $('metricReading').textContent = '—'; $('startGpsButton').disabled = true; return; } $('routeTitle').textContent = target.label.replace(/^Parkplatz für Menschen mit Behinderung /i, ''); $('routeSubtitle').textContent = `${Math.round(target.distanceMeters)} m from ${destination.label}`; $('routeBadge').textContent = previousTargetId && previousTargetId !== target.spotId ? 'REROUTED' : 'TARGET SELECTED'; $('metricTarget').textContent = target.spotId; $('metricReading').textContent = ageLabel(target.ageSeconds); $('startGpsButton').disabled = false; if (previousTargetId && previousTargetId !== target.spotId) { flash(`The official feed changed. Now routing to ${target.spotId}.`); if (livePosition) drawRoute(); } previousTargetId = target.spotId; }
+    function render(data) { current = data; const source = data.source; const freshCount = data.spots.filter((spot) => spot.fresh).length; const feedReady = source.connected && freshCount > 0; $('statusDot').className = `status-dot ${feedReady ? 'ok' : source.connected ? 'warn' : 'bad'}`; $('sourcePill').textContent = feedReady ? 'Live curb data' : source.connected ? 'Feed connected' : 'Feed unavailable'; $('sourcePillDetail').textContent = feedReady ? 'Fresh official readings' : source.connected ? 'Awaiting fresh readings' : (source.error || 'Retrying'); $('feedConnection').textContent = feedReady ? 'Live readings available' : source.connected ? 'Feed connected · readings stale' : 'Feed unavailable'; $('feedConnection').style.color = feedReady ? 'var(--green)' : source.connected ? 'var(--amber)' : 'var(--red)'; $('feedLatest').textContent = timeLabel(source.newestObservedAt); $('mapLabel').textContent = `${data.spots.length} monitored sensor spaces`; renderMarkers(data.spots); renderSpaces(data.spots, data.target); renderRoute(data); if (data.destination) { if (!destinationMarker) destinationMarker = L.circleMarker([data.destination.latitude, data.destination.longitude], { radius: 9, color:'#fff', fillColor:'#f56a2d', fillOpacity:1, weight:4 }).addTo(map); destinationMarker.setLatLng([data.destination.latitude, data.destination.longitude]).bindPopup(`<b>Destination</b><br>${esc(data.destination.label)}`); $('destinationInput').value = data.destination.label.split(',')[0]; } const points = data.spots.map((spot) => [spot.latitude, spot.longitude]); if (data.destination) points.push([data.destination.latitude, data.destination.longitude]); if (points.length && !livePosition) { map.fitBounds(points, { padding: [40, 40], maxZoom: 16 }); setTimeout(() => { map.invalidateSize({ pan:false }); map.fitBounds(points, { padding: [40, 40], maxZoom: 16 }); }, 180); } }
+    async function getState() { const response = await fetch('/feed/state', { cache:'no-store' }); if (!response.ok) throw new Error('state request failed'); return response.json(); }
+    async function drawRoute() { if (!livePosition || !current?.target) return; const response = await fetch(`/routing?from=${encodeURIComponent(`${livePosition.latitude},${livePosition.longitude}`)}&to=${encodeURIComponent(`${current.target.latitude},${current.target.longitude}`)}`, { cache:'no-store' }); if (!response.ok) throw new Error('road route unavailable'); const route = await response.json(); if (routeLine) map.removeLayer(routeLine); routeLine = L.geoJSON({ type:'Feature', geometry:{ type:'LineString', coordinates:route.coordinates } }, { style:{ color:'#246bf3', weight:7, opacity:.92, lineCap:'round', lineJoin:'round' } }).addTo(map); map.fitBounds(routeLine.getBounds(), { padding:[65,65] }); $('routeSubtitle').textContent = `${(route.distanceMeters / 1000).toFixed(1)} km · about ${Math.max(1, Math.round(route.durationSeconds / 60))} min by car · ${current.target.spotId}`; }
+    function startGps() { if (!navigator.geolocation) { flash('This browser does not provide GPS. Open the public URL on the phone.'); return; } $('startGpsButton').disabled = true; $('startGpsButton').textContent = 'Waiting for GPS…'; $('metricGps').textContent = 'Waiting…'; navigator.geolocation.watchPosition(async (position) => { livePosition = { latitude:position.coords.latitude, longitude:position.coords.longitude }; $('metricGps').textContent = 'Connected'; if (!positionMarker) positionMarker = L.circleMarker([livePosition.latitude, livePosition.longitude], { radius:9, color:'#fff', fillColor:'#246bf3', fillOpacity:1, weight:4 }).addTo(map).bindTooltip('Your live position'); else positionMarker.setLatLng([livePosition.latitude, livePosition.longitude]); try { await drawRoute(); } catch { flash('GPS connected, but the road route service did not answer.'); } }, (error) => { $('startGpsButton').disabled = false; $('startGpsButton').textContent = 'Start live GPS'; $('metricGps').textContent = error.code === 1 ? 'Permission needed' : 'Unavailable'; flash(error.code === 1 ? 'Allow location in the phone browser, then try again.' : 'The device did not provide GPS.'); }, { enableHighAccuracy:true, maximumAge:10000, timeout:15000 }); }
+    $('destinationForm').addEventListener('submit', async (event) => { event.preventDefault(); const query = $('destinationInput').value.trim(); const error = $('formError'); error.classList.add('hidden'); $('findButton').disabled = true; $('findButton').textContent = 'Finding…'; try { const geoResponse = await fetch(`/find/address?q=${encodeURIComponent(query)}`, { cache:'no-store' }); const geo = await geoResponse.json(); if (!geoResponse.ok || !Number.isFinite(geo.latitude)) throw new Error(geo.error || 'No real address result found'); const selectResponse = await fetch('/feed/select', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ latitude:geo.latitude, longitude:geo.longitude, label:geo.label }) }); const data = await selectResponse.json(); if (!selectResponse.ok) throw new Error(data.error || 'Could not select destination'); render(data); if (data.target) flash(`Best match: ${data.target.spotId}. Start live GPS when you are in the car.`); } catch (requestError) { window.location.href = `/osnabrueck?destination=${encodeURIComponent(query)}`; } finally { $('findButton').disabled = false; $('findButton').textContent = 'Find space'; } });
+    $('startGpsButton').addEventListener('click', startGps);
+    async function poll() { try { render(await getState()); } catch { if (!current) { $('statusDot').className = 'status-dot bad'; $('sourcePill').textContent = 'Connection error'; } } }
+    if (window.__INITIAL_STATE__) render(window.__INITIAL_STATE__); else poll(); setInterval(poll, 60 * 1000);
+  </script>
+</body>
+</html>
