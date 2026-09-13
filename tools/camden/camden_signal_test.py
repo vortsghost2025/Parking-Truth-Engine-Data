@@ -62,7 +62,8 @@ from camden_aggregate import (          # noqa: E402
     build_date_index,
     cell_sort_key,
 )
-from camden_normalize import STRATA, STRATUM_CEO_GPS, STRATUM_FIXED_CCTV, normalize_all  # noqa: E402
+from camden_normalize import (  # noqa: E402
+    STRATA, STRATUM_CEO_GPS, STRATUM_FIXED_CCTV, load_code_map, normalize_all)
 from camden_pressure import (           # noqa: E402
     SEMANTIC_CONTRACT,
     assert_no_forbidden_semantics,
@@ -154,14 +155,15 @@ def spearman(pairs) -> dict:
 # ---------------------------------------------------------------------------
 
 def run_pipeline(bays_payload: dict, pcn_payload: dict, level: str,
-                 date_subset: set[str] | None = None) -> dict:
+                 date_subset: set[str] | None = None,
+                 code_map: dict | None = None) -> dict:
     """Normalise -> capacity -> date index -> cells, optionally for a date subset.
 
     Re-running the pipeline on a subset is how period comparisons are made.
     Aggregation is pure and cheap, so splitting is done by filtering events
     rather than by storing per-date counts inside every cell.
     """
-    norm = normalize_all(bays_payload, pcn_payload)
+    norm = normalize_all(bays_payload, pcn_payload, code_map=code_map)
     pcns = norm["pcns"]
     if date_subset is not None:
         pcns = [e for e in pcns
@@ -342,7 +344,8 @@ def check_stratum_isolation(pipe: dict, thresholds: dict) -> dict:
 
 
 def check_split_half(pipe: dict, bays_payload: dict, pcn_payload: dict,
-                     level: str, thresholds: dict) -> dict:
+                     level: str, thresholds: dict,
+                     code_map: dict | None = None) -> dict:
     """F5 - are rankings stable across comparable periods?
 
     Splits the observation window chronologically in half and rebuilds the street
@@ -359,7 +362,8 @@ def check_split_half(pipe: dict, bays_payload: dict, pcn_payload: dict,
 
     out = {}
     for label, subset in (("firstHalf", first), ("secondHalf", second)):
-        sub = run_pipeline(bays_payload, pcn_payload, level, date_subset=subset)
+        sub = run_pipeline(bays_payload, pcn_payload, level, date_subset=subset,
+                           code_map=code_map)
         idx = build_index(sub["grid"]["cells"], stratum=None,
                           min_exposure=thresholds["minEventsForRanking"] / 10.0)
         out[label] = {"dates": len(subset), "indexMap": _index_map(idx),
@@ -607,7 +611,8 @@ def decide_verdict(criteria: dict) -> dict:
 
 def build_report(bays_path: str, pcn_path: str, proxy_path: str | None,
                  level: str, thresholds: dict, route_declaration: str,
-                 as_of: str | None, field_map: dict | None = None) -> dict:
+                 as_of: str | None, field_map: dict | None = None,
+                 code_map_path: str | None = None) -> dict:
     """Build the report.
 
     `field_map` pins normalised->source column names per dataset, e.g.
@@ -616,6 +621,11 @@ def build_report(bays_path: str, pcn_path: str, proxy_path: str | None,
     wired without editing code - guessing a column is worse than failing loudly,
     and failing loudly is worse than being told.
     """
+    # C4A: load the authoritative code map ONCE, up front, and validate it. An
+    # absent or malformed artifact raises here rather than degrading the whole run
+    # to the keyword heuristic unnoticed.
+    code_map = load_code_map(code_map_path, required=True)
+
     overrides = {"bay-map": {}, "pcn-series": {}}
     for key, val in (field_map or {}).items():
         if key in overrides and isinstance(val, dict):
@@ -626,7 +636,7 @@ def build_report(bays_path: str, pcn_path: str, proxy_path: str | None,
     if proxy_payload is not None:
         route_declaration = "supplied"
 
-    pipe = run_pipeline(bays_payload, pcn_payload, level)
+    pipe = run_pipeline(bays_payload, pcn_payload, level, code_map=code_map)
     cells = pipe["grid"]["cells"]
     unknown = pipe["grid"]["unknownHourCells"]
     norm = pipe["normalized"]
@@ -641,7 +651,8 @@ def build_report(bays_path: str, pcn_path: str, proxy_path: str | None,
         "coverage": check_coverage(pipe, thresholds),
         "stratumIsolation": check_stratum_isolation(pipe, thresholds),
         "splitHalfStability": check_split_half(pipe, bays_payload, pcn_payload,
-                                               level, thresholds),
+                                               level, thresholds,
+                                               code_map=code_map),
         "deploymentDominance": check_deployment_dominance(pipe, thresholds),
         "validationRoute": check_validation_route(proxy_payload, route_declaration,
                                                   idx, thresholds),
@@ -697,6 +708,7 @@ def build_report(bays_path: str, pcn_path: str, proxy_path: str | None,
             "pcn": os.path.abspath(pcn_path),
             "proxy": os.path.abspath(proxy_path) if proxy_path else None,
             "fieldMapOverrides": field_map or {},
+            "codeMap": code_map_path or code_map["path"],
         },
         "provenance": norm["provenance"],
         "semanticContract": dict(SEMANTIC_CONTRACT),
@@ -721,6 +733,9 @@ def build_report(bays_path: str, pcn_path: str, proxy_path: str | None,
 
         # 2. missingness
         "missingness": norm["missingness"],
+
+        # 2A. classification provenance (PTE-TEL-004 C4A)
+        "classification": norm["classification"],
 
         # 3. repeatability by time and street
         "repeatability": {
@@ -838,6 +853,13 @@ def main(argv: list[str] | None = None) -> int:
                     default="available-but-not-supplied",
                     help="declare whether an independent validation route exists")
     ap.add_argument("--as-of", help="report timestamp; defaults to max date in data")
+    ap.add_argument("--code-map",
+                    help="path to the frozen authoritative contravention-code "
+                         "artifact (PTE-TEL-004 C4A). Defaults to "
+                         "sources/camden/london-councils-contravention-codes-v7.0.json "
+                         "in the repo, or $PTE_CAMDEN_CODE_MAP. Required: an "
+                         "absent artifact raises rather than silently degrading to "
+                         "the keyword heuristic.")
     ap.add_argument("--field-map",
                     help=("JSON pinning normalised->source column names per "
                           "dataset, e.g. "
@@ -870,7 +892,8 @@ def main(argv: list[str] | None = None) -> int:
             ap.error("--field-map must contain a JSON object")
 
     report = build_report(args.bays, args.pcn, args.proxy, args.level,
-                          thresholds, route, args.as_of, field_map=field_map)
+                          thresholds, route, args.as_of, field_map=field_map,
+                          code_map_path=args.code_map)
     text = json.dumps(report, indent=2, sort_keys=True)
     if args.out:
         os.makedirs(os.path.dirname(os.path.abspath(args.out)) or ".", exist_ok=True)

@@ -404,6 +404,125 @@ classifier.
 run is blocked pending a decision on amendment C4A, which must be committed
 before any Camden row is read in order to remain pre-registration.
 
+## 4B. Amendment C4A — authoritative classification, committed before any row was read
+
+C4A executes C4's own pre-registered option (a): *"supply an authoritative London
+Councils contravention-code to class mapping **as data, not as keywords**."* It
+was justified by a defect measured against an external authoritative codebook
+**before any Camden row was read**, so it is pre-registration, not post-hoc
+tuning. The pressure-class declaration itself was **not** revised: the artifact
+sha256 `539c5413ff430eb4ec9756fa27ea020d02ca0bca648ef14f20d03c3c1a892a80` is
+identical before and after C4A. **The code changed to match the declaration, not
+the declaration to match the code.**
+
+### What changed
+
+Classification is now a lookup of the base code against the frozen artifact:
+
+| declared class | harness label |
+| --- | --- |
+| `TURNOVER_PAYMENT` | `TURNOVER_TYPE` |
+| `PROHIBITION_ENTITLEMENT` | `PROHIBITION_TYPE` |
+| `MIXED` | `AMBIGUOUS` |
+| `NOT_PARKING` / `RESERVED` | excluded per the already-declared C3 policy |
+
+`TURNOVER_CODE_HINTS` and `PROHIBITION_CODE_HINTS` are retained **byte-for-byte**
+and remain reachable only as an explicit fallback for codes genuinely absent from
+the artifact. Every fallback is counted and the offending raw codes are named in
+the report — nothing degrades silently. A missing artifact **raises**; an explicit
+`--code-map` path that does not exist raises rather than falling through to the
+repo default, because a typo must not silently load a different artifact.
+
+### What did not change
+
+| file | status |
+| --- | --- |
+| `camden_pressure.py` | **bit-identical to `a602244`** — index math, `SEMANTIC_CONTRACT`, forbidden-key guard |
+| `camden_aggregate.py` | **bit-identical to `a602244`** |
+| `camden_sources.py` | **bit-identical to `a602244`** |
+| `README.md`, `.gitignore` | bit-identical |
+| `camden_normalize.py` | amended — classification section only |
+| `camden_signal_test.py` | amended — `--code-map` threading + `classification` report block |
+| `make_camden_fixture.py` | amended — codes derived from the artifact |
+| `run_selftest.py` | amended — 9 new C4A guards |
+| `build_code_map.py` | added |
+
+No F1–F5 numerical threshold moved, no criterion was added, removed or redefined,
+`decide_verdict()` is untouched, and `street_key()` / `join_key()` and the Spatial
+Accuracy stratum mapping are untouched. Threshold immutability is asserted by
+`c4a:no-f1-f5-threshold-changed`, which compares live `DEFAULT_THRESHOLDS`
+against the `frozenThresholds` block committed in
+`manifests/camden-harness-freeze.json` — not against a value retyped in the test,
+so the check cannot be satisfied by editing both sides.
+
+### The second defect C4A uncovered
+
+The fixture did not merely use the classifier's own vocabulary. **It invented
+codes that contradict the authoritative codebook.** Five of its nine codes carried
+the wrong authoritative class and one did not exist:
+
+| fixture said | authoritative source says |
+| --- | --- |
+| `("01", "Parked without payment")` | 01 = *"Parked in a restricted street during prescribed hours"* → **PROHIBITION** |
+| `("02", "Parked longer than maximum stay")` | 02 = restricted-street waiting/loading offence → **PROHIBITION** |
+| `("03", "Parked exceeding paid time")` | **code 03 does not exist** |
+| `("12", "Parked in restricted zone")` | 12 = residents'/shared-use permit code → **MIXED** |
+| `("30", "Parked without a permit in a CPZ")` | 30 = *"Parked for longer than permitted"* → **TURNOVER** — the cleanest duration-demand code in the entire list, sitting in the fixture's prohibition bucket |
+| `("31", "Parked in a permit bay without a permit")` | 31 = *"Entering and stopping in a box junction"* → **NOT_PARKING**, a moving-traffic offence used as if it were a parking prohibition |
+
+So the deployment-dominated scenario's "prohibition-heavy" series was built on a
+fabricated codebook, and the 14/14 green self-test was validating the classifier
+against invented ground truth. The fixture now derives every code and description
+from the frozen artifact, and `c4a:fixture-codes-come-from-authoritative-artifact`
+fails the suite if it ever drifts back.
+
+### Result
+
+| | keyword heuristic | C4A table lookup |
+| --- | --- | --- |
+| classified codes reproducing the declaration | 42 / 66 | **66 / 66** |
+| upward bias on `prohibitionShareOverall` | +0.030 to +0.074 | **removed** |
+| self-test | 14/14 (circular) | **23/23** |
+
+All seven original scenario verdicts still hold on an authoritative codebook:
+demand-dominated PASS, deployment-dominated FAIL(F1), gps-biased FAIL(F2),
+sparse-coverage FAIL(F3), no-validation-route FAIL(F4), drifting FAIL(F5),
+noproxy PARTIAL. F1 still fires when deployment genuinely dominates — it now fires
+for the right reason.
+
+The nine new guards are: every mapped code produces its declared class; the
+keyword heuristic is retained as fallback only and still exhibits its documented
+defective behaviour; a missing code map raises rather than degrades; unmapped
+codes increment the reported fallback count with the codes named; non-parking rows
+are surfaced as `c3PolicyRowsStillPresent` rather than absorbed into the F1
+denominator; invalid code suffixes are surfaced; fixture codes come from the
+artifact; suffix `j` is recorded but not used in any verdict; and no threshold
+changed.
+
+A new scenario `code-map-contaminated` mixes in moving-traffic, `MIXED` and
+unmapped codes. It deliberately asserts **no verdict** — its purpose is to prove
+contamination is surfaced and counted, since a harness that quietly folded those
+rows into the F1 denominator would pass every other check and still be lying about
+what it measured.
+
+### Suffix `j` is recorded and deliberately not used
+
+The source states suffix `j` identifies a contravention enforceable by CCTV. That
+is an authoritative *deployment* marker carried in the code itself — exactly what
+F1 is trying to detect. It is recorded in the artifact and counted in the report
+(`cameraEnforcementSuffixRows`), but it does **not** influence any verdict, and
+`cameraEnforcementSuffixUsedInVerdict` is asserted `False` by a self-test check.
+Expanding F1 to read deployment from it would be a separate amendment with its own
+pre-registration, not a side effect of this one.
+
+### Re-freeze
+
+`tools/camden/FREEZE.sha256` regenerated over 10 files; `sha256sum -c` passes.
+`manifests/camden-harness-freeze.json` records the amendment, the per-file status
+(`AMENDED_BY_C4A` / `UNCHANGED_SINCE_a602244` / `NEW_IN_C4A`) and the boundaries
+respected. **The run protocol in §7 is unchanged and still must be executed
+before any Camden row is read.**
+
 ## 5. Unverified at freeze time
 
 Recorded so nobody mistakes an assumption for a finding:

@@ -59,9 +59,14 @@ import hashlib
 import math
 import os
 import random
+import sys
 from datetime import date, timedelta
 
-FIXTURE_VERSION = "1.0.0"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from camden_normalize import load_code_map  # noqa: E402
+
+FIXTURE_VERSION = "2.0.0"
 
 # Column spellings chosen to match the PRIMARY candidate for each field in
 # camden_sources, so the fixture exercises the default resolution path. A real
@@ -98,18 +103,62 @@ TIMES = ["Mon-Fri 08:30-18:30", "Mon-Sat 08:30-18:30", "Daily 24 Hours",
 MAX_STAYS = ["2 Hours", "3 Hours", "No Max Stay", "4 Hours", "1 Hour"]
 TARIFFS = ["Tariff A", "Tariff B", "Tariff C", "Zone 2"]
 
-TURNOVER_CODES = [
-    ("01", "Parked without payment"),
-    ("02", "Parked longer than maximum stay"),
-    ("03", "Parked exceeding paid time"),
-    ("04", "Pay and display ticket expired"),
-]
-PROHIBITION_CODES = [
-    ("12", "Parked in restricted zone"),
-    ("24", "Parked on a single yellow line"),
-    ("25", "Parked in a loading bay"),
-    ("30", "Parked without a permit in a controlled parking zone"),
-    ("31", "Parked in a permit bay without a permit"),
+# ---------------------------------------------------------------------------
+# Fixture contravention codes are DERIVED FROM THE FROZEN AUTHORITATIVE ARTIFACT
+# (PTE-TEL-004 C4A). They used to be hand-written, and that was worse than
+# merely circular.
+#
+# The PTE-TEL-003 fixture invented both the codes and their descriptions. Checked
+# against the London Councils codebook, five of its nine codes carried the WRONG
+# authoritative class and one did not exist at all:
+#
+#   fixture ("01", "Parked without payment")            -> authoritative 01 is
+#       "Parked in a restricted street during prescribed hours" = PROHIBITION
+#   fixture ("02", "Parked longer than maximum stay")   -> authoritative 02 is a
+#       restricted-street waiting/loading offence = PROHIBITION
+#   fixture ("03", "Parked exceeding paid time")        -> CODE 03 DOES NOT EXIST
+#   fixture ("12", "Parked in restricted zone")         -> authoritative 12 is the
+#       residents'/shared-use permit code = MIXED
+#   fixture ("30", "Parked without a permit in a CPZ")  -> authoritative 30 is
+#       "Parked for longer than permitted" = TURNOVER, the cleanest duration-demand
+#       code in the entire list, sitting in the fixture's PROHIBITION bucket
+#   fixture ("31", "Parked in a permit bay")            -> authoritative 31 is
+#       "Entering and stopping in a box junction" = NOT_PARKING, a moving-traffic
+#       offence used as if it were a parking prohibition
+#
+# So the deployment-dominated scenario's "prohibition-heavy" series was built on a
+# fabricated codebook, and the self-test that passed 14/14 was validating the
+# classifier against invented ground truth. Deriving the fixture from the frozen
+# artifact is what makes the self-test able to disagree with the implementation,
+# which is the only reason to have one.
+# ---------------------------------------------------------------------------
+
+_CODE_MAP = load_code_map(required=True)
+
+
+def _codes_by_declared_class(declared: str) -> list[tuple[str, str]]:
+    """(base code, OFFICIAL description) for every code we declared `declared`.
+
+    Sorted by code so selection is deterministic and independent of dict order.
+    """
+    return [(c, e["officialDescription"])
+            for c, e in sorted(_CODE_MAP["codes"].items())
+            if e["declaredPressureClass"] == declared]
+
+
+TURNOVER_CODES = _codes_by_declared_class("TURNOVER_PAYMENT")
+PROHIBITION_CODES = _codes_by_declared_class("PROHIBITION_ENTITLEMENT")
+MIXED_CODES = _codes_by_declared_class("MIXED")
+NOT_PARKING_CODES = _codes_by_declared_class("NOT_PARKING")
+
+# Deliberately outside the authoritative artifact, to exercise the counted
+# fallback path. "999" parses structurally as base 99 with suffix 9 - a suffix the
+# source does not permit on code 99 - so it also exercises invalid-suffix
+# reporting. "1234" and "ZZ9" are unparseable. None of these is ever guessed at.
+UNMAPPED_CODES = [
+    ("999", ""),
+    ("1234", ""),
+    ("ZZ9", ""),
 ]
 VEHICLES = ["Private Car", "Light Goods Vehicle", "Motorcycle", "Private Hire"]
 CASE_STATUSES = ["Issued", "Paid", "Challenged", "Cancelled", "Outstanding"]
@@ -178,6 +227,21 @@ SCENARIOS: dict[str, dict] = {
         streets=48, days=84, demand_weight=1.0, deployment_weight=0.05,
         cctv_share=0.25, gps_bias=0.0, drift=1.0, with_proxy=True,
         deployment_concentration=1.0, seed=20260913),
+    # Demand-dominated like the PASS scenario, but contaminated the way the real
+    # Camden series is: moving-traffic and bus-lane codes that C3 should have
+    # removed, MIXED codes, and codes absent from the authoritative artifact.
+    #
+    # The purpose of this scenario is NOT to assert a verdict. It exists to prove
+    # that contamination is SURFACED AND COUNTED rather than absorbed: the report
+    # must show a non-zero c3PolicyRowsStillPresent, a non-zero fallbackRows with
+    # the offending codes named, and a non-zero invalidSuffixRows. A harness that
+    # quietly folded any of those into the F1 denominator would pass every other
+    # check and still be lying about what it measured.
+    "code-map-contaminated": dict(
+        streets=48, days=84, demand_weight=1.0, deployment_weight=0.05,
+        cctv_share=0.25, gps_bias=0.0, drift=0.0, with_proxy=True,
+        deployment_concentration=1.0, seed=20260913,
+        non_parking_share=0.18, unmapped_share=0.03),
 }
 
 
@@ -349,6 +413,22 @@ def generate(out_dir: str, scenario: str | None, params: dict,
                         origin="DEPLOYMENT", time_supplied=rng.random() > 0.08,
                         cctv_prob=cctv_prob))
                     pcn_seq += 1
+                # Non-parking and unmapped contamination. Shares default to zero so
+                # the six original scenarios keep their expected verdicts exactly.
+                lam_nonpark = (n_dem + n_dep) * float(p.get("non_parking_share", 0.0))
+                for _ in range(_poisson(rng, lam_nonpark)):
+                    pcn_rows.append(_make_pcn(
+                        pcn_seq, rng, d, hour, st, i in camera_idx,
+                        origin=rng.choice(("NON_PARKING", "MIXED")),
+                        time_supplied=rng.random() > 0.08, cctv_prob=cctv_prob))
+                    pcn_seq += 1
+                lam_unmapped = (n_dem + n_dep) * float(p.get("unmapped_share", 0.0))
+                for _ in range(_poisson(rng, lam_unmapped)):
+                    pcn_rows.append(_make_pcn(
+                        pcn_seq, rng, d, hour, st, i in camera_idx,
+                        origin="UNMAPPED", time_supplied=rng.random() > 0.08,
+                        cctv_prob=cctv_prob))
+                    pcn_seq += 1
 
     # A few PCNs on streets that are NOT in the bay inventory, so unmatched-street
     # coverage reporting is exercised.
@@ -402,6 +482,20 @@ def generate(out_dir: str, scenario: str | None, params: dict,
             "pcn.csv": _sha256(pcn_path),
             **({"proxy.csv": _sha256(proxy_path)} if proxy_path else {}),
         },
+        "codeMap": {
+            "path": _CODE_MAP["path"],
+            "sha256": _CODE_MAP["sha256"],
+            "codeListVersion": _CODE_MAP["codeListVersion"],
+            "artifactVersion": _CODE_MAP["artifactVersion"],
+        },
+        "fixtureCodesDerivedFromAuthoritativeArtifact": True,
+        "authoritativeCodePool": {
+            "TURNOVER_PAYMENT": len(TURNOVER_CODES),
+            "PROHIBITION_ENTITLEMENT": len(PROHIBITION_CODES),
+            "MIXED": len(MIXED_CODES),
+            "NOT_PARKING": len(NOT_PARKING_CODES),
+            "UNMAPPED": len(UNMAPPED_CODES),
+        },
         "isRealData": False,
     }
 
@@ -419,8 +513,22 @@ def _make_pcn(seq: int, rng: random.Random, d: date, hour: int, st: dict,
     """
     if origin == "DEMAND":
         code, desc = rng.choice(TURNOVER_CODES)
-    else:
+    elif origin == "DEPLOYMENT":
         code, desc = rng.choice(PROHIBITION_CODES)
+    elif origin == "MIXED":
+        code, desc = rng.choice(MIXED_CODES)
+    elif origin == "NON_PARKING":
+        # A moving-traffic or bus-lane contravention. Under the C3 policy these are
+        # removed at the input layer; emitting them here proves the harness
+        # SURFACES any that survive rather than absorbing them into the F1
+        # denominator.
+        code, desc = rng.choice(NOT_PARKING_CODES)
+    elif origin == "UNMAPPED":
+        # A code absent from the authoritative artifact. Must increment the
+        # reported fallback count.
+        code, desc = rng.choice(UNMAPPED_CODES)
+    else:
+        raise ValueError(f"unknown fixture origin {origin!r}")
 
     if is_camera_street and rng.random() < cctv_prob:
         accuracy = "Fixed CCTV Camera"

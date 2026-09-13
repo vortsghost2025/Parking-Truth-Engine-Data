@@ -328,9 +328,86 @@ for the payment path. It came from Camden's bay inventory, not from any negotiat
 with a provider. It does not change the frozen run; it changes what is worth
 asking for next.
 
-**Not run, and PASS is not reachable in the first run.** No independent proxy has
-been sourced and F1 is inoperative without a code mapping — both cap the verdict
-at PARTIAL. Saying so in advance is the point of pre-registering. Protocol and
+### C4 executed — and it falsified its own remedy (amendment C4A)
+
+C4 was approved first and executed **before any Camden row was read**. The
+authoritative source is London Councils' *Penalty Charge Notices: Contravention
+Code List*, footer **PCN Codes v7.0, effective 31 May 2022** — 91 codes
+transcribed verbatim into
+[`sources/camden/london-councils-contravention-codes-v7.0.json`](../sources/camden/london-councils-contravention-codes-v7.0.json)
+(sha256 `539c5413…`) together with **our own** pre-declared pressure class and a
+per-code rationale. London Councils says what a contravention *means*; it
+publishes no pressure taxonomy, so which codes count as turnover versus
+prohibition for F1 is a judgement we declare in advance and freeze:
+18 `TURNOVER_PAYMENT`, 46 `PROHIBITION_ENTITLEMENT`, 2 `MIXED` (codes 12 and 19,
+whose official text fuses a permit violation with a payment violation),
+18 `NOT_PARKING`, 7 `RESERVED`.
+
+Two things the source gave us that were not being looked for. **`Diff. level` is
+`n/a` for exactly the moving-traffic and bus-lane codes** — an independent
+corroboration of C3 from a source unrelated to Camden's `ticket_type` field. And
+**suffix `j` means camera enforcement**, an authoritative *deployment* marker
+carried in the code itself; it is recorded and counted but deliberately **not**
+used in any verdict, since expanding F1 to read it would be a separate amendment.
+
+Suffix resolution also had to be code-aware: the general legend reports **`33H` as
+"hospital bay"** and **`52M` as "parking meter"**, where the source's
+code-specific lists say **"local buses and cycles only"** and **"motor vehicles"**.
+Correctly resolved, Camden's two highest-volume codes are authoritatively moving
+traffic, accounting for **150,030 of the 177,779** rows `ticket_type` implies —
+two unrelated sources agreeing on C3.
+
+**Then the audit broke the plan.** Running the *frozen, unmodified* keyword
+classifier against the authoritative descriptions: agreement **42 of 66**
+classified codes, recognising **9 of 18** turnover codes against **31 of 46**
+prohibition codes. Mechanisms: bare substring matching (`"permit"` inside
+`"permitted"` makes code 30 *"Parked for longer than permitted"* — the cleanest
+maximum-stay code in the list — come out `AMBIGUOUS`); an overbroad `"bay"` hint;
+and a vocabulary gap (the hint is `"expired"`, code 05 says *"expiry"*, so the
+purest overstay contravention returns `UNCLASSIFIED`).
+
+No code is ever *inverted* between classes — every failure collapses into
+`AMBIGUOUS` or `UNCLASSIFIED` — but the loss is **asymmetric**, and that is what
+makes it consequential. `prohibitionShareOverall` is `PROHIBITION_TYPE` over *all*
+classes, so attenuating turnover harder than prohibition biases the share
+**upward by +0.030 to +0.074**: a true share of **0.45 is reported as 0.524**,
+crossing the frozen F1 threshold of 0.50 unaided. A false F1 trigger yields FAIL,
+whose pre-registered reading is to drop the PCN-exhaust source class as
+enforcement-biased — so the defect could **manufacture the evidence for abandoning
+the approach**. This direction was computed from `_contravention_mix()` rather
+than assumed; an earlier draft claimed the opposite and was corrected.
+
+The root cause is circular validation, and it is worse than vocabulary. **The
+fixture invented codes that contradict the authoritative codebook** — five of nine
+carried the wrong class and code `03` does not exist at all. The fixture's
+`("30", "Parked without a permit in a controlled parking zone")` is
+authoritatively *"Parked for longer than permitted"* = **TURNOVER**, sitting in
+the prohibition bucket; its `("31", "Parked in a permit bay")` is authoritatively
+a **box-junction moving-traffic** offence. So the 14/14 green self-test had been
+validating the classifier against fabricated ground truth and could not have
+caught any of this.
+
+**Amendment C4A** executes C4's own pre-registered option (a) — *"as data, not as
+keywords"* — replacing classification with a lookup against the frozen artifact.
+Agreement is now **66/66** and the bias is removed. Boundaries held: no F1–F5
+threshold moved (asserted against the committed `frozenThresholds`, not a retyped
+value), `decide_verdict()` untouched, and **`camden_pressure.py`,
+`camden_aggregate.py` and `camden_sources.py` remain bit-identical to `a602244`** —
+the index math, semantic contract and forbidden-key guard were never in play. The
+keyword heuristic is retained **byte-for-byte** as an explicit counted fallback,
+and a missing artifact now **raises** instead of degrading silently. The fixture is
+derived from the artifact, and the suite is **23/23** with nine new guards
+including one that fails if the fixture ever drifts back to invented descriptions.
+Re-frozen over 10 files in [`camden-harness-freeze.json`](../manifests/camden-harness-freeze.json).
+The declaration itself was not revised — **the code changed to match the
+declaration, not the declaration to match the code.** Detail:
+[`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md) §4A–§4B.
+
+**Not run, and PASS is still not reachable in the first run.** No independent
+proxy has been sourced, which caps the verdict at PARTIAL. C4A removed the *other*
+cap: F1 is now fully evaluable, so a FAIL on F1 can be read as a real finding
+about enforcement dominance rather than an artefact of a keyword list. Saying so
+in advance is the point of pre-registering. Protocol and
 verdict interpretation: [`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md).
 
 ## Camera lane

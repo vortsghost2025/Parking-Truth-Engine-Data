@@ -4,21 +4,25 @@
 **Snapshot date:** 2026-09-13
 **Extends:** [`PARKING-DATA-SOURCE-REALITY-CHECK.md`](PARKING-DATA-SOURCE-REALITY-CHECK.md) (PTE-TEL-002), which proposed this experiment as action 2
 **Lane:** AVAILABILITY (research). No legality claim made; `legalityClaimed: false` throughout.
-**Code:** [`tools/camden/`](../tools/camden/) — 3,636 lines, stdlib only
+**Code:** [`tools/camden/`](../tools/camden/) — 5,348 lines, stdlib only
 **Schema:** [`schemas/camden-pressure-signal-schema.json`](../schemas/camden-pressure-signal-schema.json)
 **Manifest:** [`manifests/camden-signal-harness-manifest.json`](../manifests/camden-signal-harness-manifest.json)
-**Frozen by:** [`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md) (PTE-TEL-004) at commit `a602244` — see [`manifests/camden-harness-freeze.json`](../manifests/camden-harness-freeze.json)
+**Frozen by:** [`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md) (PTE-TEL-004) at commit `a602244`, **re-frozen after amendment C4A** — see [`manifests/camden-harness-freeze.json`](../manifests/camden-harness-freeze.json) and §4B of that record
+**Authoritative code map:** [`sources/camden/london-councils-contravention-codes-v7.0.json`](../sources/camden/london-councils-contravention-codes-v7.0.json) (London Councils, PCN Codes v7.0) with its [classification audit](../sources/camden/code-classification-audit.json)
 **Companion:** [`AVAILABILITY-INFERENCE-HANDOFF.md`](AVAILABILITY-INFERENCE-HANDOFF.md) (PTE-INF-001)
 
 ---
 
 ## 0. Status, stated first
 
-**Built, self-tested 14/14, and NOT yet run against real Camden data.**
+**Built, amended by C4A, self-tested 23/23, and NOT yet run against real Camden
+data.**
 
 What is proven: the pipeline's arithmetic, and that the harness detects each of
 the five failure modes it claims to detect, graded against fixtures built from
-latent processes it did not create.
+latent processes it did not create — and, since C4A, that contravention
+classification reproduces a pre-declared taxonomy derived from an authoritative
+external codebook.
 
 What is **not** proven: that the column-name candidates match a live Camden
 export, and therefore nothing at all about Camden. That gap is closed by
@@ -38,6 +42,32 @@ criterion — would be **silently inoperative** on real Camden data, because
 contravention codes are numeric (`33H`, `52M`, `12R`, `11`) and the classifier
 matches keywords. That would permit a PASS which never tested the central
 confound. See §11 below.
+
+**Correction to that framing, found by executing C4.** Supplying authoritative
+descriptions does *not* rescue the keyword classifier. Run against the London
+Councils wording it agrees with the pre-declared taxonomy on only **42 of 66**
+classified codes, recognising 9 of 18 turnover codes against 31 of 46 prohibition
+codes. Because `prohibitionShareOverall` is `PROHIBITION_TYPE` over *all* classes,
+that asymmetric attenuation biases it **upward by +0.030 to +0.074** — enough to
+carry a true prohibition share of 0.45 to a reported **0.524** and cross the
+frozen F1 threshold of 0.50 unaided. So F1 was not merely at risk of being
+inoperative; it was at risk of **firing falsely**, which would produce a FAIL
+whose pre-registered reading is to drop the PCN-exhaust source class as
+enforcement-biased. The defect could manufacture the evidence for abandoning the
+approach. Full analysis in [`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md) §4A.
+
+**Amendment C4A** therefore replaced keyword classification with a lookup against
+the frozen authoritative artifact, executing C4's own pre-registered option (a) —
+*"as data, not as keywords"*. Agreement is now **66/66** and the bias is removed.
+The keyword heuristic is retained byte-for-byte as a counted fallback; no F1–F5
+threshold moved; `camden_pressure.py`, `camden_aggregate.py` and
+`camden_sources.py` remain **bit-identical to `a602244`**. C4A also found that the
+original fixture invented codes contradicting the authoritative codebook — five of
+nine had the wrong class and code `03` does not exist — so the 14/14 green
+self-test had been validating the classifier against fabricated ground truth. The
+fixture is now derived from the artifact and the suite is **23/23**. Both changes
+were committed **before any Camden row was read**. See
+[`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md) §4B.
 
 ### Reporting correction
 

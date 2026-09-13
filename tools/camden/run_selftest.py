@@ -39,6 +39,7 @@ STDLIB ONLY. Deterministic.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import os
 import shutil
@@ -398,6 +399,204 @@ def _minimal_bays(d: str) -> dict:
     return load_bay_map(path)
 
 
+
+# ---------------------------------------------------------------------------
+# PTE-TEL-004 C4A: authoritative contravention-code classification
+# ---------------------------------------------------------------------------
+# These checks exist because the PTE-TEL-003 self-test could not catch the defect
+# they now guard against. Its fixture was written in the classifier's own
+# vocabulary AND its codes contradicted the authoritative codebook, so 14/14 green
+# was evidence of nothing. Every check below compares the implementation against
+# the frozen London Councils artifact, which the implementation did not write.
+
+FROZEN_THRESHOLD_MANIFEST = os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..",
+    "manifests", "camden-harness-freeze.json"))
+
+
+def check_c4a_classification(root: str, verbose: bool) -> list[dict]:
+    """Guards added by amendment C4A. See docs/CAMDEN-REAL-RUN.md section 4A/4B."""
+    results: list[dict] = []
+    code_map = camden_normalize.load_code_map(required=True)
+    codes = code_map["codes"]
+
+    # 1. EVERY mapped code must produce the class we declared, before any Camden
+    #    row was read. This is the regression guard the user asked for.
+    mismatches = []
+    for base, entry in sorted(codes.items()):
+        expected = camden_normalize.DECLARED_TO_CLASS[entry["declaredPressureClass"]]
+        got = camden_normalize.classify_contravention(
+            base, entry["officialDescription"], code_map=code_map)
+        if got["contraventionClass"] != expected:
+            mismatches.append({"code": base, "expected": expected,
+                               "observed": got["contraventionClass"]})
+        elif got["classificationMethod"] != camden_normalize.METHOD_TABLE:
+            mismatches.append({"code": base, "expected": expected,
+                               "observed": got["classificationMethod"]})
+    results.append({
+        "check": "c4a:every-mapped-code-produces-declared-class",
+        "expected": {"codes": len(codes), "mismatches": 0},
+        "observed": {"codes": len(codes), "mismatches": len(mismatches),
+                     "detail": mismatches[:12]},
+        "passed": not mismatches,
+    })
+
+    # 2. The keyword heuristic must be FALLBACK ONLY, and must still be the
+    #    original code - tested separately, against the defects documented in the
+    #    C4 audit, so a silent rewrite of the fallback would be caught.
+    kw_cases = [
+        ("30", codes["30"]["officialDescription"], "AMBIGUOUS"),   # "permit" in "permitted"
+        ("05", codes["05"]["officialDescription"], "UNCLASSIFIED"),  # "expiry" not "expired"
+        ("22", codes["22"]["officialDescription"], "UNCLASSIFIED"),
+    ]
+    kw_ok = []
+    for base, desc, expected in kw_cases:
+        got = camden_normalize.classify_contravention_keywords(base, desc)
+        kw_ok.append({"code": base, "expected": expected,
+                      "observed": got["contraventionClass"],
+                      "passed": got["contraventionClass"] == expected
+                      and got["classificationMethod"] == camden_normalize.METHOD_KEYWORDS})
+    table_beats_kw = all(
+        camden_normalize.classify_contravention(b, d, code_map=code_map)["contraventionClass"]
+        == camden_normalize.DECLARED_TO_CLASS[codes[b]["declaredPressureClass"]]
+        for b, d, _ in kw_cases)
+    results.append({
+        "check": "c4a:keyword-heuristic-retained-as-fallback-only",
+        "expected": "unchanged defective behaviour preserved for auditability; "
+                    "table lookup correct on the same inputs",
+        "observed": {"keywordCases": kw_ok, "tableLookupCorrectOnSameInputs": table_beats_kw},
+        "passed": bool(all(c["passed"] for c in kw_ok) and table_beats_kw),
+    })
+
+    # 3. An absent artifact must RAISE. Silently degrading to the keyword
+    #    heuristic is the failure mode C4A exists to remove.
+    raised = None
+    try:
+        camden_normalize.load_code_map("/nonexistent/code-map.json", required=True)
+    except FileNotFoundError as exc:
+        raised = str(exc)[:160]
+    degraded_ok = camden_normalize.load_code_map("/nonexistent/code-map.json",
+                                                 required=False) is None
+    results.append({
+        "check": "c4a:missing-code-map-raises-not-degrades",
+        "expected": "FileNotFoundError when required; None only when explicitly "
+                    "asked for",
+        "observed": {"raised": raised is not None, "message": raised,
+                     "optionalPathReturnsNone": degraded_ok},
+        "passed": bool(raised is not None and degraded_ok),
+    })
+
+    # 4-6. Contamination must be SURFACED, not absorbed.
+    manifest = fx.generate(os.path.join(root, "c4a-contaminated"),
+                           "code-map-contaminated",
+                           dict(fx.SCENARIOS["code-map-contaminated"]))
+    report = _report_for(os.path.join(root, "c4a-contaminated"),
+                         manifest["baysPath"], manifest["pcnPath"],
+                         manifest["proxyPath"], "supplied",
+                         dict(sig.DEFAULT_THRESHOLDS))
+    cls = report["classification"]
+    if verbose:
+        print(f"  [c4a-contaminated] {manifest['pcnRowCount']} PCNs, "
+              f"fallback={cls['fallbackRows']}, c3Present={cls['c3PolicyRowsStillPresent']}",
+              file=sys.stderr)
+
+    results.append({
+        "check": "c4a:unmapped-code-increments-fallback-count",
+        "expected": "fallbackRows > 0 with the offending raw codes named",
+        "observed": {"fallbackRows": cls["fallbackRows"],
+                     "fallbackShare": cls["fallbackShare"],
+                     "fallbackCodes": cls["fallbackCodes"],
+                     "methodCounts": cls["methodCounts"]},
+        "passed": bool(cls["fallbackRows"] > 0 and cls["fallbackCodes"]
+                       and cls["methodCounts"].get(camden_normalize.METHOD_KEYWORDS, 0)
+                       == cls["fallbackRows"]),
+    })
+
+    results.append({
+        "check": "c4a:non-parking-rows-surfaced-not-absorbed",
+        "expected": "c3PolicyRowsStillPresent > 0 and labelled NOT_PARKING, so "
+                    "rows C3 should have removed are visible in the denominator",
+        "observed": {"c3PolicyRowsStillPresent": cls["c3PolicyRowsStillPresent"],
+                     "NOT_PARKING": cls["classCounts"].get("NOT_PARKING", 0),
+                     "c3PolicyNote": cls["c3PolicyNote"][:120]},
+        "passed": bool(cls["c3PolicyRowsStillPresent"] > 0
+                       and cls["c3PolicyRowsStillPresent"]
+                       == cls["classCounts"].get("NOT_PARKING", 0)),
+    })
+
+    results.append({
+        "check": "c4a:invalid-code-suffix-surfaced",
+        "expected": "a suffix the source does not permit on that base code is "
+                    "reported, not silently treated as a real contravention",
+        "observed": {"invalidSuffixRows": cls["invalidSuffixRows"],
+                     "invalidSuffixCodes": cls["invalidSuffixCodes"]},
+        "passed": bool(cls["invalidSuffixRows"] > 0 and cls["invalidSuffixCodes"]),
+    })
+
+    # 7. Fixture contravention text must come FROM the artifact. This is the check
+    #    that makes the self-test non-circular: if the fixture ever drifts back to
+    #    invented descriptions, it fails here.
+    off_artifact = {}
+    unmapped_expected = {c for c, _ in fx.UNMAPPED_CODES}
+    with open(manifest["pcnPath"], encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            raw = (row.get("Contravention Code") or "").strip()
+            if raw in unmapped_expected:
+                continue
+            parsed = camden_normalize.split_contravention_code(raw)
+            entry = codes.get(parsed["baseCode"] or "")
+            desc = (row.get("Contravention Description") or "").strip()
+            if entry is None or desc != entry["officialDescription"]:
+                off_artifact[raw] = desc[:60]
+    results.append({
+        "check": "c4a:fixture-codes-come-from-authoritative-artifact",
+        "expected": {"rowsNotMatchingArtifact": 0},
+        "observed": {"rowsNotMatchingArtifact": len(off_artifact),
+                     "examples": dict(list(sorted(off_artifact.items()))[:8])},
+        "passed": not off_artifact,
+    })
+
+    # 8. Suffix 'j' (camera enforcement) must be recorded but must NOT influence
+    #    any verdict. Expanding F1 to read deployment from it would be a separate
+    #    pre-registered amendment, not a side effect of C4A.
+    results.append({
+        "check": "c4a:camera-suffix-recorded-not-used-in-verdict",
+        "expected": {"usedInVerdict": False,
+                     "artifactRecordsSuffix": code_map["cameraEnforcementSuffix"]},
+        "observed": {"usedInVerdict": cls["cameraEnforcementSuffixUsedInVerdict"],
+                     "rowsCarryingSuffix": cls["cameraEnforcementSuffixRows"],
+                     "artifactRecordsSuffix": code_map["cameraEnforcementSuffix"]},
+        "passed": bool(cls["cameraEnforcementSuffixUsedInVerdict"] is False
+                       and code_map["cameraEnforcementSuffix"] == "j"
+                       and code_map["cameraSuffixUsedInVerdict"] is False),
+    })
+
+    # 9. No F1-F5 numerical threshold may have moved. Verified against the
+    #    committed freeze manifest rather than against a value retyped here, so
+    #    the check cannot be satisfied by editing both sides.
+    frozen = {}
+    manifest_ok = os.path.isfile(FROZEN_THRESHOLD_MANIFEST)
+    if manifest_ok:
+        with open(FROZEN_THRESHOLD_MANIFEST, encoding="utf-8") as fh:
+            frozen = {k: v for k, v in
+                      json.load(fh).get("frozenThresholds", {}).items()
+                      if k != "note"}
+    live = dict(sig.DEFAULT_THRESHOLDS)
+    drifted = {k: {"frozen": frozen.get(k), "live": live.get(k)}
+               for k in sorted(set(frozen) | set(live))
+               if frozen.get(k) != live.get(k)}
+    results.append({
+        "check": "c4a:no-f1-f5-threshold-changed",
+        "expected": {"thresholds": len(frozen), "drifted": 0},
+        "observed": {"freezeManifestFound": manifest_ok,
+                     "thresholds": len(frozen), "drifted": len(drifted),
+                     "detail": drifted},
+        "passed": bool(manifest_ok and frozen and not drifted),
+    })
+
+    return results
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description="Self-test the Camden signal harness against fixtures built "
@@ -420,14 +619,17 @@ def main(argv: list[str] | None = None) -> int:
         results += check_no_hour_imputation(root)
         results += check_unrecognised_spatial_accuracy(root)
         results += check_schema_conformance(root)
+        results += check_c4a_classification(root, args.verbose)
     finally:
         if not args.keep:
             shutil.rmtree(root, ignore_errors=True)
 
     passed = sum(1 for r in results if r["passed"])
     summary = {
-        "selfTestVersion": "1.0.0",
+        "selfTestVersion": "2.0.0",
         "recordId": "PTE-TEL-003",
+        "amendedBy": "PTE-TEL-004-C4A",
+        "codeMapSha256": camden_normalize.load_code_map(required=True)["sha256"],
         "fixtureIsRealData": False,
         "totalChecks": len(results),
         "passed": passed,

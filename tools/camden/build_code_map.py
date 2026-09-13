@@ -69,8 +69,14 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from camden_normalize import (  # noqa: E402  FROZEN - do not edit
+# camden_normalize is AMENDED by C4A; build_code_map reuses its parser so the two
+# can never diverge on how a raw code is split.
+from camden_normalize import (  # noqa: E402
     classify_contravention,
+    classify_contravention_keywords,
+    split_contravention_code,
+    DECLARED_TO_CLASS,
+    load_code_map,
     PROHIBITION_CODE_HINTS,
     TURNOVER_CODE_HINTS,
 )
@@ -431,41 +437,33 @@ CAMDEN_OBSERVED_TOP_CODES = {"33H": 76882, "52M": 73148, "12R": 72219, "11": 684
 # Code parsing
 # ---------------------------------------------------------------------------
 
-_CODE_RE = re.compile(r"^\s*(\d{1,2})\s*([A-Za-z0-9]*)\s*$")
-
-
 def split_code(raw: str | None) -> dict:
-    """Split a Camden `contravention_code` into base code and suffix.
+    """Split a Camden `contravention_code` into base code, suffix and its meaning.
 
-    `12R` -> base `12`, suffix `R`. `33H` -> base `33`, suffix `H`. `11` -> base
-    `11`, suffix None. The RAW value is always preserved; nothing is normalised
-    away. Suffix matching against the source legend is case-insensitive because
-    the source lists suffixes in lower case while Camden emits them in upper.
+    Delegates the parse to camden_normalize.split_contravention_code so there is
+    exactly one implementation of "how is a raw code split", then layers the
+    source's suffix meaning on top. `12R` -> base `12`, suffix `R`. The raw value
+    is always preserved; nothing is normalised away.
+
+    Suffix meaning is resolved CODE-SPECIFICALLY first, because the same letter
+    means different things on different codes: the general legend says `h` is
+    "hospital bay" but on code 33 it is "local buses and cycles only", and says
+    `m` is "parking meter" but on code 52 it is "motor vehicles". Resolving from
+    the general legend alone reports a confidently wrong meaning for exactly the
+    high-volume moving-traffic codes Camden emits.
     """
-    out = {"raw": raw, "baseCode": None, "suffix": None, "suffixMeaning": None,
-           "suffixMeaningSource": None, "parseStatus": "EMPTY",
-           "suffixIsCameraEnforcement": False}
-    if raw is None or not str(raw).strip():
-        return out
-    text = str(raw).strip()
-    m = _CODE_RE.match(text)
-    if not m:
-        out["parseStatus"] = "UNPARSEABLE"
-        return out
-    base, suffix = m.group(1), m.group(2)
-    out["baseCode"] = base.zfill(2)
-    out["suffix"] = suffix.upper() or None
-    out["parseStatus"] = "PARSED"
+    out = dict(split_contravention_code(raw))
+    out["suffixMeaning"] = None
+    out["suffixMeaningSource"] = None
+    out["suffixIsCameraEnforcement"] = False
+    suffix = out.get("suffix")
     if suffix:
         low = suffix.lower()
-        # Code-specific meanings override the general legend; see
-        # CODE_SPECIFIC_SUFFIXES for why resolving from the general legend alone
-        # reports a confidently wrong meaning for the high-volume moving-traffic
-        # codes.
         specific = CODE_SPECIFIC_SUFFIXES.get(out["baseCode"] or "", {}).get(low)
         out["suffixMeaning"] = specific if specific is not None else SUFFIX_LEGEND.get(low)
         out["suffixMeaningSource"] = ("CODE_SPECIFIC" if specific is not None
-                                      else ("GENERAL_LEGEND" if low in SUFFIX_LEGEND else None))
+                                      else ("GENERAL_LEGEND" if low in SUFFIX_LEGEND
+                                            else None))
         out["suffixIsCameraEnforcement"] = (CAMERA_ENFORCEMENT_SUFFIX in low)
     return out
 
@@ -619,7 +617,7 @@ def audit() -> dict:
                              "failureMode": None,
                              "note": "excluded before classification (C3)"})
             continue
-        observed = classify_contravention(code, desc)["contraventionClass"]
+        observed = classify_contravention_keywords(code, desc)["contraventionClass"]
         ok = observed == expected
         agree += 1 if ok else 0
         disagree += 0 if ok else 1
@@ -671,6 +669,25 @@ def audit() -> dict:
             "status": status,
         })
 
+    # The amended path, audited the same way, so the artifact records both the
+    # defect that justified C4A and its remedy.
+    code_map = load_code_map(required=True)
+    amended_agree = amended_bad = 0
+    amended_detail = []
+    for code, _, desc, _, _, cls, _ in sorted(CODES, key=lambda r: r[0]):
+        if DECLARED_TO_HARNESS[cls].startswith("EXCLUDED"):
+            continue
+        expected = DECLARED_TO_HARNESS[cls]
+        got = classify_contravention(code, desc, code_map=code_map)
+        ok = (got["contraventionClass"] == expected
+              and got["classificationMethod"] == "AUTHORITATIVE_TABLE_LOOKUP")
+        amended_agree += 1 if ok else 0
+        amended_bad += 0 if ok else 1
+        if not ok:
+            amended_detail.append({"baseCode": code, "expected": expected,
+                                   "observed": got["contraventionClass"],
+                                   "method": got["classificationMethod"]})
+
     classified = agree + disagree
     disagreements = [e for e in per_code if e["agrees"] is False]
     failure_modes: dict[str, int] = {}
@@ -680,7 +697,25 @@ def audit() -> dict:
 
     return {
         "auditVersion": ARTIFACT_VERSION,
-        "frozenClassifierUnmodified": True,
+        "auditedPath": ("PTE-TEL-003 keyword heuristic "
+                        "(classify_contravention_keywords, retained as fallback)"),
+        "amendedBy": "PTE-TEL-004-C4A",
+        "amendedPathAudit": {
+            "auditedPath": "C4A authoritative table lookup",
+            "codeMapSha256": code_map["sha256"],
+            "classifiedCodes": amended_agree + amended_bad,
+            "agree": amended_agree,
+            "disagree": amended_bad,
+            "agreementRate": (round(amended_agree / (amended_agree + amended_bad), 6)
+                              if (amended_agree + amended_bad) else None),
+            "disagreements": amended_detail,
+            "interpretation": (
+                "Same artifact, same declaration, same comparison - only the "
+                "classification path differs. The keyword heuristic reproduces the "
+                "declaration on 42 of 66 classified codes; the table lookup "
+                "reproduces it on all of them. This is the evidence that justified "
+                "amendment C4A and the evidence that the amendment worked."),
+        },
         "totalCodes": len(CODES),
         "excludedBeforeClassification": excluded,
         "classifiedCodes": classified,

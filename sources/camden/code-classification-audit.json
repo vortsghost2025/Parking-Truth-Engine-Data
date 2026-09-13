@@ -1,7 +1,19 @@
 {
   "agree": 42,
   "agreementRate": 0.636364,
+  "amendedBy": "PTE-TEL-004-C4A",
+  "amendedPathAudit": {
+    "agree": 66,
+    "agreementRate": 1.0,
+    "auditedPath": "C4A authoritative table lookup",
+    "classifiedCodes": 66,
+    "codeMapSha256": "539c5413ff430eb4ec9756fa27ea020d02ca0bca648ef14f20d03c3c1a892a80",
+    "disagree": 0,
+    "disagreements": [],
+    "interpretation": "Same artifact, same declaration, same comparison - only the classification path differs. The keyword heuristic reproduces the declaration on 42 of 66 classified codes; the table lookup reproduces it on all of them. This is the evidence that justified amendment C4A and the evidence that the amendment worked."
+  },
   "auditVersion": "1.0.0",
+  "auditedPath": "PTE-TEL-003 keyword heuristic (classify_contravention_keywords, retained as fallback)",
   "camdenObservedCodes": [
     {
       "baseCode": "33",
@@ -457,7 +469,6 @@
     "SPURIOUS_PROHIBITION_HINT": 4,
     "VOCABULARY_GAP": 20
   },
-  "frozenClassifierUnmodified": true,
   "highValueFailures": [
     {
       "baseCode": "04",
