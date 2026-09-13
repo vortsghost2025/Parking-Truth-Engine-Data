@@ -7,6 +7,7 @@
 **Code:** [`tools/camden/`](../tools/camden/) — 3,636 lines, stdlib only
 **Schema:** [`schemas/camden-pressure-signal-schema.json`](../schemas/camden-pressure-signal-schema.json)
 **Manifest:** [`manifests/camden-signal-harness-manifest.json`](../manifests/camden-signal-harness-manifest.json)
+**Frozen by:** [`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md) (PTE-TEL-004) at commit `a602244` — see [`manifests/camden-harness-freeze.json`](../manifests/camden-harness-freeze.json)
 **Companion:** [`AVAILABILITY-INFERENCE-HANDOFF.md`](AVAILABILITY-INFERENCE-HANDOFF.md) (PTE-INF-001)
 
 ---
@@ -24,6 +25,31 @@ export, and therefore nothing at all about Camden. That gap is closed by
 downloading two OGL files and running one command; it cannot be closed from
 inside this sandbox, which has no outbound network except the fetch and search
 tools.
+
+**The harness is now FROZEN at commit `a602244`** for the real run, with
+`DEFAULT_THRESHOLDS` snapshotted and every file hashed in
+[`manifests/camden-harness-freeze.json`](../manifests/camden-harness-freeze.json).
+Verify with `cd tools/camden && sha256sum -c FREEZE.sha256`. Retrieving Camden's
+own dataset metadata before the run found four defects that mean the harness
+cannot ingest the real files as-is; they are pre-registered in
+[`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md) §4, dated and evidenced **before any
+data row was read**. The most serious is that F1 — the deployment-dominance
+criterion — would be **silently inoperative** on real Camden data, because
+contravention codes are numeric (`33H`, `52M`, `12R`, `11`) and the classifier
+matches keywords. That would permit a PASS which never tested the central
+confound. See §11 below.
+
+### Reporting correction
+
+The commit message for `a602244` and the summary written alongside it both stated
+that the only existing files changed were `README.md` and `docs/PROJECT_STATUS.md`,
+"both link additions". **That is wrong for the second file.** `git show --stat
+a602244` gives `README.md | 1 +` and `docs/PROJECT_STATUS.md | 74 ++++`. The
+README change is one link line; the PROJECT_STATUS change is a substantial new
+PTE-TEL-003 status section. It is not destructive and it does not breach the
+experiment boundary — but describing a 74-line section as a link addition
+understates what was touched, and an evidence record should not do that. The
+commit message is now immutable, so the correction is recorded here instead.
 
 ---
 
@@ -301,3 +327,65 @@ merged to main, and no existing data is overwritten: outputs go to new paths and
 `tools/camden/.gitignore` keeps fixtures, downloads and reports out of git.
 
 **A PCN says a car was there. It does not say a car may be there.**
+
+---
+
+## 11. Post-freeze findings from Camden's own metadata
+
+Retrieved 2026-09-13 from `opendata.camden.gov.uk/api/views/<id>.json` — the
+publisher's own dataset metadata, **before any data row was read**. These correct
+assumptions baked into this record and into the fixture. Full detail and evidence
+in [`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md).
+
+1. **The bay dataset is `7hiv-3r9k` ("Parking Bays"), not `t4s2-xa5a`.** The
+   latter is `assetType: "map"` with an **empty `columns` array**, pointing at
+   `7hiv-3r9k` as its data source. §1 of this record names `t4s2-xa5a`; that is
+   the map view, not the table.
+2. **Two real bay column names are not in the adapter's candidates:**
+   `Parking Spaces` and `Parking Bay Length Metres`. Because both are *optional*
+   fields the adapter would **not raise** — it would load every bay with
+   `spaceCount = None`, produce zero indexed streets, and fail F3 for a reason
+   that has nothing to do with Camden. A silent wrong conclusion, and the exact
+   scenario the "run the field resolver first" protocol exists to catch.
+3. **35.9% of the PCN dataset is not parking.** `ticket_type` over 495,814 rows:
+   O/S TMA 312,203 (63.0%) and CCTV TMA 5,194 (1.0%) are parking; **MTC 170,747
+   (34.4%) is moving traffic** and **BUS 7,032 (1.4%) is bus lanes**. The fixture
+   modelled a parking-only series, so it never exercised this. Pre-declared
+   filter: `ticket_type IN ('O/S TMA', 'CCTV TMA')` → 317,397 rows.
+4. **F1 is inoperative on real data** — see §0. Numeric contravention codes carry
+   no keywords, so every row classifies `UNCLASSIFIED`, I2 can never trigger, and
+   F1 can never fire. Since `decide_verdict()` reads a non-firing criterion as
+   not-triggered, the harness could return PASS having never tested deployment
+   dominance. **Pre-registered handling: source an authoritative London Councils
+   code→class mapping, or declare F1 unevaluable and cap the verdict at PARTIAL.**
+5. **Street strings will not match.** PCN `Street` is uppercase with postcode
+   suffixes and junction qualifiers — `TOTTENHAM COURT ROAD W1 BY JUNCTION WITH
+   CHENIES STREET` (27,940 rows). Five such Tottenham Court Road variants are
+   **15.2% of the whole dataset**. `street_key()` strips neither. **CPZ is the
+   reliable join level**; a street-level run must be read as a *matching* result,
+   not a data-availability result.
+6. **A `MOBILE CCTV` location type may exist.** The publisher's ward and
+   coordinate descriptions reference *"the Civil Enforcement Officer location,
+   fixed CCTV location or mobile CCTV location"* — three types, where §3 of this
+   record and the strata model assume two plus unknown. A mobile-CCTV value would
+   surface as `UNRECOGNISED`, which is the designed behaviour.
+7. **`Spatial Accuracy` itself was not retrieved.** Metadata chunks covering
+   positions 31+ failed with `SignatureDoesNotMatch`. The column is documented in
+   the dataset description but its exact name and value set are unverified.
+8. **Capacity carries a publisher-documented defect:** both `Parking Spaces` and
+   `Parking Bay Length Metres` warn of *"Known issues with echelon shaped parking
+   bays"*. That must travel with every capacity figure, and it is stronger than
+   the generic "approximate" flag this record described.
+9. **38.7% of PCN rows have no coordinates and 39.4% no ward** — a stratum, not
+   missingness to fill. Any coordinate-based diagnostic covers at most 61.3%.
+
+**A find that was not being looked for:** `7hiv-3r9k` position 6 is
+**`Cashless Identifier`** — *"Location ID for cashless payment"*. That is the join
+key to RingGo / MiPermit session data (PTE-TEL-002 class A), and it joins on an
+**identifier rather than a street string**, which dissolves finding 5 entirely for
+the payment-session path. It does not change the frozen run; it changes what is
+worth asking for next.
+
+None of this is a threshold change and none of it is post-hoc tuning: all nine
+items come from publisher metadata dated before the download. The distinction is
+the whole reason the harness was frozen first.

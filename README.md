@@ -395,6 +395,7 @@ Additional documentation:
 - [`docs/AVAILABILITY-INFERENCE-HANDOFF.md`](docs/AVAILABILITY-INFERENCE-HANDOFF.md) — handoff record PTE-INF-001: reproduction commands, measured results, invariants, open work
 - [`docs/PARKING-DATA-SOURCE-REALITY-CHECK.md`](docs/PARKING-DATA-SOURCE-REALITY-CHECK.md) — record PTE-TEL-002: where live occupancy actually comes from when a city publishes none
 - [`docs/CAMDEN-SIGNAL-HARNESS.md`](docs/CAMDEN-SIGNAL-HARNESS.md) — record PTE-TEL-003: can enforcement exhaust carry a parking-pressure signal? Harness built, self-tested 14/14, not yet run on real Camden data
+- [`docs/CAMDEN-REAL-RUN.md`](docs/CAMDEN-REAL-RUN.md) — record PTE-TEL-004: pre-registration for the real Camden run; harness frozen at `a602244`, four pre-registered defects found in Camden's own metadata
 - [`schemas/parking-telemetry-event-schema.json`](schemas/parking-telemetry-event-schema.json)
 - [`tools/realtime-sim/README.md`](tools/realtime-sim/README.md)
 - [`tools/telemetry/README.md`](tools/telemetry/README.md)

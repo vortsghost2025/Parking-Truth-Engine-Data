@@ -266,6 +266,72 @@ Boundaries respected: legality kernel not modified, imported or consulted;
 PTE-007/PTE-008 evidence untouched; camera lane still frozen (this consumes other
 people's published records, operates no lens); no individual-space occupancy
 inferred; nothing deployed; nothing merged to main; no existing data overwritten.
+Two existing files were touched by that commit: `README.md` (+1 line, a link) and
+this file (+74 lines, the section above). An earlier summary described both as
+"link additions", which was wrong for this file; corrected in
+[`CAMDEN-SIGNAL-HARNESS.md`](CAMDEN-SIGNAL-HARNESS.md) §0.
+
+### Frozen for the real run (PTE-TEL-004)
+
+Harness **frozen at commit `a602244`** with `DEFAULT_THRESHOLDS` snapshotted and
+all nine files hashed — [`camden-harness-freeze.json`](../manifests/camden-harness-freeze.json),
+verified by `cd tools/camden && sha256sum -c FREEZE.sha256`. No threshold or
+verdict-logic change is permitted after a real result is seen.
+
+Retrieving Camden's **own dataset metadata** before the run — publisher evidence,
+dated before any data row was read — found four defects meaning the harness cannot
+ingest the real files unchanged. Pre-registration, not tuning:
+
+- **The bay dataset is `7hiv-3r9k` ("Parking Bays"), not `t4s2-xa5a`.** The latter
+  is `assetType: "map"` with an **empty `columns` array**, pointing at `7hiv-3r9k`
+  as its source.
+- **Two real bay column names miss the adapter candidates** — `Parking Spaces` and
+  `Parking Bay Length Metres`. Severe and **silent**: both are optional fields, so
+  the adapter would not raise; it would load every bay with `spaceCount = None`,
+  index zero streets, and fail F3 for a reason that has nothing to do with Camden.
+  Fixed via `--field-map`, leaving the frozen binaries bit-identical.
+- **35.9% of the PCN series is not parking.** Of 495,814 rows: O/S TMA 312,203
+  (63.0%) and CCTV TMA 5,194 (1.0%) are parking; **MTC 170,747 (34.4%) is moving
+  traffic** and **BUS 7,032 (1.4%) is bus lanes**. Pre-declared filter:
+  `ticket_type IN ('O/S TMA','CCTV TMA')` → 317,397 rows. The fixture modelled a
+  parking-only series and so never exercised this.
+- **F1 would be silently inoperative — the dangerous one.** Contravention codes
+  are numeric with suffixes (`33H` 76,882 · `52M` 73,148 · `12R` 72,219 · `11`
+  68,427) and carry no keywords, so every row classifies `UNCLASSIFIED`, I2 can
+  never trigger, and the deployment-dominance criterion can never fire.
+  `decide_verdict()` reads a non-firing criterion as not-triggered, so **the
+  harness could return PASS having never tested the central confound.**
+  Pre-registered: source an authoritative London Councils code→class mapping, or
+  declare F1 unevaluable and cap the verdict at PARTIAL.
+
+Three further real-data facts the fixture did not model: **PCN street strings are
+uppercase with postcode suffixes and junction qualifiers**
+(`TOTTENHAM COURT ROAD W1 BY JUNCTION WITH CHENIES STREET`, 27,940 rows; five such
+variants are 15.2% of the dataset), which `street_key()` does not strip — so
+**CPZ is the reliable join level** and a street-level run reads as a *matching*
+result, not a data-availability one. **38.7% of rows have no coordinates and 39.4%
+no ward**, a stratum rather than missingness. And the publisher references a
+**third location type, "mobile CCTV"**, where the strata model assumes two plus
+unknown. `Spatial Accuracy` itself could not be retrieved (the fetch proxy failed
+on metadata positions 31+), so it stays documented-but-unverified.
+
+Capacity carries a stronger caveat than "approximate": both `Parking Spaces` and
+`Parking Bay Length Metres` warn of *"Known issues with echelon shaped parking
+bays"*, and bay coordinates are *"along the line of a parking bay — not the
+centre"*.
+
+**Strategic find, not being looked for:** `7hiv-3r9k` position 6 is
+**`Cashless Identifier`** — *"Location ID for cashless payment"*. That is the join
+key to RingGo/MiPermit session data (PTE-TEL-002 class A), and it joins on an
+**identifier rather than a street string**, dissolving the street-matching problem
+for the payment path. It came from Camden's bay inventory, not from any negotiation
+with a provider. It does not change the frozen run; it changes what is worth
+asking for next.
+
+**Not run, and PASS is not reachable in the first run.** No independent proxy has
+been sourced and F1 is inoperative without a code mapping — both cap the verdict
+at PARTIAL. Saying so in advance is the point of pre-registering. Protocol and
+verdict interpretation: [`CAMDEN-REAL-RUN.md`](CAMDEN-REAL-RUN.md).
 
 ## Camera lane
 
