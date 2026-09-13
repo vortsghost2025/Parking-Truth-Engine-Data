@@ -474,10 +474,27 @@ Learned the hard way; each cost a wrong conclusion at least once.
   expected occupied, so Poisson noise dominates. Do not read a single overnight
   sample as a calibration failure.
 - **The local git clone can be rolled back to the branch base by a sandbox
-  restart** while the working tree survives, which makes committed files appear
-  untracked. Check `git ls-remote origin` before assuming work is lost; recover
-  with `git fetch` + `git reset --mixed <sha>`, which does not touch the working
-  tree.
+  restart** while the working tree survives. This happened twice in one session.
+  Always check `git ls-remote origin` before assuming work is lost — the remote
+  normally still has every commit.
+
+  Two distinct cases, with different fixes:
+
+  *Nothing committed yet since the rollback.* Committed files show as untracked
+  (`??`). Recover with `git fetch origin <branch>` then
+  `git reset --mixed <remote-sha>`, which moves HEAD and the index but does not
+  touch the working tree. Status then shows only your genuine new edits.
+
+  *Already committed on the wrong base.* The push is rejected as non-fast-forward,
+  and `git log` shows your commit parented on the branch base. Because the
+  rollback kept the working tree, that commit's diff is taken against the old
+  base and therefore **contains both the missing commits' content and your new
+  work**. Fix with `git fetch origin <branch> && git rebase FETCH_HEAD`. The
+  earlier commits are already upstream, so every conflict resolves in favour of
+  the incoming commit (`git checkout --theirs <file>`). Afterwards
+  `git diff --stat <remote-sha> HEAD` should show **only** the new work — if it
+  shows more, something was duplicated or lost. Verify key files still exist
+  before pushing.
 
 ---
 
