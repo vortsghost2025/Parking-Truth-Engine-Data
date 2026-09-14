@@ -1,0 +1,64 @@
+{
+  "artifactVersion": "1.0.0",
+  "recordId": "PTE-TEL-004-CPZ-C7-KEYS",
+  "purpose": "Repo-visible extraction of the exact 19 CPZ join keys and per-key PCN counts from the preserved valid Camden CPZ-C7 result, after a read-only semantic identity check of the local report.",
+  "sourceReport": {
+    "path": "S:\\Parking-Truth-Engine\\sources\\camden\\downloads\\camden-signal-CPZ-C7-v2.json",
+    "preservedExpectedSha256": "313707FF0F3A943037A43F5E35E626B33885FB6E6C76BAEB34385C4F6D3A21DA",
+    "currentLocalSha256": "CC18A0BB635B9DB2C5FC9395927FA5E2BEF53CD2FC02B60229D1C7AA7AAE2525",
+    "currentCanonicalJsonSha256": "8757BC58D50389752DDC34DCD1990B7CD59EE448747B55C4D52A78B454BC0575",
+    "byteIdenticalToPreserved": false,
+    "semanticIdentityCheck": "PASS",
+    "semanticIdentityNote": "The current local report is not byte-identical to the originally preserved report hash, but all checked frozen semantic invariants matched the preserved valid run. Do not describe the current file as byte-identical."
+  },
+  "extraction": {
+    "jsonPath": "$.index.allSuppliedStrata",
+    "keyCount": 19,
+    "totalPcnCount": 317341,
+    "expectedTotalPcnCount": 317341,
+    "perKeyCountField": "pcnCount",
+    "cpzField": "cpz",
+    "rerunPerformed": false,
+    "inferencePerformed": false
+  },
+  "checkedRunInvariants": {
+    "recordId": "PTE-TEL-003",
+    "harnessVersion": "1.0.0",
+    "joinLevel": "CPZ",
+    "verdict": "PARTIAL",
+    "validationState": "AVAILABLE_NOT_SUPPLIED",
+    "distinctCpzJoinKeys": 19,
+    "distinctDates": 527,
+    "capacityCoverageFraction": 1.0,
+    "ceoGpsShare": 0.899647,
+    "pcnEventsUnplaceable": 0,
+    "pcnHourUnknownShare": 0.0,
+    "classCounts": {
+      "AMBIGUOUS": 89660,
+      "PROHIBITION_TYPE": 128537,
+      "TURNOVER_TYPE": 99144
+    },
+    "prohibitionShareOverall": 0.405044
+  },
+  "cpzKeys": [
+    {"cpzKey": "CA-B", "pcnCount": 26856, "cpzFieldInIndex": "CA-B"},
+    {"cpzKey": "CA-C", "pcnCount": 33819, "cpzFieldInIndex": "CA-C"},
+    {"cpzKey": "CA-D", "pcnCount": 51711, "cpzFieldInIndex": "CA-D"},
+    {"cpzKey": "CA-E", "pcnCount": 30295, "cpzFieldInIndex": "CA-E"},
+    {"cpzKey": "CA-F", "pcnCount": 45515, "cpzFieldInIndex": "CA-F"},
+    {"cpzKey": "CA-G", "pcnCount": 20091, "cpzFieldInIndex": "CA-G"},
+    {"cpzKey": "CA-H", "pcnCount": 25582, "cpzFieldInIndex": "CA-H"},
+    {"cpzKey": "CA-J", "pcnCount": 5499, "cpzFieldInIndex": "CA-J"},
+    {"cpzKey": "CA-K", "pcnCount": 13717, "cpzFieldInIndex": "CA-K"},
+    {"cpzKey": "CA-L", "pcnCount": 5469, "cpzFieldInIndex": "CA-L"},
+    {"cpzKey": "CA-M", "pcnCount": 9734, "cpzFieldInIndex": "CA-M"},
+    {"cpzKey": "CA-N", "pcnCount": 4271, "cpzFieldInIndex": "CA-N"},
+    {"cpzKey": "CA-P", "pcnCount": 12638, "cpzFieldInIndex": "CA-P"},
+    {"cpzKey": "CA-Q", "pcnCount": 14645, "cpzFieldInIndex": "CA-Q"},
+    {"cpzKey": "CA-R", "pcnCount": 7112, "cpzFieldInIndex": "CA-R"},
+    {"cpzKey": "CA-S", "pcnCount": 1976, "cpzFieldInIndex": "CA-S"},
+    {"cpzKey": "CA-U", "pcnCount": 7263, "cpzFieldInIndex": "CA-U"},
+    {"cpzKey": "CA-V", "pcnCount": 433, "cpzFieldInIndex": "CA-V"},
+    {"cpzKey": "CA-X", "pcnCount": 715, "cpzFieldInIndex": "CA-X"}
+  ]
+}
